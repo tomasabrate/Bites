@@ -1,26 +1,24 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';  // Importa Ionicons de @expo/vector-icons
+import { createStackNavigator } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 
-function HomeScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffeae6' }}>
-      <Text>Casa!</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffeae6' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
+import Home from './components/Home';
+import Perfil from './components/Perfil';
+import Productos from './components/productos/Productos';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function HomeStack() {
+  return (
+    <Stack.Navigator >
+      <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
+      <Stack.Screen name="Productos" component={Productos} />
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
@@ -30,10 +28,10 @@ export default function App() {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
-            if (route.name === 'Home') {
+            if (route.name === 'HomeStack') {
               iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Settings') {
-              iconName = focused ? 'settings' : 'settings-outline';
+            } else if (route.name === 'Perfil') {
+              iconName = focused ? 'person' : 'person-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -42,11 +40,11 @@ export default function App() {
           tabBarInactiveTintColor: 'gray',
           tabBarStyle: { backgroundColor: '#ff6347' },
           headerStyle: { backgroundColor: '#ff6347' },
-          headerTitleStyle: { fontWeight: 'bold' },
+          headerTitleStyle: { fontWeight: 'bold', color: 'white' },
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
+        <Tab.Screen name="HomeStack" component={HomeStack} options={{ title: 'Bites' }} />
+        <Tab.Screen name="Perfil" component={Perfil} />
       </Tab.Navigator>
     </NavigationContainer>
   );
