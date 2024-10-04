@@ -7,16 +7,18 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffeae6' }}>
-      <Text>Casa!</Text>
-      <Pressable 
+      <Text>Home!</Text>
+      <Pressable
         style={({ pressed }) => [
           {
+            borderRadius: 5,
+            padding:10,
             backgroundColor: pressed ? '#ff8566' : '#ff6347',
           }
         ]}
         onPress={() => navigation.navigate('Productos')}
       >
-        <Text >Ir a Productos</Text>
+        <Text>Promociones del dia!</Text>
       </Pressable>
     </View>
   );

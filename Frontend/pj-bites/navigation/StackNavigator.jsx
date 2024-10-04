@@ -1,5 +1,6 @@
 import Home from "../screens/Home"
 import Productos from "../screens/Productos";
+import DetalleProducto from "../screens/DetalleProducto"
 import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
@@ -13,6 +14,7 @@ export default function StackNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Productos" component={Productos} />
+      <Stack.Screen name="DetalleProducto" component={DetalleProducto} />
     </Stack.Navigator>
   );
 }
