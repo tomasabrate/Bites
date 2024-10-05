@@ -1,12 +1,21 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import TabNavigator from './navigation/TabNavigator';
-
+import AppNavigator from './navigation/AppNavigator';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      setIsAuthenticated(true); // Simular autenticación
+    };
+
+    checkAuthentication();
+  }, []);
+
   return (
     <NavigationContainer>
-      <TabNavigator/>
+      <AppNavigator isAuthenticated={isAuthenticated} />
     </NavigationContainer>
   );
 }
