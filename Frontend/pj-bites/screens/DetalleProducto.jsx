@@ -21,7 +21,7 @@ export default function DetalleProducto({ navigation, route }) {
           ]}
           onPress={() => navigation.navigate("Productos")}
         >
-          <Text>Volver</Text>
+          <CustomText>Volver</CustomText>
         </Pressable>
         <Pressable
           style={({ pressed }) => [
