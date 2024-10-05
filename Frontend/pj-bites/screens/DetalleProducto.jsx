@@ -1,70 +1,55 @@
-import * as React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, TextInput, Button, StyleSheet } from "react-native";
 
-export default function DetalleProducto({ navigation, route }) {
-  const producto = route.params.producto;
+export default function ProductoForm({ onSubmit }) {
+  const [nombre, setNombre] = useState("");
+  const [tipo, setTipo] = useState("");
+  const [precio, setPrecio] = useState("");
+
+  const handleSubmit = () => {
+    const newProduct = { nombre, tipo, precio: parseFloat(precio) };
+    onSubmit(newProduct);
+    // Limpiar el formulario si es necesario
+    setNombre("");
+    setTipo("");
+    setPrecio("");
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.nombre}>{producto.nombre}</Text>
-      <Text>Tipo: {producto.tipo}</Text>
-      <Text style={styles.precio}>Precio: ${producto.precio}</Text>
-      <Text>Fecha de produccion: {producto.fecha_produccion}</Text>
-      <Text>Fecha de vencimiento: {producto.fecha_vencimiento}</Text>
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={({ pressed }) => [
-            {
-              borderRadius: 5,
-              padding: 10,
-              backgroundColor: pressed ? "#ff8566" : "#ff6347",
-            },
-          ]}
-          onPress={() => navigation.navigate("Productos")}
-        >
-          <CustomText>Volver</CustomText>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [
-            {
-              borderRadius: 5,
-              padding: 10,
-              backgroundColor: pressed ? "#ff8566" : "#ff6347",
-            },
-          ]}
-        >
-          <Text>Añadir al Carrito</Text>
-        </Pressable>
-      </View>
+      <TextInput
+        placeholder="Nombre"
+        value={nombre}
+        onChangeText={setNombre}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Precio"
+        value={precio}
+        onChangeText={setPrecio}
+        keyboardType="numeric"
+        style={styles.input}
+      />
+      <Button title="Agregar Producto" onPress={handleSubmit} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    alignItems: "center",
   },
-  buttonContainer: {
-    marginTop: 20,
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
     marginBottom: 20,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    // imagenContainer
-  },
-  // imagen: {
-  //   width: '100%',
-  //   height: 250,
-  //   resizeMode: 'cover',
-  //   marginBottom: 20,
-  // },
-  nombre: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  precio: {
-    fontSize: 20,
-    marginTop: 10,
+    paddingHorizontal: 10,
   },
 });

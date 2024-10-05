@@ -15,7 +15,7 @@ export default function Producto(props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFA07A", // Salmón claro para la tarjeta
+    backgroundColor: "#FFA07A",
     borderRadius: 10,
     width: "90%",
     marginVertical: 10,
@@ -25,25 +25,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
-    elevation: 5, // Sombra en Android
+    elevation: 5,
   },
-  // imagen: {
-  //   width: '100%',
-  //   height: 150,
-  //   resizeMode: 'cover',
-  // },
   info: {
     padding: 10,
-    backgroundColor: "#FFF5EE", // Fondo más suave para la información
+    backgroundColor: "#FFF5EE",
   },
   nombre: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333333", // Texto oscuro
+    color: "#333333",
   },
   precio: {
     fontSize: 16,
-    color: "#FF6347", // Salmón intenso para destacar el precio
+    color: "#FF6347",
     marginTop: 5,
   },
 });

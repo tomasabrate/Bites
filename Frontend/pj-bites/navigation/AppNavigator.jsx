@@ -5,8 +5,9 @@ import IntroScreen from '../screens/IntroScreen';
 import LoginSelectionScreen from '../screens/LoginSelectionScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ClienteProfile from '../screens/ClienteProfile';
-import ComercioProfile from '../screens/ComercioProfile'; // Asegúrate de que la ruta sea correcta
+import ComercioProfile from '../screens/ComercioProfile';
 import Perfil from '../screens/Perfil';
+import Locales from '../screens/LocalesScreen'; // Asegúrate de importar la nueva pantalla
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,10 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="Perfil" 
         component={Perfil} 
+      />
+      <Stack.Screen 
+        name="Locales" 
+        component={Locales} // Agrega esta línea
       />
     </Stack.Navigator>
   );
