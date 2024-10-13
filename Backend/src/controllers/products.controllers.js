@@ -1,16 +1,34 @@
 import { pool } from "../database/connection.js";
+import multer from "multer";
+import path from "path";
+import { Router } from "express";
 
+const routerProductos = Router();
+
+// Configuración de multer para almacenar la imagen
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directorio donde se almacenarán las imágenes
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Nombre único para la imagen
+  }
+});
+
+const upload = multer({ storage });
+
+// Controlador para obtener todos los productos
 export const getProductos = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT * FROM productos");
-    console.log(result);//muestra en consola
-    res.status(200).json(result);//respuesta en el cliente
+    const [rows] = await pool.query("SELECT * FROM productos");
+    res.json(rows);
   } catch (error) {
-    console.log("ERROR en GET productos.", error);
-    return res.status(500).send("500 - Error en la base de datos.");
+    console.error("ERROR en GET productos.", error);
+    res.status(500).send("500 - Error en la base de datos");
   }
 };
 
+// Controlador para crear un nuevo producto
 export const postProducto = async (req, res) => {
   const {
     id_vendedor,
@@ -20,10 +38,14 @@ export const postProducto = async (req, res) => {
     fecha_vencimiento,
     cantidad,
     tipo,
-  } = req.body;//no hace falta validar el req.body
+  } = req.body;
+
+  // La ruta de la imagen subida
+  const foto = req.file ? req.file.path : null;
+
   try {
     const [rows] = await pool.query(
-      "INSERT INTO productos (id_vendedor,nombre,precio,fecha_produccion,fecha_vencimiento,cantidad,tipo) VALUES(?,?,?,?,?,?,?)",
+      "INSERT INTO productos (id_vendedor, nombre, precio, fecha_produccion, fecha_vencimiento, cantidad, tipo, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         id_vendedor,
         nombre,
@@ -32,6 +54,7 @@ export const postProducto = async (req, res) => {
         fecha_vencimiento,
         cantidad,
         tipo,
+        foto
       ]
     );
 
@@ -44,6 +67,7 @@ export const postProducto = async (req, res) => {
       fecha_vencimiento,
       cantidad,
       tipo,
+      foto
     });
   } catch (error) {
     console.log("ERROR en POST producto.", error);
@@ -51,10 +75,52 @@ export const postProducto = async (req, res) => {
   }
 };
 
-export const putProducto = (req, res) => {
-  res.status(200).send("PUT producto");
+// Controlador para actualizar un producto
+export const putProducto = async (req, res) => {
+  const { id_producto, nombre, precio, fecha_produccion, fecha_vencimiento, cantidad, tipo } = req.body;
+  
+  try {
+    const [result] = await pool.query(
+      "UPDATE productos SET nombre = ?, precio = ?, fecha_produccion = ?, fecha_vencimiento = ?, cantidad = ?, tipo = ? WHERE id_producto = ?",
+      [nombre, precio, fecha_produccion, fecha_vencimiento, cantidad, tipo, id_producto]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    res.send("Producto actualizado exitosamente");
+  } catch (error) {
+    console.error("ERROR en PUT producto.", error);
+    return res.status(500).send("500 - Error en la base de datos");
+  }
 };
 
-export const deleteProducto = (req, res) => {
-  res.status(200).send("DELETE producto");
+// Controlador para eliminar un producto
+export const deleteProducto = async (req, res) => {
+  const { id_producto } = req.body;
+
+  try {
+    const [result] = await pool.query(
+      "DELETE FROM productos WHERE id_producto = ?",
+      [id_producto]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    res.send("Producto eliminado exitosamente");
+  } catch (error) {
+    console.error("ERROR en DELETE producto.", error);
+    return res.status(500).send("500 - Error en la base de datos");
+  }
 };
+
+// ENDPOINTS de Productos
+routerProductos.get("/productos", getProductos);
+routerProductos.post("/productos", upload.single('foto'), postProducto); // Middleware para subir la imagen
+routerProductos.put("/productos", putProducto);
+routerProductos.delete("/productos", deleteProducto);
+
+export default routerProductos;

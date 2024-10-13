@@ -2,7 +2,7 @@
 import { PUERTO } from "./config.js";
 import app from "./app.js";
 import  routerProductos  from "./routes/products.routes.js";
-
+//PUERTO 3306
 
 //Home
 app.get("/", (req, res) => {

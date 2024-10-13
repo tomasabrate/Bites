@@ -1,14 +1,15 @@
-// CargarProducto.js
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-const CargarProducto = ({ onSubmit }) => {
+const CargarProducto = ({ onSubmit, idVendedor }) => {
   const [nombre, setNombre] = useState('');
   const [precio, setPrecio] = useState('');
   const [foto, setFoto] = useState(null);
-  const [fechaElaboracion, setFechaElaboracion] = useState('');
+  const [fechaProduccion, setFechaProduccion] = useState(''); // Cambiado el nombre
   const [fechaVencimiento, setFechaVencimiento] = useState('');
+  const [cantidad, setCantidad] = useState('');
+  const [tipo, setTipo] = useState('');
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,11 +26,14 @@ const CargarProducto = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     const formData = {
+      id_vendedor: idVendedor, // Se toma del contexto del usuario autenticado
       nombre,
       precio,
-      foto,
-      fechaElaboracion,
-      fechaVencimiento,
+      foto, // Esto se enviará al backend, que debe manejarlo
+      fecha_produccion: fechaProduccion,
+      fecha_vencimiento: fechaVencimiento,
+      cantidad,
+      tipo,
     };
     onSubmit(formData);
   };
@@ -52,15 +56,28 @@ const CargarProducto = ({ onSubmit }) => {
       <Button title="Subir Foto del Producto" onPress={pickImage} />
       {foto && <Image source={{ uri: foto }} style={styles.image} />}
       <TextInput
-        placeholder="Fecha de Elaboración (YYYY-MM-DD)"
-        value={fechaElaboracion}
-        onChangeText={setFechaElaboracion}
+        placeholder="Fecha de Producción (YYYY-MM-DD)"
+        value={fechaProduccion}
+        onChangeText={setFechaProduccion}
         style={styles.input}
       />
       <TextInput
         placeholder="Fecha de Vencimiento (YYYY-MM-DD)"
         value={fechaVencimiento}
         onChangeText={setFechaVencimiento}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Cantidad"
+        value={cantidad}
+        onChangeText={setCantidad}
+        keyboardType="numeric"
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Tipo de Producto"
+        value={tipo}
+        onChangeText={setTipo}
         style={styles.input}
       />
       <Button title="Agregar Producto" onPress={handleSubmit} />
