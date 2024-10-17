@@ -1,5 +1,5 @@
-import { Button, StyleSheet, View, Text } from "react-native";
-import {Controller} from "react-hook-form"
+import { Button, StyleSheet, View, Text, Platform } from "react-native";
+import { Controller } from "react-hook-form"
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
 export default function DatePickerController({ control, name, label, errors }) {
@@ -11,26 +11,37 @@ export default function DatePickerController({ control, name, label, errors }) {
         control={control}
         name={name} //identificador del controller
         render={({ field: { onChange, value } }) => (
-          <View>
-            <Text>{label}</Text>
-            <Button
-              title="Seleccionar Fecha"//texto del boton
-              onPress={() => {
-                setShow(true);
-              }}
+          //seccion para web
+          Platform.OS === 'web' ? (
+            <input
+              type="date"
+              value={value ? value.toISOString().split("T")[0] : ""}
+              onChange={(e) => onChange(new Date(e.target.value))}
             />
-            {show && (
-              <DateTimePicker
-                mode={"date"}
-                value={value || new Date()}
-                is24Hour={true}
-                onChange={(event, selectedDate) => {
-                  setShow(false);
-                  onChange(selectedDate || value); // Actualiza la fecha
+          ) : (
+            //seccion para mobile
+            <View>
+              <Text>{label}</Text>
+              <Button
+                title="Seleccionar Fecha"//texto del boton
+                onPress={() => {
+                  setShow(true);
                 }}
               />
-            )}
-          </View>
+              {show && (
+                <DateTimePicker
+                  mode={"date"}
+                  value={value || new Date()}
+                  is24Hour={true}
+                  onChange={(event, selectedDate) => {
+                    setShow(false);
+                    onChange(selectedDate || value); // Actualiza la fecha
+                  }}
+                />
+              )}
+            </View>
+          )
+
         )}
       />
       {errors && errors[name] && (
