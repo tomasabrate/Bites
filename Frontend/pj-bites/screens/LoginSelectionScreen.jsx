@@ -10,7 +10,15 @@ export default function LoginSelectionScreen({ navigation }) {
         <Button
           title="Inicio Developer"
           onPress={() => navigation.navigate("Productos")}
-          color="#01a3ff" // Color rojo para el botón
+          color="#01a3ff" // Color azul para el botón
+        />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Inicio Developer Cliente"
+          onPress={() => navigation.navigate("InterfazCliente")} // Cambiado a InterfazCliente
+          color="#01a3ff" // Color azul para el botón
         />
       </View>
 

@@ -28,6 +28,21 @@ export const getProductos = async (req, res) => {
   }
 };
 
+// Controlador para obtener solo productos activos
+export const getProductosActivos = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT * FROM productos 
+      WHERE cantidad > 0 
+      AND (fecha_vencimiento IS NULL OR fecha_vencimiento > NOW())
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error("ERROR en GET productos activos.", error);
+    res.status(500).send("500 - Error en la base de datos");
+  }
+};
+
 // Controlador para crear un nuevo producto
 export const postProducto = async (req, res) => {
   const {
@@ -118,7 +133,8 @@ export const deleteProducto = async (req, res) => {
 };
 
 // ENDPOINTS de Productos
-routerProductos.get("/productos", getProductos);
+routerProductos.get("/productos", getProductos); // Para obtener todos los productos
+routerProductos.get("/productos/activos", getProductosActivos); // Para obtener solo los productos activos
 routerProductos.post("/productos", upload.single('foto'), postProducto); // Middleware para subir la imagen
 routerProductos.put("/productos", putProducto);
 routerProductos.delete("/productos", deleteProducto);
