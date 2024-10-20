@@ -12,6 +12,7 @@ import Locales from "../screens/LocalesScreen"; // Asegúrate de importar la nue
 import ProductoForm from "../screens/ProductoForm";
 import InterfazCliente from "../screens/InterfazCliente";
 import Mapa from "../screens/MapaScreen"; // Comentado para que no se use
+import DetalleProducto from "../screens/DetalleProducto"; // Importa el componente
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,7 @@ export default function AppNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Productos" component={Productos} />
+      <Stack.Screen name="DetalleProducto" component={DetalleProducto} /> 
       <Stack.Screen name="ProductoForm" component={ProductoForm} />
       <Stack.Screen name="LoginSelection" component={LoginSelectionScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
