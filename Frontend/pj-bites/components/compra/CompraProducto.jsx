@@ -1,9 +1,9 @@
-// DetalleProductoCliente.js
+// CompraProducto.js
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, TextInput } from "react-native";
 
-export default function DetalleProductoCliente({ route, navigation }) {
-  const { producto } = route.params; // Recibe el producto desde la navegación
+export default function CompraProducto({ route, navigation }) {
+  const { producto } = route.params; // Recibe el producto seleccionado
   const [cantidad, setCantidad] = useState(1); // Estado para la cantidad
 
   const handleCompra = async () => {
@@ -35,9 +35,8 @@ export default function DetalleProductoCliente({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>{producto.nombre}</Text>
+      <Text>Producto: {producto.nombre}</Text>
       <Text>Precio: ${producto.precio}</Text>
-      <Text>Tipo: {producto.tipo}</Text>
       <Text>Cantidad:</Text>
       <TextInput
         value={String(cantidad)}
@@ -56,11 +55,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: "center",
     alignItems: "center",
-  },
-  titulo: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
   },
   input: {
     height: 40,

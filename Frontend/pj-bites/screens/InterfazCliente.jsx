@@ -73,19 +73,26 @@ const InterfazCliente = () => {
         onChangeText={setSearchQuery}
       />
 
-      {/* Categorías */}
-      <View style={styles.categoriaContainer}>
-        {categorias.map((categoria) => (
+      {/* Categorías usando FlatList */}
+      <FlatList
+        data={categorias}
+        keyExtractor={(item) => item.nombre}
+        horizontal
+        renderItem={({ item }) => (
           <TouchableOpacity
-            key={categoria.nombre}
-            style={styles.categoriaButton}
-            onPress={() => filtrarProductosPorCategoria(categoria.nombre)}
+            style={[
+              styles.categoriaButton,
+              categoriaSeleccionada === item.nombre && styles.categoriaSelected,
+            ]}
+            onPress={() => filtrarProductosPorCategoria(item.nombre)}
           >
-            <Image source={categoria.imagen} style={styles.categoriaImage} />
-            <Text style={styles.categoriaText}>{categoria.nombre}</Text>
+            <Image source={item.imagen} style={styles.categoriaImage} />
+            <Text style={styles.categoriaText}>{item.nombre}</Text>
           </TouchableOpacity>
-        ))}
-      </View>
+        )}
+        contentContainerStyle={styles.categoriaContainer}
+        showsHorizontalScrollIndicator={false}
+      />
 
       {/* Lista de productos */}
       {cargando ? (
@@ -96,11 +103,10 @@ const InterfazCliente = () => {
         <FlatList
           data={productos.filter(producto => {
             if (categoriaSeleccionada) {
-              return producto.tipo === categoriaSeleccionada; // Filtra por el tipo de producto
+              return producto.tipo === categoriaSeleccionada;
             }
-            return true; // Si no hay categoría seleccionada, muestra todos los productos
+            return true;
           }).filter(producto => {
-            // Filtrado adicional por búsqueda
             return producto.nombre.toLowerCase().includes(searchQuery.toLowerCase());
           })}
           keyExtractor={(item) => item.id_producto.toString()}
@@ -108,12 +114,10 @@ const InterfazCliente = () => {
             <Producto
               id_producto={item.id_producto}
               nombre={item.nombre}
-              tipo={item.tipo} // Asegúrate de que 'tipo' está disponible
+              tipo={item.tipo}
               precio={item.precio}
               onPress={() => {
-                console.log("Producto presionado:", item);
-                // Navega a la pantalla de detalle del producto
-                // navigation.navigate("DetalleProducto", { producto: item }) // Descomenta si tienes el prop navigation
+                navigation.navigate("DetalleProductoCliente", { producto: item });
               }}
             />
           )}
@@ -125,7 +129,7 @@ const InterfazCliente = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Mapa')}>
           <Text style={styles.footerButton}>Mapa</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Mis Pedidos')}>
           <Text style={styles.footerButton}>Mis Pedidos</Text>
         </TouchableOpacity>
       </View>
@@ -139,10 +143,22 @@ const styles = StyleSheet.create({
   menuIcon: { fontSize: 24 },
   title: { fontSize: 20, fontWeight: 'bold' },
   searchInput: { margin: 16, borderWidth: 1, borderRadius: 8, padding: 8 },
-  categoriaContainer: { flexDirection: 'row', justifyContent: 'space-around', padding: 16 },
-  categoriaButton: { alignItems: 'center' },
-  categoriaImage: { width: 60, height: 60, marginBottom: 8 }, // Ajusta el tamaño según sea necesario
-  categoriaText: { fontSize: 16 },
+  categoriaContainer: { paddingHorizontal: 8 }, // Añadido espaciado horizontal
+  categoriaButton: {
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    marginRight: 10, // Espaciado entre las categorías
+  },
+  categoriaSelected: {
+    backgroundColor: '#ffcccb',
+  },
+  categoriaImage: { width: 80, height: 80, marginBottom: 8 }, // Tamaño ajustado
+  categoriaText: {
+    fontSize: 16, // Ajustado para pantallas más pequeñas
+    fontWeight: 'bold',
+  },
   footer: { flexDirection: 'row', justifyContent: 'space-around', padding: 16 },
   footerButton: { fontSize: 16, color: 'blue' },
 });

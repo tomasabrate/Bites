@@ -8,8 +8,8 @@ export default function LoginSelectionScreen({ navigation }) {
 
       <View style={styles.buttonContainer}>
         <Button
-          title="Inicio Developer"
-          onPress={() => navigation.navigate("Productos")}
+          title="Inicio Developer Comercio"
+          onPress={() => navigation.navigate("InterfazComerciante")}
           color="#01a3ff" // Color azul para el botón
         />
       </View>

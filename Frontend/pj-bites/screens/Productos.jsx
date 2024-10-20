@@ -7,11 +7,13 @@ export default function Productos({ navigation }) {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
-  console.log("Navigation prop:", navigation);
-
+  // Función para obtener productos desde la API
   const obtenerProductos = async () => {
     try {
       const response = await fetch("http://localhost:3000/productos");
+      if (!response.ok) {
+        throw new Error("Error en la respuesta de la red");
+      }
       const data = await response.json();
       setProductos(data);
     } catch (error) {
@@ -22,6 +24,7 @@ export default function Productos({ navigation }) {
     }
   };
 
+  // Llamada a la API al montar el componente
   useEffect(() => {
     obtenerProductos();
   }, []);
@@ -30,8 +33,8 @@ export default function Productos({ navigation }) {
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <Button
-          title="Agregar producto"
-          onPress={() => navigation.navigate("ProductoForm")}
+          title="Agregar Nuevo Producto" // Título más claro
+          onPress={() => navigation.navigate("CargarProducto")}
         />
       </View>
       <Text>Promociones del día!</Text>
@@ -49,8 +52,10 @@ export default function Productos({ navigation }) {
               nombre={item.nombre}
               tipo={item.tipo} // Asegúrate de que 'tipo' está disponible
               precio={item.precio}
-              onPress={() => {console.log("Producto presionado:", item);
-                navigation.navigate("DetalleProducto", { producto: item })}}
+              onPress={() => {
+                console.log("Producto presionado:", item);
+                navigation.navigate("DetalleProducto", { producto: item });
+              }}
             />
           )}
         />
