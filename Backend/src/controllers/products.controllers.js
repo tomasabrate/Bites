@@ -2,7 +2,7 @@ import { pool } from "../database/connection.js";
 
 export const getProductos = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT * FROM productos");
+    const [result] = await pool.query("SELECT * FROM Productos");
     console.log(result);//muestra en consola
     res.status(200).json(result);//respuesta en el cliente
   } catch (error) {
@@ -14,36 +14,47 @@ export const getProductos = async (req, res) => {
 export const postProducto = async (req, res) => {
   const {
     id_vendedor,
+    id_categoria,
     nombre,
+    descripcion,
     precio,
+    descuento,
     fecha_produccion,
     fecha_vencimiento,
-    cantidad,
     tipo,
+    cantidad,
+    activo
   } = req.body;//no hace falta validar el req.body
   try {
     const [rows] = await pool.query(
-      "INSERT INTO productos (id_vendedor,nombre,precio,fecha_produccion,fecha_vencimiento,cantidad,tipo) VALUES(?,?,?,?,?,?,?)",
+      "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
       [
         id_vendedor,
+        id_categoria,
         nombre,
+        descripcion,
         precio,
+        descuento,
         fecha_produccion,
         fecha_vencimiento,
-        cantidad,
         tipo,
+        cantidad,
+        activo
       ]
     );
 
     res.status(201).send({
       id_producto: rows.insertId,
-      id_vendedor,
-      nombre,
-      precio,
-      fecha_produccion,
-      fecha_vencimiento,
-      cantidad,
-      tipo,
+      id_categoria,
+        nombre,
+        descripcion,
+        precio,
+        descuento,
+        fecha_produccion,
+        fecha_vencimiento,
+        tipo,
+        cantidad,
+        activo
     });
   } catch (error) {
     console.log("ERROR en POST producto.", error);
