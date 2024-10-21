@@ -62,7 +62,7 @@ export default function ImagePickerController({
             ListHeaderComponent={
               <View>
                 <Text>Imagenes</Text>
-                <Button title={title} onPress={() => pickImages(onChange)} />
+                <Button title={title} onPress={() => pickImages(onChange)} color={'#ff6347'}/>
               </View>
             }
           />
