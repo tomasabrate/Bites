@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Button, Image, FlatList } from 'react-native';
+import { View, Button, Image, FlatList, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 const ImagePickerController = ({ onChange, images }) => {
