@@ -15,8 +15,8 @@ export default function StackNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Productos" component={Productos} />
-      <Stack.Screen name="DetalleProducto" component={DetalleProducto} />
-      <Stack.Screen name="CargarProducto" component={CargarProducto} />
+      <Stack.Screen name="Detalle Producto" component={DetalleProducto} />
+      <Stack.Screen name="Cargar Producto" component={CargarProducto} />
     </Stack.Navigator>
   );
 }

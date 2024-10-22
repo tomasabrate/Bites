@@ -1,13 +1,28 @@
 import * as React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import imagenDefault from "../utilities/imagenDefault.utilities"
+import CalcularDescuento from "../utilities/calcularDescuento.utilities";
+
+
 
 export default function Producto(props) {
+  const imagen = imagenDefault(props)
+
+  const precioFinal = CalcularDescuento(props.precio, props.descuento)
+
   return (
     <Pressable onPress={props.onPress} style={styles.card}>
-      <View style={styles.info}>
-        <Text style={styles.nombre}>{props.nombre}</Text>
-        <Text>{props.tipo}</Text>
-        <Text style={styles.precio}>Precio: ${props.precio}</Text>
+      <View style={styles.content}>
+        <Image
+          source={imagen} // Pasar la variable imagen directamente
+          style={styles.imagen}
+        />
+        <View>
+          <Text style={styles.nombre}>{props.nombre}</Text>
+          <Text>{props.tipo}</Text>
+          <Text style={styles.precio}>Precio: ${props.precio}</Text>
+          <Text style={styles.precio}>Con descuento: ${precioFinal}</Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -15,7 +30,7 @@ export default function Producto(props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFA07A", // Salmón claro para la tarjeta
+    backgroundColor: "#ffc4ad",
     borderRadius: 10,
     width: "90%",
     marginVertical: 10,
@@ -25,25 +40,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
-    elevation: 5, // Sombra en Android
+    elevation: 5,
   },
-  // imagen: {
-  //   width: '100%',
-  //   height: 150,
-  //   resizeMode: 'cover',
+  content: {
+    flexDirection: "row", // Hace que los elementos se coloquen en fila
+    alignItems: "center", // Centra verticalmente la imagen y el texto
+  },
+  imagen: {
+    width: 80, // Ajustar el tamaño de la imagen
+    height: 80,
+    marginRight: 10, // Espacio entre la imagen y el texto
+    resizeMode: "cover",
+  },
+  // info: {
+  //   padding: 5,
+  //   borderRadius:5,
+  //   width:"95%",
+  //   backgroundColor: "#FFF5EE",
+  //   // flex: 1, // Para que el texto ocupe todo el espacio restante
   // },
-  info: {
-    padding: 10,
-    backgroundColor: "#FFF5EE", // Fondo más suave para la información
-  },
   nombre: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333333", // Texto oscuro
+    color: "#333333",
   },
   precio: {
     fontSize: 16,
-    color: "#FF6347", // Salmón intenso para destacar el precio
+    color: "#FF6347",
     marginTop: 5,
   },
 });
