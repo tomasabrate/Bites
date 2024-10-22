@@ -28,7 +28,7 @@ export default function Home() {
             backgroundColor: pressed ? '#ff8566' : '#ff6347',
           }
         ]}
-        onPress={() => navigation.navigate('CargarProducto')}
+        onPress={() => navigation.navigate('Cargar Producto')}
       >
         <Text>Cargar Producto!</Text>
       </Pressable>

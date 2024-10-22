@@ -31,21 +31,24 @@ export default function Productos({navigation}) {
     <View
       style={styles.container}
     >
-      <Text>Promociones del dia!</Text>
+      <Text style={styles.title}>Promociones del dia!</Text>
       {cargando ? (
         <Text>Cargando productos...</Text>
       ) : error ? (
         <Text style={{ color: "red" }}>{error}</Text>
       ) : (
         <FlatList
+          style={styles.flatList}
           data={productos}
           keyExtractor={(item) => item.id_producto.toString()}
           renderItem={({ item }) => (
             <Producto
+              imagenes={item.imagenes}
               id_producto={item.id_producto}
               nombre={item.nombre}
               precio={item.precio}
-              onPress={() => navigation.navigate("DetalleProducto", {producto: item})}
+              descuento={item.descuento}
+              onPress={() => navigation.navigate("Detalle Producto", {producto: item})}
             />
           )}
         />
@@ -63,4 +66,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffeae6',
   },
+  flatList: {
+    width: '100%',
+
+  },
+  title:{
+    fontSize: 24,
+    fontWeight: 'bold',
+  }
 })

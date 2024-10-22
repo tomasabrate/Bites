@@ -10,6 +10,7 @@ import {
   Button,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import BotonGenerico from "../../../components/BotonGenerico";
 
 export default function ImagePickerController({
   name,
@@ -61,8 +62,7 @@ export default function ImagePickerController({
             }}
             ListHeaderComponent={
               <View>
-                <Text>Imagenes</Text>
-                <Button title={title} onPress={() => pickImages(onChange)} color={'#ff6347'}/>
+                <BotonGenerico title={title} onPress={() => pickImages(onChange)}/>
               </View>
             }
           />
@@ -79,7 +79,9 @@ const styles = StyleSheet.create({
   inputError: {
     justifyContent: "space-between",
     color: "red",
-    marginBottom: 5,
+    marginBottom: 20,
+    marginTop: 10,
+    padding: 10,
     fontSize: 12,
     fontWeight: "bold",
   },
