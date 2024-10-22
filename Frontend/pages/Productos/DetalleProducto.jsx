@@ -1,8 +1,21 @@
-import * as React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import * as React from 'react';
+import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { useCart } from '../../context/CartContext'; // Asegúrate de que la ruta es correcta
 
 export default function DetalleProducto({ navigation, route }) {
   const producto = route.params.producto;
+  const { agregarAlCarrito } = useCart(); // Obtener la función de agregar al carrito
+
+  const handleAgregarAlCarrito = () => {
+    agregarAlCarrito(producto);
+    console.log('Agregado')
+    Alert.alert("Producto añadido", `${producto.nombre} ha sido añadido al carrito.`, [
+      { text: "Ir al Carrito", onPress: () => navigation.navigate("Carrito") },
+      { text: "Cancelar", style: "cancel" },
+    ]);
+  };
+  
+
   return (
     <View style={styles.container}>
       <Text style={styles.nombre}>{producto.nombre}</Text>
@@ -23,6 +36,7 @@ export default function DetalleProducto({ navigation, route }) {
         >
           <Text>Volver</Text>
         </Pressable>
+
         <Pressable
           style={({ pressed }) => [
             {
@@ -31,6 +45,7 @@ export default function DetalleProducto({ navigation, route }) {
               backgroundColor: pressed ? "#ff8566" : "#ff6347",
             },
           ]}
+          onPress={handleAgregarAlCarrito} // Cambié aquí
         >
           <Text>Añadir al Carrito</Text>
         </Pressable>
@@ -51,14 +66,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
-    // imagenContainer
   },
-  // imagen: {
-  //   width: '100%',
-  //   height: 250,
-  //   resizeMode: 'cover',
-  //   marginBottom: 20,
-  // },
   nombre: {
     fontSize: 24,
     fontWeight: "bold",
