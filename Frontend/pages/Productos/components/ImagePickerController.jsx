@@ -1,55 +1,40 @@
-import React, { useState } from "react";
-import { Controller } from "react-hook-form";
-import { FlatList, StyleSheet, Text, View, Image, Button, TouchableOpacity } from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import React, { useState } from 'react';
+import { View, Button, Image, FlatList } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
-export default function ImagePickerController({ name, control, title, errors }) {
-  const [images, setImages] = useState([]);
+const ImagePickerController = ({ onChange, images }) => {
+  const [selectedImages, setSelectedImages] = useState(images || []);
 
-  const pickImages = async (onChange) => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true,
-        selectionLimit: 5, // Permitir hasta 5 imágenes
-        quality: 0.5,
-      });
+  const pickImages = async () => {
+    // Permitir que el usuario seleccione múltiples imágenes
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true, // Permitir selección múltiple
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-      if (!result.canceled) {
-        const selectedImages = result.assets.map((asset) => asset.uri);
-        setImages([...images, ...selectedImages]); // Agregar las nuevas imágenes a las existentes
-        onChange([...images, ...selectedImages]);  // Pasar las imágenes seleccionadas al formulario
-      }
-    } catch (error) {
-      console.error("Error al seleccionar imágenes:", error.message);
+    if (!result.canceled) {
+      // Actualiza el estado local y llama a onChange para notificar al componente padre
+      const newImages = result.assets.map(asset => asset.uri);
+      setSelectedImages(newImages);
+      onChange(newImages); // Asegúrate de que onChange esté correctamente definido en el componente padre
     }
-  };
-
-  const removeImage = (uri) => {
-    const filteredImages = images.filter((image) => image !== uri);
-    setImages(filteredImages);
-    control.setValue(name, filteredImages); // Actualizar el valor en el formulario
   };
 
   return (
     <View>
-      <Button title={title} onPress={() => pickImages(control.setValue)} color={'#ff6347'} />
+      <Button title="Seleccionar Imágenes" onPress={pickImages} />
       <FlatList
-        data={images}
+        data={selectedImages}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: item }} style={styles.image} />
-            <TouchableOpacity onPress={() => removeImage(item)} style={styles.removeButton}>
-              <Text style={styles.removeButtonText}>Eliminar</Text>
-            </TouchableOpacity>
-          </View>
+          <Image source={{ uri: item }} style={{ width: 100, height: 100 }} />
         )}
       />
-      {errors[name] && <Text style={styles.inputError}>{errors[name].message}</Text>}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   imageContainer: {
