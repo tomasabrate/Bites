@@ -2,13 +2,13 @@
 import { PUERTO } from './config.js';
 import app from './app.js';
 import routerProductos from './routes/products.routes.js';
-const cloudinary = require('cloudinary').v2;
+import cloudinary from 'cloudinary';
 
-//Manejar cloudinary
+// Configurar Cloudinary
 cloudinary.config({
-  cloud_name: 'tu_cloud_name',
-  api_key: 'tu_api_key',
-  api_secret: 'tu_api_secret',
+  cloud_name: 'dturrtxzx',
+  api_key: '337961572316383',
+  api_secret: 'kp7PKcTyqJIDYY5pCYbPhi9p_Vk',
 });
 
 //Home

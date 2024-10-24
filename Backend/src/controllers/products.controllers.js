@@ -3,10 +3,21 @@ import cloudinary from 'cloudinary';
 
 // Configurar Cloudinary
 cloudinary.config({
-  cloud_name: 'tu_cloud_name',
-  api_key: 'tu_api_key',
-  api_secret: 'tu_api_secret',
+  cloud_name: 'dturrtxzx',
+  api_key: '337961572316383',
+  api_secret: 'kp7PKcTyqJIDYY5pCYbPhi9p_Vk',
 });
+
+export const getProductos = async (req, res) => {
+  try {
+    const [result] = await pool.query('SELECT * FROM Productos');
+    console.log(result); //muestra en consola
+    res.status(200).json(result); //respuesta en el cliente
+  } catch (error) {
+    console.log('ERROR en GET productos.', error);
+    return res.status(500).send('500 - Error en la base de datos.');
+  }
+};
 
 export const postProducto = async (req, res) => {
   const {
@@ -30,14 +41,14 @@ export const postProducto = async (req, res) => {
     // Subir las imágenes a Cloudinary
     for (const image of images) {
       const result = await cloudinary.uploader.upload(image, {
-        folder: 'tu_carpeta', // Carpeta en Cloudinary
+        folder: 'BitesImages', // Carpeta en Cloudinary
       });
       imageUrls.push(result.secure_url); // Guardar la URL
     }
 
     // Guardar el producto en la base de datos
     const [rows] = await pool.query(
-      'INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo,image_url) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
+      'INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo,imagenes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
       [
         id_vendedor,
         id_categoria,
@@ -72,4 +83,12 @@ export const postProducto = async (req, res) => {
     console.log('ERROR en POST producto.', error);
     return res.status(500).send('500 - Error en la base de datos');
   }
+};
+
+export const putProducto = (req, res) => {
+  res.status(200).send('PUT producto');
+};
+
+export const deleteProducto = (req, res) => {
+  res.status(200).send('DELETE producto');
 };

@@ -53,22 +53,57 @@ export default function CargarProducto() {
   };
 
   const onSubmit = async (data) => {
-    const formData = {
-      ...data,
-      tipo: selectedTipo,
-      categorias: selectedCategories,
-      fecha_produccion: formatDate(data.fecha_produccion),
-      fecha_vencimiento: formatDate(data.fecha_vencimiento),
-      imagenes: data.imagenes || [], // Asegúrate de manejar esto correctamente
-    };
+    console.log('Errores de validación:', errors); // Para ver si hay errores
+    console.log('Imágenes seleccionadas:', data.imagenes); // Revisa las imágenes
+    if (Object.keys(errors).length > 0) {
+      console.log('El formulario tiene errores');
+      return;
+    }
+    console.log('onSubmit ejecutado', data);
+    // Subir las imágenes a Cloudinary antes de mandar el resto de los datos
+    const imagenesSeleccionadas = data.imagenes || [];
+    const urlsImagenes = [];
 
     try {
+      // Subir cada imagen a Cloudinary
+      for (const imagen of imagenesSeleccionadas) {
+        const formData = new FormData();
+        formData.append('file', {
+          uri: imagen.uri, // o la propiedad que contenga la URI de la imagen seleccionada
+          type: 'image/jpeg', // Puedes ajustar el tipo según sea necesario
+          name: `producto_${Date.now()}.jpg`,
+        });
+        formData.append('upload_preset', 'ml_default'); // Reemplaza con tu preset
+        formData.append('cloud_name', 'dturrtxzx'); // Reemplaza con tu cloud name
+
+        // Realiza la solicitud a Cloudinary
+        const response = await axios.post(
+          'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+          formData,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+
+        // Almacena la URL de la imagen subida
+        urlsImagenes.push(response.data.secure_url);
+      }
+
+      // Ahora que las imágenes se han subido, podemos añadir las URLs al resto del formData
+      const formDataFinal = {
+        ...data,
+        tipo: selectedTipo,
+        categorias: selectedCategories,
+        fecha_produccion: formatDate(data.fecha_produccion),
+        fecha_vencimiento: formatDate(data.fecha_vencimiento),
+        imagenes: urlsImagenes, // Guardamos las URLs de las imágenes
+      };
+
+      // Enviar el formulario al backend
       const response = await fetch('http://localhost:3000/productos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formDataFinal),
       });
 
       if (response.ok) {
@@ -79,7 +114,7 @@ export default function CargarProducto() {
         Alert.alert('Error', 'Hubo un error al cargar el producto.');
       }
     } catch (error) {
-      console.error('Error al hacer la solicitud:', error);
+      console.error('Error al subir imágenes o hacer la solicitud:', error);
       Alert.alert('Error', 'No se pudo conectar con el servidor.');
     }
   };
