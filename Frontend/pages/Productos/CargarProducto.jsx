@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DatePickerController from './components/DatePickerController';
 import FormInputController from './components/FormInputController';
 import ImagePickerController from './components/ImagePickerController'; // Asegúrate de importar correctamente
-import { View, StyleSheet, FlatList, Text, Alert } from 'react-native';
+import { View, StyleSheet, FlatList, Text, Alert, Button } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -53,6 +53,7 @@ export default function CargarProducto() {
   };
 
   const onSubmit = async (data) => {
+    alert('onSubmit ejecutado');
     console.log('Errores de validación:', errors); // Para ver si hay errores
     console.log('Imágenes seleccionadas:', data.imagenes); // Revisa las imágenes
     if (Object.keys(errors).length > 0) {
@@ -94,7 +95,7 @@ export default function CargarProducto() {
         categorias: selectedCategories,
         fecha_produccion: formatDate(data.fecha_produccion),
         fecha_vencimiento: formatDate(data.fecha_vencimiento),
-        imagenes: urlsImagenes, // Guardamos las URLs de las imágenes
+        imagenes: urlsImagenes.join(';'), // Guardamos las URLs de las imágenes
       };
 
       // Enviar el formulario al backend
@@ -177,7 +178,7 @@ export default function CargarProducto() {
             title="Seleccionar imágenes"
             errors={errors}
           />
-
+          {/* Hacer que el boton generico si se presiona llame al onSubmit, para mostrar una alerta del botonPresionado */}
           <BotonGenerico
             title="Publicar Producto!"
             color={'#ff8566'}
