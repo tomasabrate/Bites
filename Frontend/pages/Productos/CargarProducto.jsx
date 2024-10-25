@@ -120,6 +120,10 @@ export default function CargarProducto() {
     }
   };
 
+  const despedir = () => {
+    console.log('Chau');
+    alert('Chau', 'Hasta luego!');
+  };
   return (
     <FlatList
       data={[{}]} // Agrega un elemento para renderizar el FlatList
@@ -182,8 +186,10 @@ export default function CargarProducto() {
           <BotonGenerico
             title="Publicar Producto!"
             color={'#ff8566'}
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => handleSubmit(onSubmit)()}
           />
+          {/* //Boton para mostrar una alerta que diga chau cuando se presiona */}
+          <Button title="Chau" onPress={() => onSubmit()} />
         </View>
       )}
     />
