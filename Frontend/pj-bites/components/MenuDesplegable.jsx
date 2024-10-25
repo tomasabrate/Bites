@@ -1,12 +1,22 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // O la familia de íconos que prefieras
 
 const MenuDesplegable = () => {
   return (
     <View style={styles.menu}>
-      <TouchableOpacity><Text style={styles.menuItem}>Mi Perfil</Text></TouchableOpacity>
-      <TouchableOpacity><Text style={styles.menuItem}>Configuraciones</Text></TouchableOpacity>
-      <TouchableOpacity><Text style={styles.menuItem}>Cerrar Sesión</Text></TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem}>
+        <Icon name="user" size={20} color="#000" />
+        <Text style={styles.menuText}>Mi Perfil</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem}>
+        <Icon name="cog" size={20} color="#000" />
+        <Text style={styles.menuText}>Configuraciones</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem}>
+        <Icon name="sign-out" size={20} color="#000" />
+        <Text style={styles.menuText}>Cerrar Sesión</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -14,9 +24,9 @@ const MenuDesplegable = () => {
 const styles = StyleSheet.create({
   menu: {
     position: 'absolute',
-    top: 60, // Cambia esta posición si es necesario
+    top: 60,
     left: 0,
-    width: 200,
+    width: 220,
     backgroundColor: 'white',
     padding: 16,
     borderRadius: 8,
@@ -24,10 +34,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    elevation: 5, // Para Android
-    zIndex: 10, // Asegúrate de que el menú esté delante
+    elevation: 5,
+    zIndex: 10,
   },
-  menuItem: { fontSize: 16, paddingVertical: 10 },
+  menuItem: {
+    flexDirection: 'row', // Para alinear el ícono y el texto en fila
+    alignItems: 'center', // Centrar ícono y texto verticalmente
+    paddingVertical: 10,
+  },
+  menuText: {
+    marginLeft: 10, // Espacio entre el ícono y el texto
+    fontSize: 16,
+  },
 });
 
 export default MenuDesplegable;
