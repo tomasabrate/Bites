@@ -24,12 +24,12 @@ export default function IntroScreen({ navigation }) {
     <View style={styles.container}>
       <Animated.View style={[styles.backgroundContainer, { transform: [{ translateY }] }]}>
         <ImageBackground
-          source={require('../assets/fondo/fondo 2.png')}
+          source={require('../assets/fondos/fondo 2.png')}
           style={styles.background}
           resizeMode="cover"
         />
         <ImageBackground
-          source={require('../assets/fondo/fondo 2.png')}
+          source={require('../assets/fondos/fondo 2.png')}
           style={styles.background}
           resizeMode="cover"
         />

@@ -1,50 +1,78 @@
-import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
 
 export default function LoginSelectionScreen({ navigation }) {
+  // Referencias para las animaciones
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.95, // Escalar hacia abajo
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1, // Regresar al tamaño original
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const navigateTo = (screen) => {
+    animateButton();
+    navigation.navigate(screen);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Seleccione una Opción</Text>
+      <Text style={styles.title}>¿Qué deseas hacer hoy?</Text>
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Inicio Developer Comercio"
-          onPress={() => navigation.navigate("InterfazComerciante")}
-          color="#01a3ff" // Color azul para el botón
-        />
-      </View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateTo("InterfazComerciante")}
+        >
+          <Text style={styles.buttonText}>Inicio Developer Comercio</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Inicio Developer Cliente"
-          onPress={() => navigation.navigate("InterfazCliente")} // Cambiado a InterfazCliente
-          color="#01a3ff" // Color azul para el botón
-        />
-      </View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateTo("InterfazCliente")}
+        >
+          <Text style={styles.buttonText}>Inicio Developer Cliente</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Iniciar Sesión"
-          onPress={() => navigation.navigate("Login", { isRegistering: false })}
-          color="#FF6347" // Color rojo para el botón
-        />
-      </View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateTo("Login", { isRegistering: false })}
+        >
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Registrarse como Cliente"
-          onPress={() => navigation.navigate("Login", { isRegistering: true })}
-          color="#FF6347" // Color rojo para el botón
-        />
-      </View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateTo("Login", { isRegistering: true })}
+        >
+          <Text style={styles.buttonText}>Registrarse como Cliente</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Registrar como Comercio"
-          onPress={() => navigation.navigate("ComercioProfile")}
-          color="#FF6347" // Color rojo para el botón
-        />
-      </View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateTo("ComercioProfile")}
+        >
+          <Text style={styles.buttonText}>Registrar como Comercio</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -55,23 +83,33 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#fff", // Fondo blanco
+    backgroundColor: "#f9f9f9", // Fondo gris suave
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#FF6347", // Tono rojo
+    fontSize: 30,
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 40,
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
-  buttonContainer: {
-    marginVertical: 10, // Espacio entre los botones
-    width: "100%", // Ocupa todo el ancho disponible
-    borderRadius: 5,
-    overflow: "hidden", // Para bordes redondeados
-    elevation: 3, // Sombra en Android
-    shadowColor: "#000", // Sombra en iOS
+  button: {
+    backgroundColor: "#FF6347",
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    marginVertical: 10,
+    width: "100%",
+    elevation: 5,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowRadius: 4,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
   },
 });
