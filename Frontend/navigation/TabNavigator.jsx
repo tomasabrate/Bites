@@ -16,7 +16,7 @@ export default function TabNavigator() {
           let iconName;
 
           if (route.name === "StackNavigator") {
-            iconName = focused ? "home" : "home-outline";
+            iconName = focused ? "grid" : "grid-outline";
           } else if (route.name === "Perfil") {
             iconName = focused ? "person" : "person-outline";
           }
@@ -25,7 +25,7 @@ export default function TabNavigator() {
         },
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
-        tabBarStyle: { backgroundColor: "#ff6347" },
+        tabBarStyle: { display: 'none' }, // Ocultar la barra de pestañas
         headerStyle: { backgroundColor: "#ff6347" },
         headerTitleStyle: { fontWeight: "bold", color: "white" },
       })}
@@ -44,7 +44,6 @@ export default function TabNavigator() {
           tabBarIcon: ({ color, size }) => (
             <Icon name="shopping-basket" size={24} color="#ffffff" />
           ),
-          
         }}
       />
     </Tab.Navigator>
