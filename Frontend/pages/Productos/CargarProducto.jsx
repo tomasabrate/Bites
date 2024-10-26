@@ -13,8 +13,7 @@ import {
 import formatDate from "./utilities/formatDate.utilities";
 import BotonGenerico from "../../components/BotonGenerico";
 import schema from "./utilities/schemaCargaProducto.utilities";
-import { Button } from "react-native-web";
-import { Pressable } from "react-native-gesture-handler";
+import { useNavigation } from '@react-navigation/native';
 
 const categorias = [
   { value: "Comida Rápida", key: 1 },
@@ -30,6 +29,7 @@ const tipos = [
 ];
 
 export default function CargarProducto() {
+  const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías
   const [selectedTipo, setSelectedTipo] = useState(""); //
   const mostrar = false;
@@ -171,11 +171,18 @@ export default function CargarProducto() {
           />
           {mostrar && <FormInputController name={"tipo"} />}
           {mostrar && <FormInputController name={"activo"} />}
-          <BotonGenerico
-            title="Publicar Producto!"
-            color={"#ff8566"}
-            onPress={handleSubmit(onSubmit)}
-          />
+          <View style={styles.buttonContainer}>
+            <BotonGenerico
+              title={"Cancelar"}
+              color={"#ff0000"}
+              onPress={() => navigation.goBack()}
+            />
+            <BotonGenerico
+              title="Publicar Producto!"
+              color={"#ff8566"}
+              onPress={handleSubmit(onSubmit)}
+            />
+          </View>
         </View>
       )}
     />
@@ -208,5 +215,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 10,
     minWidth: "100%",
+  },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });

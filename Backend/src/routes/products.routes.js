@@ -9,6 +9,6 @@ routerProductos.post("/productos", postProducto);
 
 routerProductos.put("/productos", putProducto);
 
-routerProductos.delete("/productos", deleteProducto);
+routerProductos.delete('/productos/:id_producto', deleteProducto);
 
 export default routerProductos;

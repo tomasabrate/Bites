@@ -27,6 +27,7 @@ import Home from "../pages/Home";
 import Productos from "../pages/Productos/Productos";
 import DetalleProducto from "../pages/Productos/DetalleProducto";
 import CargarProducto from "../pages/Productos/CargarProducto";
+import ModificarProducto from "../pages/Productos/ModificarProducto";
 
 const Stack = createStackNavigator();
 
@@ -55,6 +56,7 @@ export default function StackNavigator() {
       <Stack.Screen name="MisPedidosCo" component={MisPedidosCo} options={{ headerShown: false }} />
       <Stack.Screen name="FloatingButton" component={FloatingButton} options={{ headerShown: false }} />
       <Stack.Screen name="StatCard" component={StatCard} options={{ headerShown: false }} />
+      <Stack.Screen name="ModificarProducto" component={ModificarProducto} options={{ headerShown: false }} />
       
     </Stack.Navigator>
   );

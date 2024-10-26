@@ -66,6 +66,19 @@ export const putProducto = (req, res) => {
   res.status(200).send("PUT producto");
 };
 
-export const deleteProducto = (req, res) => {
-  res.status(200).send("DELETE producto");
+export const deleteProducto = async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+
+    const [result] = await pool.query("DELETE FROM Productos WHERE id_producto = ?", [id_producto]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    res.status(200).send(`Producto con id ${id_producto} eliminado exitosamente`);
+  } catch (error) {
+    console.log("ERROR en DELETE producto.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
 };

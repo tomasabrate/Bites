@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Modal } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import MenuDesplegable from './MenuDeslizanteC'; 
-import Icon from 'react-native-vector-icons/Ionicons'; // Asegúrate de instalar react-native-vector-icons
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function InterfazComerciante() {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
   const navigation = useNavigation();
 
   const obtenerProductos = async () => {
@@ -18,7 +19,6 @@ export default function InterfazComerciante() {
       setProductos(data);
     } catch (error) {
       console.error("Error al obtener productos:", error);
-      setError("Error al obtener productos. Inténtalo de nuevo más tarde.");
     } finally {
       setCargando(false);
     }
@@ -34,14 +34,24 @@ export default function InterfazComerciante() {
 
   const eliminarProducto = async (id) => {
     try {
-      await fetch(`http://localhost:3000/productos/${id}`, {
+      const response = await fetch(`http://localhost:3000/productos/${id}`, {
         method: 'DELETE',
       });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
       setProductos(prevProductos => prevProductos.filter(producto => producto.id_producto !== id));
     } catch (error) {
       console.error("Error al eliminar producto:", error);
-      setError("Error al eliminar el producto. Inténtalo de nuevo más tarde.");
+      setError("Error al eliminar el producto. El producto ya fue vendido.");
+      setModalVisible(true); // Mostrar el modal en caso de error
     }
+  };
+
+  const cerrarModal = () => {
+    setModalVisible(false);
   };
 
   const setPaginaActual = (pagina) => {
@@ -58,7 +68,7 @@ export default function InterfazComerciante() {
       default:
         break;
     }
-    setMenuVisible(false); // Cierra el menú al seleccionar una opción
+    setMenuVisible(false);
   };
 
   return (
@@ -73,8 +83,6 @@ export default function InterfazComerciante() {
       
       {cargando ? (
         <ActivityIndicator size="large" color="#FF6347" />
-      ) : error ? (
-        <Text style={styles.error}>{error}</Text>
       ) : (
         <FlatList
           data={productos}
@@ -87,7 +95,7 @@ export default function InterfazComerciante() {
               <View style={styles.botonContainer}>
                 <TouchableOpacity
                   style={styles.boton}
-                  onPress={() => navigation.navigate("EditarProducto", { producto: item })}
+                  onPress={() => navigation.navigate("ModificarProducto", { producto: item })}
                 >
                   <Icon name="create-outline" size={16} color="#fff" />
                   <Text style={styles.botonTexto}>Editar</Text>
@@ -110,6 +118,23 @@ export default function InterfazComerciante() {
       >
         <Text style={styles.botonTexto}>Agregar Producto</Text>
       </TouchableOpacity>
+
+      {/* Modal para mostrar el error */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={cerrarModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTexto}>{error}</Text>
+            <TouchableOpacity style={styles.botonCerrar} onPress={cerrarModal}>
+              <Text style={styles.botonTexto}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -161,6 +186,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     marginTop: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTexto: {
+    fontSize: 18,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  botonCerrar: {
+    backgroundColor: "#FF6347",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
   },
   error: {
     color: "red",
