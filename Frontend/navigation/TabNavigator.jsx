@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import Perfil from "../pages/Perfil";
 import StackNavigator from "./StackNavigator";
-import Cart from '../pages/Cart';
+import Cart from '../pages/Cliente/Cart';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Tab = createBottomTabNavigator();

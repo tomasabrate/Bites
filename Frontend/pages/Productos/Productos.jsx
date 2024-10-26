@@ -2,8 +2,10 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import Producto from "./components/Producto";
+import { useNavigation } from '@react-navigation/native';
 
-export default function Productos({navigation}) {
+export default function Productos() {
+  const navigation = useNavigation();
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true); // Nuevo estado para indicar carga
   const [error, setError] = useState(null); // Estado para errores
@@ -48,7 +50,7 @@ export default function Productos({navigation}) {
               nombre={item.nombre}
               precio={item.precio}
               descuento={item.descuento}
-              onPress={() => navigation.navigate("Detalle Producto", {producto: item})}
+              onPress={() => navigation.navigate("DetalleProducto", {producto: item})}
             />
           )}
         />

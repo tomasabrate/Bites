@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, FlatList, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import BotonGenerico from "../../components/BotonGenerico";
 
 const Mapa = () => {
   const navigation = useNavigation();
@@ -30,7 +31,12 @@ const Mapa = () => {
       <Text style={styles.mapPlaceholder}>Acá va el mapa de Google Maps</Text>
 
       {/* Botón para volver atrás */}
-      <Button title="Volver atrás" onPress={() => navigation.goBack()} />
+      <View style={styles.buttonContainer}>
+        <BotonGenerico
+          title={"Volver"}
+          onPress={() => navigation.goBack()}
+        />
+      </View>
     </View>
   );
 };
@@ -62,6 +68,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 20,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
 

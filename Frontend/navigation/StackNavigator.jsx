@@ -14,7 +14,7 @@ import Perfil from "../pages/Perfil";
 import MisPedidos from "../pages/Cliente/Mispedidos";
 import Locales from "../pages/Comercio/LocalPerfilC";
 import Mapa from "../pages/Cliente/Mapa";
-import Cart from '../pages/Cart';
+import Cart from '../pages/Cliente/Cart';
 import Dashboard from "../pages/Comercio/Dashboard";
 import Reportes from "../pages/Comercio/reporte";
 import MisPedidosCo from "../pages/Comercio/MisPedidosCo";
@@ -47,7 +47,7 @@ export default function StackNavigator() {
       <Stack.Screen name="Mapa" component={Mapa} options={{ headerShown: false }} />
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
       <Stack.Screen name="Productos" component={Productos} options={{ headerShown: false }} />
-      <Stack.Screen name="Detalle Producto" component={DetalleProducto} options={{ headerShown: false }} />
+      <Stack.Screen name="DetalleProducto" component={DetalleProducto} options={{ headerShown: false }} />
       <Stack.Screen name="CargarProducto" component={CargarProducto} options={{ headerShown: false }} />
       <Stack.Screen name="Carrito" component={Cart} options={{ headerShown: false }} />
       <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />

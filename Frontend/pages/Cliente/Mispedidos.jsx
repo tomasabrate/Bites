@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Button } from "react-native";
 import Reseña from '../../pages/Cliente/reseña_denuncia/reseña'; 
 import Denuncia from '../../pages/Cliente/reseña_denuncia/denuncia'; 
+import BotonGenerico from "../../components/BotonGenerico";
+import { useNavigation } from '@react-navigation/native';
 
 const pedidosEnCurso = [
   { id: '1', nombre: 'Producto A', estado: 'En proceso' },
@@ -14,6 +16,7 @@ const pedidosRealizados = [
 ];
 
 const MisPedidos = () => {
+  const navigation = useNavigation();
   const [modalResenaVisible, setModalResenaVisible] = useState(false);
   const [modalDenunciaVisible, setModalDenunciaVisible] = useState(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null); // Estado para el pedido seleccionado
@@ -97,6 +100,12 @@ const MisPedidos = () => {
       >
         <Denuncia onSubmit={handleDenunciaSubmit} onCancel={() => setModalDenunciaVisible(false)} />
       </Modal>
+      <View style={styles.buttonContainer}>
+      <BotonGenerico
+        title={"Volver"}
+        onPress={() => navigation.goBack()}
+      />
+      </View>
     </View>
   );
 };
@@ -149,6 +158,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333', // Color del texto
+  },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
 

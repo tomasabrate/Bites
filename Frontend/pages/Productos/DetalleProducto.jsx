@@ -53,7 +53,7 @@ export default function DetalleProducto({ navigation, route }) {
       <View style={styles.buttonContainer}>
         <BotonGenerico
           title={"Vovler"}
-          onPress={() => navigation.navigate("Productos")}
+          onPress={() => navigation.goBack()}
         />
 
         <BotonGenerico

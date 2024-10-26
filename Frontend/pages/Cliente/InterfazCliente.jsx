@@ -4,8 +4,10 @@ import Carrusel from '../../pages/Cliente/Carrusel'; // Carrusel de imágenes
 import MenuDesplegable from '../../pages/Cliente/MenuDesplegable'; // Menú lateral desplegable
 import Producto from '../Productos/Productos'; // Componente para mostrar los productos
 import Icon from 'react-native-vector-icons/FontAwesome'; // Para añadir iconos
+import { useNavigation } from '@react-navigation/native';
 
-const InterfazCliente = ({ navigation }) => {
+const InterfazCliente = () => {
+  const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [productos, setProductos] = useState([]);
@@ -21,6 +23,8 @@ const InterfazCliente = ({ navigation }) => {
     { nombre: 'Comida Rápida', imagen: require('../../assets/categorias/comida_rapida.jpg') },
   ]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
+
+  console.log(navigation)
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -146,7 +150,7 @@ const InterfazCliente = ({ navigation }) => {
               tipo={item.tipo}
               precio={item.precio}
               onPress={() => {
-                navigation.navigate("DetalleProductoCliente", { producto: item });
+                navigation.navigate("DetalleProducto", { producto: item });
               }}
             />
           )}
@@ -162,6 +166,10 @@ const InterfazCliente = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('MisPedidos')}>
           <Icon name="list" size={20} color="red" />
           <Text style={styles.footerButton}>Mis Pedidos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Carrito')}>
+          <Icon name="shopping-basket" size={20} color="red" />
+          <Text style={styles.footerButton}>Carrito</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,10 +1,13 @@
 // pages/Cart.jsx
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
-import { useCart } from '../context/CartContext'; // Asegúrate de que la ruta es correcta
+import { useCart } from '../../context/CartContext'; // Asegúrate de que la ruta es correcta
 import Icon from 'react-native-vector-icons/FontAwesome'; // Asegúrate de tener este import
+import BotonGenerico from "../../components/BotonGenerico";
+import { useNavigation } from '@react-navigation/native';
 
 const Cart = () => {
+  const navigation = useNavigation();
   const { carrito, eliminarDelCarrito } = useCart(); // Obtener el carrito y la función para eliminar productos
 
   return (
@@ -27,6 +30,13 @@ const Cart = () => {
           )}
         />
       )}
+      <View style={styles.buttonContainer}>
+        <BotonGenerico
+          title={"Volver"}
+          onPress={() => navigation.goBack()}
+        />
+      </View>
+
     </View>
   );
 };
@@ -51,6 +61,13 @@ const styles = StyleSheet.create({
   },
   productoNombre: {
     fontSize: 18,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
 
