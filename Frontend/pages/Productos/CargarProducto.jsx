@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import DatePickerController from "./components/DatePickerController";
 import FormInputController from "./components/FormInputController";
 import ImagePickerController from "./components/ImagePickerController";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, Modal, TouchableOpacity, Text } from "react-native";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Alert } from "react-native";
 import {
   MultipleSelectList,
   SelectList,
@@ -32,6 +31,8 @@ export default function CargarProducto() {
   const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías
   const [selectedTipo, setSelectedTipo] = useState(""); //
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
   const mostrar = false;
 
   const {
@@ -49,14 +50,6 @@ export default function CargarProducto() {
     setValue("activo", 1);
   }, [setValue]);
 
-  const showAlert = () => {
-    Alert.alert("Alerta de publicacion.", "Producto publicado con exito!", [
-      {
-        text: "OK",
-        onPress: () => console.log("OK Pressed"),
-      },
-    ]);
-  };
 
   const onSubmit = async (data) => {
     const formData = {
@@ -79,113 +72,138 @@ export default function CargarProducto() {
       });
 
       if (response.ok) {
-        showAlert();
+        console.log("Producto cargado");
+        setModalMessage("Producto cargado!"); //error -> mensaje
+        setModalVisible(true); // Mostrar el modal en caso de error
       } else {
-        const errorData = await response.json();
-        console.error("Error en la respuesta:", errorData);
-        Alert.alert("Error", "Hubo un error al cargar el producto.");
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      console.error("Error al hacer la solicitud:", error);
-      Alert.alert("Error", "No se pudo conectar con el servidor.");
+      console.error("Error al eliminar producto:", error);
+      setModalMessage("Error al eliminar el producto. El producto ya fue vendido.");
+      setModalVisible(true); // Mostrar el modal en caso de error
     }
   };
 
+  const cerrarModal = () => {
+    setModalVisible(false);
+  };
+
   return (
-    <FlatList
-      data={[{}]} // Agrega un elemento para renderizar el FlatList
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={() => (
-        <View style={styles.container}>
-          {mostrar && (
+    <View>
+      <FlatList
+        data={[{}]} // Agrega un elemento para renderizar el FlatList
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={() => (
+          <View style={styles.container}>
+            {mostrar && (
+              <FormInputController
+                control={control}
+                name={"id_vendedor"}
+                errors={errors}
+              />
+            )}
             <FormInputController
               control={control}
-              name={"id_vendedor"}
+              name={"nombre"}
+              placeholder={"Nombre del producto..."}
               errors={errors}
             />
-          )}
-          <FormInputController
-            control={control}
-            name={"nombre"}
-            placeholder={"Nombre del producto..."}
-            errors={errors}
-          />
-          <FormInputController
-            control={control}
-            name={"descripcion"}
-            placeholder={"Descripcion del producto..."}
-            errors={errors}
-          />
-          <FormInputController
-            control={control}
-            name={"precio"}
-            placeholder={"Precio del producto..."}
-            keyboardType="numeric"
-            errors={errors}
-          />
-          <FormInputController
-            control={control}
-            name={"descuento"}
-            placeholder={"Descuento..."}
-            keyboardType="numeric"
-            errors={errors}
-          />
-          <FormInputController
-            control={control}
-            name={"cantidad"}
-            placeholder={"Stock..."}
-            keyboardType="numeric"
-            errors={errors}
-          />
-          <MultipleSelectList
-            setSelected={setSelectedCategories}
-            label="Categorias..."
-            data={categorias}
-            styles={styles.picker}
-            save="key"
-          />
-          <SelectList
-            setSelected={setSelectedTipo}
-            label="Tipo..."
-            data={tipos}
-            styles={styles.picker}
-            save="key"
-          />
-          <DatePickerController
-            control={control}
-            name={"fecha_produccion"}
-            title={"Fecha Produccion"}
-            errors={errors}
-          />
-          <DatePickerController
-            control={control}
-            name={"fecha_vencimiento"}
-            title={"Fecha Vencimiento"}
-            errors={errors}
-          />
-          <ImagePickerController
-            control={control}
-            name={"imagenes"}
-            title="Seleccionar imagenes"
-            errors={errors}
-          />
-          {mostrar && <FormInputController name={"tipo"} />}
-          {mostrar && <FormInputController name={"activo"} />}
-          <View style={styles.buttonContainer}>
-            <BotonGenerico
-              title={"Cancelar"}
-              color={"#ff0000"}
-              onPress={() => navigation.goBack()}
+            <FormInputController
+              control={control}
+              name={"descripcion"}
+              placeholder={"Descripcion del producto..."}
+              errors={errors}
             />
-            <BotonGenerico
-              title="Publicar Producto!"
-              color={"#ff8566"}
-              onPress={handleSubmit(onSubmit)}
+            <FormInputController
+              control={control}
+              name={"precio"}
+              placeholder={"Precio del producto..."}
+              keyboardType="numeric"
+              errors={errors}
             />
+            <FormInputController
+              control={control}
+              name={"descuento"}
+              placeholder={"Descuento..."}
+              keyboardType="numeric"
+              errors={errors}
+            />
+            <FormInputController
+              control={control}
+              name={"cantidad"}
+              placeholder={"Stock..."}
+              keyboardType="numeric"
+              errors={errors}
+            />
+            <MultipleSelectList
+              setSelected={setSelectedCategories}
+              label="Categorias..."
+              data={categorias}
+              styles={styles.picker}
+              save="key"
+            />
+            <SelectList
+              setSelected={setSelectedTipo}
+              label="Tipo..."
+              data={tipos}
+              styles={styles.picker}
+              save="key"
+            />
+            <DatePickerController
+              control={control}
+              name={"fecha_produccion"}
+              title={"Fecha Produccion"}
+              errors={errors}
+            />
+            <DatePickerController
+              control={control}
+              name={"fecha_vencimiento"}
+              title={"Fecha Vencimiento"}
+              errors={errors}
+            />
+            <ImagePickerController
+              control={control}
+              name={"imagenes"}
+              title="Seleccionar imagenes"
+              errors={errors}
+            />
+            {mostrar && <FormInputController name={"tipo"} />}
+            {mostrar && <FormInputController name={"activo"} />}
+            <View style={styles.buttonContainer}>
+              <BotonGenerico
+                title={"Cancelar"}
+                color={"#ff0000"}
+                onPress={() => navigation.goBack()}
+              />
+              <BotonGenerico
+                title="Publicar Producto!"
+                color={"#ff8566"}
+                onPress={handleSubmit(onSubmit)}
+              />
+            </View>
+          </View>
+        )}
+      />
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={cerrarModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTexto}>{modalMessage}</Text>
+            <TouchableOpacity style={styles.botonCerrar} onPress={() => {
+              cerrarModal();
+              navigation.goBack(); 
+            }}>
+              <Text style={styles.botonTexto}>Cerrar</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      )}
-    />
+      </Modal>
+    </View>
   );
 }
 
@@ -222,5 +240,35 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTexto: {
+    fontSize: 18,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  botonTexto: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 5,
+  },
+  botonCerrar: {
+    backgroundColor: "#FF6347",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
   },
 });
