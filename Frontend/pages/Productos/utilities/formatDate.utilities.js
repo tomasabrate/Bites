@@ -8,7 +8,7 @@ const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Sumar 1 porque los meses son 0-indexados
   const year = date.getFullYear();
-  return `${day}-${month}-${year}`; // Formato YYYY-MM-DD
+  return `${year}-${month}-${day}`; // Formato YYYY-MM-DD
 };
 
 export default formatDate;

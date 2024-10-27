@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  Animated,
 } from "react-native";
 import Producto from "./components/Producto";
 import { useNavigation } from "@react-navigation/native";
@@ -52,22 +51,6 @@ export default function Productos() {
       imagen: require("../../assets/categorias/postres.jpg"),
     },
   ];
-
-  //Funciones para el manejo de la navegacion de la lista de productos
-  // const scrollY = useRef(new Animated.Value(0)).current;
-  // const headerHeight = 300;
-
-  // const headerTranslateY = scrollY.interpolate({
-  //   inputRange: [0, headerHeight],
-  //   outputRange: [0, -headerHeight],
-  //   extrapolate: "clamp",
-  // });
-
-  // const headerOpacity = scrollY.interpolate({
-  //   inputRange: [0, headerHeight / 2, headerHeight],
-  //   outputRange: [1, 0.5, 0],
-  //   extrapolate: "clamp",
-  // });
 
   const obtenerProductos = async () => {
     try {
@@ -289,7 +272,6 @@ const styles = StyleSheet.create({
   },
   flatList: {
     width: "100%",
-    paddingHorizontal: 16,
   },
   loader: {
     marginTop: 20,

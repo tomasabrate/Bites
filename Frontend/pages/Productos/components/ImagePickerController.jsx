@@ -6,8 +6,7 @@ import {
   Text,
   View,
   Image,
-  useWindowDimensions,
-  Button,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import BotonGenerico from "../../../components/BotonGenerico";
@@ -20,7 +19,6 @@ export default function ImagePickerController({
   errors,
 }) {
   const [images, setImages] = useState([]);
-  const { width } = useWindowDimensions(); //para tener el width de el dispositivo que esta usando la app
 
   const pickImages = async (onChange) => {
     try {
@@ -28,7 +26,7 @@ export default function ImagePickerController({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
         // allowsEditing: true,
-        selectionLimit: 2,
+        selectionLimit: 1,
         aspect: [4, 3],
         quality: 0.5,
       });
@@ -45,44 +43,61 @@ export default function ImagePickerController({
   };
 
   return (
-    <>
+    <View style={styles.container}>
       <Controller
         control={control}
         name={name}
         defaultValue={[]}
-        render={( {field: { onChange, value }}) => (
-          <FlatList
-            data={images}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => {
-              <Image
-                source={{ uri: item }}
-                style={{ width: width, height: 250, marginVertical: 5 }}
-              />;
-            }}
-            ListHeaderComponent={
-              <View>
-                <BotonGenerico title={title} onPress={() => pickImages(onChange)}/>
-              </View>
-            }
-          />
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.buttonContainer}>
+            <BotonGenerico title={title} onPress={() => pickImages(onChange)} />
+          </View>
         )}
       />
       {errors && errors[name] && (
         <Text style={styles.inputError}>{errors[name].message}</Text>
       )}
-    </>
+      {images.length > 0 && (
+        <FlatList
+          data={images}
+          keyExtractor={(item) => item}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.imageListContainer}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={styles.image} />
+          )}
+        />
+      )}
+    </View>
   );
 }
 
+const  width  = Dimensions.get("screen").width;
 const styles = StyleSheet.create({
+  container: {
+    marginVertical: 10,
+  },
+  buttonContainer: {
+    marginBottom: 15,
+    height:70
+  },
   inputError: {
-    justifyContent: "space-between",
     color: "red",
-    marginBottom: 20,
-    marginTop: 10,
-    padding: 10,
     fontSize: 12,
     fontWeight: "bold",
+    marginTop: 5,
+  },
+  imageListContainer: {
+    paddingVertical: 10,
+    height: width * 0.6
+  },
+  image: {
+    width: width * 0.5,
+    height: width * 0.5,
+    borderRadius: 8,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
 });

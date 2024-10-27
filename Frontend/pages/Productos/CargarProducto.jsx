@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import DatePickerController from "./components/DatePickerController";
 import FormInputController from "./components/FormInputController";
 import ImagePickerController from "./components/ImagePickerController";
-import { View, StyleSheet, FlatList, Modal, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+  Text,
+} from "react-native";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -12,7 +20,7 @@ import {
 import formatDate from "./utilities/formatDate.utilities";
 import BotonGenerico from "../../components/BotonGenerico";
 import schema from "./utilities/schemaCargaProducto.utilities";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
 const categorias = [
   { value: "Comida Rápida", key: 1 },
@@ -23,8 +31,8 @@ const categorias = [
 ];
 
 const tipos = [
-  { value: "Unidad", key: "1" },
-  { value: "Bolson", key: "2" },
+  { value: "Unidad", key: 1 },
+  { value: "Bolson", key: 2 },
 ];
 
 export default function CargarProducto() {
@@ -50,12 +58,11 @@ export default function CargarProducto() {
     setValue("activo", 1);
   }, [setValue]);
 
-
   const onSubmit = async (data) => {
     const formData = {
       ...data,
       tipo: selectedTipo,
-      categorias: selectedCategories, // Añade las categorías seleccionadas
+      id_categoria: selectedCategories, // Añade las categorías seleccionadas
       fecha_produccion: formatDate(data.fecha_produccion), // Formatear fecha de producción
       fecha_vencimiento: formatDate(data.fecha_vencimiento), // Formatear fecha de vencimiento
     };
@@ -80,7 +87,9 @@ export default function CargarProducto() {
       }
     } catch (error) {
       console.error("Error al eliminar producto:", error);
-      setModalMessage("Error al eliminar el producto. El producto ya fue vendido.");
+      setModalMessage(
+        "Error al eliminar el producto. El producto ya fue vendido."
+      );
       setModalVisible(true); // Mostrar el modal en caso de error
     }
   };
@@ -90,101 +99,98 @@ export default function CargarProducto() {
   };
 
   return (
-    <View>
-      <FlatList
-        data={[{}]} // Agrega un elemento para renderizar el FlatList
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={() => (
-          <View style={styles.container}>
-            {mostrar && (
-              <FormInputController
-                control={control}
-                name={"id_vendedor"}
-                errors={errors}
-              />
-            )}
-            <FormInputController
-              control={control}
-              name={"nombre"}
-              placeholder={"Nombre del producto..."}
-              errors={errors}
-            />
-            <FormInputController
-              control={control}
-              name={"descripcion"}
-              placeholder={"Descripcion del producto..."}
-              errors={errors}
-            />
-            <FormInputController
-              control={control}
-              name={"precio"}
-              placeholder={"Precio del producto..."}
-              keyboardType="numeric"
-              errors={errors}
-            />
-            <FormInputController
-              control={control}
-              name={"descuento"}
-              placeholder={"Descuento..."}
-              keyboardType="numeric"
-              errors={errors}
-            />
-            <FormInputController
-              control={control}
-              name={"cantidad"}
-              placeholder={"Stock..."}
-              keyboardType="numeric"
-              errors={errors}
-            />
-            <MultipleSelectList
-              setSelected={setSelectedCategories}
-              label="Categorias..."
-              data={categorias}
-              styles={styles.picker}
-              save="key"
-            />
-            <SelectList
-              setSelected={setSelectedTipo}
-              label="Tipo..."
-              data={tipos}
-              styles={styles.picker}
-              save="key"
-            />
-            <DatePickerController
-              control={control}
-              name={"fecha_produccion"}
-              title={"Fecha Produccion"}
-              errors={errors}
-            />
-            <DatePickerController
-              control={control}
-              name={"fecha_vencimiento"}
-              title={"Fecha Vencimiento"}
-              errors={errors}
-            />
-            <ImagePickerController
-              control={control}
-              name={"imagenes"}
-              title="Seleccionar imagenes"
-              errors={errors}
-            />
-            {mostrar && <FormInputController name={"tipo"} />}
-            {mostrar && <FormInputController name={"activo"} />}
-            <View style={styles.buttonContainer}>
-              <BotonGenerico
-                title={"Cancelar"}
-                color={"#ff0000"}
-                onPress={() => navigation.goBack()}
-              />
-              <BotonGenerico
-                title="Publicar Producto!"
-                color={"#ff8566"}
-                onPress={handleSubmit(onSubmit)}
-              />
-            </View>
-          </View>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.container}>
+        {mostrar && (
+          <FormInputController
+            control={control}
+            name={"id_vendedor"}
+            errors={errors}
+          />
         )}
-      />
+        <FormInputController
+          control={control}
+          name={"nombre"}
+          placeholder={"Nombre del producto..."}
+          errors={errors}
+        />
+        <FormInputController
+          control={control}
+          name={"descripcion"}
+          placeholder={"Descripcion del producto..."}
+          errors={errors}
+        />
+        <FormInputController
+          control={control}
+          name={"precio"}
+          placeholder={"Precio del producto..."}
+          keyboardType="numeric"
+          errors={errors}
+        />
+        <FormInputController
+          control={control}
+          name={"descuento"}
+          placeholder={"Descuento..."}
+          keyboardType="numeric"
+          errors={errors}
+        />
+        <FormInputController
+          control={control}
+          name={"cantidad"}
+          placeholder={"Stock..."}
+          keyboardType="numeric"
+          errors={errors}
+        />
+        <SelectList
+          setSelected={setSelectedCategories}
+          label="Categoria..."
+          data={categorias}
+          styles={styles.picker}
+          save="key"
+        />
+        <SelectList
+          setSelected={setSelectedTipo}
+          label="Tipo..."
+          data={tipos}
+          styles={styles.picker}
+          save="key"
+        />
+        <DatePickerController
+          control={control}
+          name={"fecha_produccion"}
+          title={"Fecha Produccion"}
+          errors={errors}
+        />
+        <DatePickerController
+          control={control}
+          name={"fecha_vencimiento"}
+          title={"Fecha Vencimiento"}
+          errors={errors}
+        />
+        <ImagePickerController
+          control={control}
+          name={"imagenes"}
+          title="Seleccionar imagenes"
+          errors={errors}
+        />
+        {mostrar && <FormInputController name={"tipo"} />}
+        {mostrar && <FormInputController name={"activo"} />}
+        <View style={styles.buttonContainer}>
+          <BotonGenerico
+            title={"Cancelar"}
+            colorInicial={"#ff0000"}
+            onPress={() => navigation.goBack()}
+          />
+          <BotonGenerico
+            title="Publicar Producto!"
+            colorInicial={"#ff8566"}
+            onPress={handleSubmit(onSubmit)}
+          />
+        </View>
+      </View>
       <Modal
         transparent={true}
         animationType="slide"
@@ -194,16 +200,19 @@ export default function CargarProducto() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTexto}>{modalMessage}</Text>
-            <TouchableOpacity style={styles.botonCerrar} onPress={() => {
-              cerrarModal();
-              navigation.goBack(); 
-            }}>
+            <TouchableOpacity
+              style={styles.botonCerrar}
+              onPress={() => {
+                cerrarModal();
+                navigation.goBack();
+              }}
+            >
               <Text style={styles.botonTexto}>Cerrar</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -245,7 +254,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semi-transparente
   },
   modalContent: {
     width: 300,

@@ -11,24 +11,33 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import { useCart } from "../../context/CartContext";
+import CalcularDescuento from "../Productos/utilities/calcularDescuento.utilities";
 
 export default function ResumenCompra({ navigation }) {
   const { carrito } = useCart();
   const [metodoPago, setMetodoPago] = useState("efectivo");
   const [metodoEnvio, setMetodoEnvio] = useState("pickup");
 
-  const { subtotal, total, cantidadProductos } = useMemo(() => {
+  const { subtotal, descuento, total, cantidadProductos } = useMemo(() => {
     const costoEnvio = metodoEnvio === "delivery" ? 200 : 0;
     const subtotal = carrito.reduce(
       (acc, producto) => acc + producto.precio * producto.cantidad,
       0
     );
-    const total = subtotal + costoEnvio;
+    const subTotalConDescuento = carrito.reduce(
+      (acc, producto) =>
+        acc +
+        CalcularDescuento(producto.precio, producto.descuento) *
+          producto.cantidad,
+      0
+    );
+    const descuento = subtotal - subTotalConDescuento;
+    const total = subTotalConDescuento + costoEnvio;
     const cantidadProductos = carrito.reduce(
       (acc, producto) => acc + producto.cantidad,
       0
     );
-    return { subtotal, total, cantidadProductos };
+    return { subtotal, total, cantidadProductos, descuento };
   }, [carrito, metodoEnvio]);
 
   const RadioButton = ({ value, label, selected, onSelect }) => (
@@ -61,9 +70,7 @@ export default function ResumenCompra({ navigation }) {
               <View key={producto.id} style={styles.productRow}>
                 <Text style={styles.productName}>{producto.nombre}</Text>
                 <Text style={styles.productQuantity}>x{producto.cantidad}</Text>
-                <Text style={styles.productPrice}>
-                  ${producto.precio}
-                </Text>
+                <Text style={styles.productPrice}>${producto.precio}</Text>
               </View>
             ))}
             <View style={styles.row}>
@@ -73,6 +80,10 @@ export default function ResumenCompra({ navigation }) {
             <View style={styles.row}>
               <Text>Subtotal:</Text>
               <Text style={styles.bold}>${subtotal}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text>Descuento:</Text>
+              <Text style={styles.bold}>-${descuento.toFixed(2)}</Text>
             </View>
             {metodoEnvio === "delivery" && (
               <View style={styles.row}>

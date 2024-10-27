@@ -3,8 +3,8 @@ import { pool } from "../database/connection.js";
 export const getProductos = async (req, res) => {
   try {
     const [result] = await pool.query("SELECT * FROM Productos");
-    console.log(result);//muestra en consola
-    res.status(200).json(result);//respuesta en el cliente
+    console.log("Lista de Productos:",result); //muestra en consola
+    res.status(200).json(result); //respuesta en el cliente
   } catch (error) {
     console.log("ERROR en GET productos.", error);
     return res.status(500).send("500 - Error en la base de datos.");
@@ -23,8 +23,9 @@ export const postProducto = async (req, res) => {
     fecha_vencimiento,
     tipo,
     cantidad,
-    activo
-  } = req.body;//no hace falta validar el req.body
+    activo,
+  } = req.body; //no hace falta validar el req.body
+  console.log(req.body);
   try {
     const [rows] = await pool.query(
       "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
@@ -39,23 +40,24 @@ export const postProducto = async (req, res) => {
         fecha_vencimiento,
         tipo,
         cantidad,
-        activo
+        activo,
       ]
     );
 
     res.status(201).send({
       id_producto: rows.insertId,
       id_categoria,
-        nombre,
-        descripcion,
-        precio,
-        descuento,
-        fecha_produccion,
-        fecha_vencimiento,
-        tipo,
-        cantidad,
-        activo
+      nombre,
+      descripcion,
+      precio,
+      descuento,
+      fecha_produccion,
+      fecha_vencimiento,
+      tipo,
+      cantidad,
+      activo,
     });
+    console.log("Producto añadido con exito!", req.body);
   } catch (error) {
     console.log("ERROR en POST producto.", error);
     return res.status(500).send("500 - Error en la base de datos");
@@ -70,13 +72,18 @@ export const deleteProducto = async (req, res) => {
   try {
     const { id_producto } = req.params;
 
-    const [result] = await pool.query("DELETE FROM Productos WHERE id_producto = ?", [id_producto]);
+    const [result] = await pool.query(
+      "DELETE FROM Productos WHERE id_producto = ?",
+      [id_producto]
+    );
 
     if (result.affectedRows === 0) {
       return res.status(404).send("Producto no encontrado");
     }
 
-    res.status(200).send(`Producto con id ${id_producto} eliminado exitosamente`);
+    res
+      .status(200)
+      .send(`Producto con id ${id_producto} eliminado exitosamente`);
   } catch (error) {
     console.log("ERROR en DELETE producto.", error);
     return res.status(500).send("500 - Error en la base de datos.");

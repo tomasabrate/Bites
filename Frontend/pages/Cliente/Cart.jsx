@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   Pressable,
-  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+  Platform,
 } from "react-native";
 import { useCart } from "../../context/CartContext";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -74,15 +77,19 @@ const Cart = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Carrito de Compras</Text>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-left" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Carrito de Comrpas</Text>
+      </View>
       {productosAgrupados.length === 0 ? (
         <View style={styles.emptyCart}>
           <Icon name="shopping-cart" size={50} color="#ccc" />
           <Text style={styles.emptyCartText}>Tu carrito está vacío</Text>
-          <BotonGenerico
-            title="Ir a Comprar"
-            onPress={() => navigation.goBack()}
-          />
         </View>
       ) : (
         <>
@@ -124,12 +131,21 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f5f5f5",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
+  header: {
+    padding: 16,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    flexDirection: "row",
+    alignItems: "center",
   },
+  backButton: {
+    marginRight: 16,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+  },
+
   listContent: {
     flexGrow: 1,
   },

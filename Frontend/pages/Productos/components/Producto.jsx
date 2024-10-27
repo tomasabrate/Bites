@@ -31,9 +31,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFF",
     borderRadius: 12,
-    width: width - 32,
+    width: width * 0.9,  // Cambia a un 90% del ancho de la pantalla para que no ocupe todo el espacio
     marginVertical: 8,
     marginHorizontal: 16,
+    alignSelf: 'center',  // Centra el producto en la pantalla
     overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 0.1,

@@ -27,7 +27,7 @@ const schema = yup.object({
   fecha_vencimiento: yup
     .date()
     .required("La fecha de vencimiento es obligatoria"),
-  imagenes: yup.array().required("Minimo 1 imagen"),
+  // imagenes: yup.array().required("Minimo 1 imagen"),
 });
 
 

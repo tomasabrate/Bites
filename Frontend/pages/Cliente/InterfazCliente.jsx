@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
+  ScrollView,
 } from "react-native";
 import Carrusel from "../../pages/Cliente/Carrusel";
 import MenuDesplegable from "../../pages/Cliente/MenuDesplegable";
@@ -34,10 +34,10 @@ const InterfazCliente = () => {
 
       {menuVisible && <MenuDesplegable />}
 
-      <Carrusel />
-
-
-      <Productos />
+      <ScrollView>
+        <Carrusel />
+        <Productos />
+      </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
