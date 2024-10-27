@@ -7,10 +7,11 @@ import CalcularDescuento from "./utilities/calcularDescuento.utilities";
 import BotonGenerico from "../../components/BotonGenerico";
 export default function DetalleProducto({ navigation, route }) {
   const producto = route.params.producto;
-  const { agregarAlCarrito } = useCart(); // Obtener la función de agregar al carrito
+  const { agregarAlCarrito, carrito } = useCart(); // Obtener la función de agregar al carrito
 
   const handleAgregarAlCarrito = () => {
     agregarAlCarrito(producto);
+    console.log(carrito)
     console.log("Agregado");
     Alert.alert(
       "Producto añadido",
@@ -39,6 +40,7 @@ export default function DetalleProducto({ navigation, route }) {
         Descripción: {producto.descripcion}
       </Text>
       <Text style={styles.tipo}>Tipo: {producto.tipo}</Text>
+      <Text style={styles.tipo}>Cantidad: {producto.cantidad}</Text>
       <Text style={styles.tipo}>Descuento: {producto.descuento}</Text>
       <Text style={styles.tipo}>Precio original: ${producto.precio}</Text>
       <Text style={styles.precio}>

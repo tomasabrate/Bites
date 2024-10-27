@@ -1,27 +1,26 @@
 import * as React from "react";
-import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image, Dimensions } from "react-native";
 import imagenDefault from "../utilities/imagenDefault.utilities"
 import CalcularDescuento from "../utilities/calcularDescuento.utilities";
 
-
+const { width } = Dimensions.get('window');
 
 export default function Producto(props) {
   const imagen = imagenDefault(props)
-
   const precioFinal = CalcularDescuento(props.precio, props.descuento)
 
   return (
     <Pressable onPress={props.onPress} style={styles.card}>
+      <Image
+        source={imagen}
+        style={styles.imagen}
+      />
       <View style={styles.content}>
-        <Image
-          source={imagen} // Pasar la variable imagen directamente
-          style={styles.imagen}
-        />
-        <View>
-          <Text style={styles.nombre}>{props.nombre}</Text>
-          <Text>{props.tipo}</Text>
-          <Text style={styles.precio}>Precio: ${props.precio}</Text>
-          <Text style={styles.precio}>Con descuento: ${precioFinal}</Text>
+        <Text style={styles.nombre}>{props.nombre}</Text>
+        <Text style={styles.tipo}>{props.tipo}</Text>
+        <View style={styles.priceContainer}>
+          <Text style={styles.precioOriginal}>${props.precio}</Text>
+          <Text style={styles.precioDescuento}>${precioFinal}</Text>
         </View>
       </View>
     </Pressable>
@@ -30,43 +29,50 @@ export default function Producto(props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#ffc4ad",
-    borderRadius: 10,
-    width: "90%",
-    marginVertical: 10,
-    marginHorizontal: 10,
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    width: width - 32,
+    marginVertical: 8,
+    marginHorizontal: 16,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
-    elevation: 5,
-  },
-  content: {
-    flexDirection: "row", // Hace que los elementos se coloquen en fila
-    alignItems: "center", // Centra verticalmente la imagen y el texto
+    elevation: 3,
   },
   imagen: {
-    width: 80, // Ajustar el tamaño de la imagen
-    height: 80,
-    marginRight: 10, // Espacio entre la imagen y el texto
+    width: '100%',
+    height: 150,
     resizeMode: "cover",
   },
-  // info: {
-  //   padding: 5,
-  //   borderRadius:5,
-  //   width:"95%",
-  //   backgroundColor: "#FFF5EE",
-  //   // flex: 1, // Para que el texto ocupe todo el espacio restante
-  // },
+  content: {
+    padding: 16,
+  },
   nombre: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333333",
+    color: "#2D3748",
+    marginBottom: 4,
   },
-  precio: {
+  tipo: {
+    fontSize: 14,
+    color: "#718096",
+    marginBottom: 8,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  precioOriginal: {
     fontSize: 16,
-    color: "#FF6347",
-    marginTop: 5,
+    color: "#718096",
+    textDecorationLine: 'line-through',
+    marginRight: 8,
+  },
+  precioDescuento: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: "#E53E3E",
   },
 });
