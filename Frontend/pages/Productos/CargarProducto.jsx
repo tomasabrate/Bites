@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import DatePickerController from './components/DatePickerController';
 import FormInputController from './components/FormInputController';
-import ImagePickerController from './components/ImagePickerController'; // Asegúrate de importar correctamente
-import { View, StyleSheet, FlatList, Text, Alert, Button } from 'react-native';
+import ImagePickerController from './components/ImagePickerController';
+import { View, StyleSheet, FlatList, Alert, Button } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -10,7 +10,7 @@ import {
   SelectList,
 } from 'react-native-dropdown-select-list';
 import formatDate from './utilities/formatDate.utilities';
-import BotonGenerico from '../../components/BotonGenerico';
+import axios from 'axios';
 import schema from './utilities/schemaCargaProducto.utilities';
 
 const categorias = [
@@ -31,9 +31,9 @@ export default function CargarProducto() {
   const [selectedTipo, setSelectedTipo] = useState([]);
 
   const {
-    handleSubmit,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
@@ -43,90 +43,80 @@ export default function CargarProducto() {
     setValue('activo', 1);
   }, [setValue]);
 
-  const showAlert = () => {
-    Alert.alert('Alerta de publicación.', 'Producto publicado con éxito!', [
-      {
-        text: 'OK',
-        onPress: () => console.log('OK Pressed'),
-      },
+  const showAlert = (message) => {
+    Alert.alert('Estado de publicación', message, [
+      { text: 'OK', onPress: () => console.log('Alerta cerrada') },
     ]);
   };
 
-  const onSubmit = async (data) => {
-    alert('onSubmit ejecutado');
-    console.log('Errores de validación:', errors); // Para ver si hay errores
-    console.log('Imágenes seleccionadas:', data.imagenes); // Revisa las imágenes
+  const handleChauButtonPress = async () => {
+    // Obtener los datos del formulario manualmente
+    const data = getValues(); // Obtener los valores actuales del formulario
+
+    console.log('Datos del formulario:', data); // Verifica si aquí se están obteniendo los valores correctos
+
+    // Validar errores manualmente
     if (Object.keys(errors).length > 0) {
-      console.log('El formulario tiene errores');
+      console.log('El formulario tiene errores:', errors);
+      showAlert('Por favor, corrige los errores en el formulario.');
       return;
     }
-    console.log('onSubmit ejecutado', data);
-    // Subir las imágenes a Cloudinary antes de mandar el resto de los datos
-    const imagenesSeleccionadas = data.imagenes || [];
-    const urlsImagenes = [];
 
     try {
-      // Subir cada imagen a Cloudinary
-      for (const imagen of imagenesSeleccionadas) {
-        const formData = new FormData();
-        formData.append('file', {
-          uri: imagen.uri, // o la propiedad que contenga la URI de la imagen seleccionada
-          type: 'image/jpeg', // Puedes ajustar el tipo según sea necesario
-          name: `producto_${Date.now()}.jpg`,
-        });
-        formData.append('upload_preset', 'ml_default'); // Reemplaza con tu preset
-        formData.append('cloud_name', 'dturrtxzx'); // Reemplaza con tu cloud name
+      // Subir imágenes a Cloudinary
+      const urlsImagenes = await Promise.all(
+        (data.imagenes || []).map(async (imagen) => {
+          const formData = new FormData();
+          formData.append('file', {
+            uri: imagen.uri,
+            type: 'image/jpeg',
+            name: `producto_${Date.now()}.jpg`,
+          });
+          formData.append('upload_preset', 'BitesPreset');
+          formData.append('cloud_name', 'dturrtxzx');
 
-        // Realiza la solicitud a Cloudinary
-        const response = await axios.post(
-          'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-          formData,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
-        );
+          const response = await axios.post(
+            'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+            formData,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+          );
+          return response.data.secure_url;
+        })
+      );
 
-        // Almacena la URL de la imagen subida
-        urlsImagenes.push(response.data.secure_url);
-      }
-
-      // Ahora que las imágenes se han subido, podemos añadir las URLs al resto del formData
+      // Preparar datos para enviar al backend
       const formDataFinal = {
         ...data,
         tipo: selectedTipo,
         categorias: selectedCategories,
         fecha_produccion: formatDate(data.fecha_produccion),
         fecha_vencimiento: formatDate(data.fecha_vencimiento),
-        imagenes: urlsImagenes.join(';'), // Guardamos las URLs de las imágenes
+        imagenes: urlsImagenes.join(';'),
       };
 
-      // Enviar el formulario al backend
+      // Enviar datos al backend
       const response = await fetch('http://localhost:3000/productos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formDataFinal),
       });
 
       if (response.ok) {
-        showAlert();
+        showAlert('Producto publicado con éxito!');
       } else {
         const errorData = await response.json();
         console.error('Error en la respuesta:', errorData);
-        Alert.alert('Error', 'Hubo un error al cargar el producto.');
+        showAlert('Hubo un error al cargar el producto.');
       }
     } catch (error) {
       console.error('Error al subir imágenes o hacer la solicitud:', error);
-      Alert.alert('Error', 'No se pudo conectar con el servidor.');
+      showAlert('No se pudo conectar con el servidor.');
     }
   };
 
-  const despedir = () => {
-    console.log('Chau');
-    alert('Chau', 'Hasta luego!');
-  };
   return (
     <FlatList
-      data={[{}]} // Agrega un elemento para renderizar el FlatList
+      data={[{}]}
       keyExtractor={(item, index) => index.toString()}
       renderItem={() => (
         <View style={styles.container}>
@@ -175,21 +165,13 @@ export default function CargarProducto() {
             title={'Fecha Vencimiento'}
             errors={errors}
           />
-          {/* Usar ImagePickerController aquí */}
           <ImagePickerController
-            name="imagenes" // Nombre que usas para capturar las imágenes
+            name="imagenes"
             control={control}
             title="Seleccionar imágenes"
             errors={errors}
           />
-          {/* Hacer que el boton generico si se presiona llame al onSubmit, para mostrar una alerta del botonPresionado */}
-          <BotonGenerico
-            title="Publicar Producto!"
-            color={'#ff8566'}
-            onPress={() => handleSubmit(onSubmit)()}
-          />
-          {/* //Boton para mostrar una alerta que diga chau cuando se presiona */}
-          <Button title="Chau" onPress={() => onSubmit()} />
+          <Button title="Chau" onPress={handleChauButtonPress} />
         </View>
       )}
     />
