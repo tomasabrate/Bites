@@ -3,7 +3,7 @@ import { pool } from "../database/connection.js";
 export const getProductos = async (req, res) => {
   try {
     const [result] = await pool.query("SELECT * FROM Productos");
-    console.log("Lista de Productos:",result); //muestra en consola
+    console.log("Lista de Productos:", result); //muestra en consola
     res.status(200).json(result); //respuesta en el cliente
   } catch (error) {
     console.log("ERROR en GET productos.", error);
@@ -64,9 +64,83 @@ export const postProducto = async (req, res) => {
   }
 };
 
-export const putProducto = (req, res) => {
-  res.status(200).send("PUT producto");
+export const putProducto = async (req, res) => {
+  console.log("Datos recibidos:", req.body);
+  const { id_producto } = req.params; // ID del producto desde los parámetros de la solicitud
+  const {
+    id_vendedor,
+    id_categoria,
+    nombre,
+    descripcion,
+    precio,
+    descuento,
+    fecha_produccion,
+    fecha_vencimiento,
+    tipo,
+    cantidad,
+    imagenes,
+    activo,
+  } = req.body; // Datos del producto desde el cuerpo de la solicitud
+
+  try {
+    // Construir la consulta SQL dinámica
+    let query = `
+      UPDATE Productos SET
+        id_vendedor = ?,
+        id_categoria = ?,
+        nombre = ?,
+        descripcion = ?,
+        precio = ?,
+        descuento = ?,
+        fecha_produccion = ?,
+        fecha_vencimiento = ?,
+        tipo = ?,
+        cantidad = ?,
+        activo = ?
+    `;
+    const values = [
+      id_vendedor,
+      id_categoria,
+      nombre,
+      descripcion,
+      precio,
+      descuento,
+      fecha_produccion,
+      fecha_vencimiento,
+      tipo,
+      cantidad,
+      activo,
+    ];
+
+    // Incluir el campo `imagenes` si tiene datos
+    if (imagenes && imagenes.length > 0) {
+      query += `, imagenes = ?`;
+      values.push(imagenes.join(',')); // Convierte el array en una cadena de texto
+    }
+
+    query += ` WHERE id_producto = ?`;
+    values.push(id_producto); // ID del producto para la cláusula WHERE
+
+    // Ejecutar la consulta
+    const [result] = await pool.query(query, values);
+
+    // Verificar si el producto fue actualizado
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // Responder con un mensaje de éxito
+    console.log("Producto actualizado: ", req.body);
+    res.status(200).json({ message: "Producto actualizado exitosamente" });
+  } catch (error) {
+    console.error("Error al actualizar el producto:", error);
+    res.status(500).json({
+      message: "Error al actualizar el producto",
+      error: error.message,
+    });
+  }
 };
+
 
 export const deleteProducto = async (req, res) => {
   try {
