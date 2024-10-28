@@ -48,14 +48,15 @@ export default function CargarProducto() {
       { text: 'OK', onPress: () => console.log('Alerta cerrada') },
     ]);
   };
-
+  /* 
+  Subir imágenes a Cloudinary:
+Este proceso se realiza en el método handleChauButtonPress, específicamente en el bloque que utiliza Promise.all para iterar sobre las imágenes y subirlas a Cloudinary.
+Aquí se obtiene cada URL de las imágenes subidas y se almacena en el array urlsImagenes.
+*/
   const handleChauButtonPress = async () => {
-    // Obtener los datos del formulario manualmente
-    const data = getValues(); // Obtener los valores actuales del formulario
+    const data = getValues();
+    console.log(data);
 
-    console.log('Datos del formulario:', data); // Verifica si aquí se están obteniendo los valores correctos
-
-    // Validar errores manualmente
     if (Object.keys(errors).length > 0) {
       console.log('El formulario tiene errores:', errors);
       showAlert('Por favor, corrige los errores en el formulario.');
@@ -63,38 +64,56 @@ export default function CargarProducto() {
     }
 
     try {
-      // Subir imágenes a Cloudinary
+      console.log('Contenido de data.imagenes:', data.imagenes);
+      console.log(
+        'Tipo de data.imagenes:',
+        Array.isArray(data.imagenes) ? 'Array' : typeof data.imagenes
+      );
+
       const urlsImagenes = await Promise.all(
         (data.imagenes || []).map(async (imagen) => {
+          if (!imagen) {
+            throw new Error('Imagen no tiene URI');
+          }
+
           const formData = new FormData();
           formData.append('file', {
-            uri: imagen.uri,
+            uri: imagen,
             type: 'image/jpeg',
             name: `producto_${Date.now()}.jpg`,
           });
           formData.append('upload_preset', 'BitesPreset');
           formData.append('cloud_name', 'dturrtxzx');
 
-          const response = await axios.post(
-            'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-            formData,
-            { headers: { 'Content-Type': 'multipart/form-data' } }
-          );
-          return response.data.secure_url;
+          try {
+            const response = await axios.post(
+              'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+              formData,
+              { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+            return response.data.secure_url;
+          } catch (error) {
+            console.error('Error subiendo imagen:', imagen, error);
+            throw new Error('Error en la carga de imagen');
+          }
         })
       );
 
-      // Preparar datos para enviar al backend
+      const validUrlsImagenes = urlsImagenes.filter((url) => url !== null);
+      if (validUrlsImagenes.length === 0) {
+        showAlert('No se pudo cargar ninguna imagen. Intenta nuevamente.');
+        return;
+      }
+
       const formDataFinal = {
         ...data,
         tipo: selectedTipo,
         categorias: selectedCategories,
         fecha_produccion: formatDate(data.fecha_produccion),
         fecha_vencimiento: formatDate(data.fecha_vencimiento),
-        imagenes: urlsImagenes.join(';'),
+        imagenes: validUrlsImagenes.join(';'),
       };
 
-      // Enviar datos al backend
       const response = await fetch('http://localhost:3000/productos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

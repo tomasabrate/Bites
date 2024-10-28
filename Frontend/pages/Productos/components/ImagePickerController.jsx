@@ -44,7 +44,8 @@ export default function ImagePickerController({
   const removeImage = (uri) => {
     const updatedImages = images.filter((image) => image !== uri);
     setImages(updatedImages);
-    onChange(updatedImages);
+    //onChange(updatedImages); // Asegúrate de que onChange se pasa aquí
+    control.setValue(name, updatedImages); // Usar control para actualizar el formulario
   };
 
   return (

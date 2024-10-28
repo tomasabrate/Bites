@@ -20,6 +20,7 @@ export const getProductos = async (req, res) => {
 };
 
 export const postProducto = async (req, res) => {
+  console.log('LLAMANDO DESDE EL BACK' + req.body); // Verifica el contenido de req.body en la cons
   const {
     id_vendedor,
     id_categoria,
