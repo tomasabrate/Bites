@@ -27,7 +27,7 @@ export const postProducto = async (req, res) => {
   } = req.body;//no hace falta validar el req.body
   try {
     const [rows] = await pool.query(
-      "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,STR_TO_DATE(?, '%d-%m-%Y'),STR_TO_DATE(?, '%d-%m-%Y'),?,?,?)",
       [
         id_vendedor,
         id_categoria,
