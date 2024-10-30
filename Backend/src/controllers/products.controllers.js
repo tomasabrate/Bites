@@ -11,6 +11,21 @@ export const getProductos = async (req, res) => {
   }
 };
 
+export const getProductosById = async (req, res) => {
+  const { id_producto } = req.params;
+  try {
+    const [result] = await pool.query(
+      "SELECT * FROM Productos WHERE id_producto = ?",
+      [id_producto]
+    );
+    console.log("Productos", result); //muestra en consola
+    res.status(200).json(result); //respuesta en el cliente
+  } catch (error) {
+    console.log("ERROR en GET productos.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
+
 export const postProducto = async (req, res) => {
   const {
     id_vendedor,
@@ -28,7 +43,7 @@ export const postProducto = async (req, res) => {
   console.log(req.body);
   try {
     const [rows] = await pool.query(
-      "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,STR_TO_DATE(?, '%d-%m-%Y'),STR_TO_DATE(?, '%d-%m-%Y'),?,?,?)",
+      "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
       [
         id_vendedor,
         id_categoria,
