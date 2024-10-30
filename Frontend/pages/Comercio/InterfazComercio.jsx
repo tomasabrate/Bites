@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Modal } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import MenuDesplegable from './MenuDeslizanteC'; 
-import Icon from 'react-native-vector-icons/Ionicons';
+import MenuDesplegable from "./MenuDeslizanteC";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export default function InterfazComerciante() {
   const [productos, setProductos] = useState([]);
@@ -10,15 +18,19 @@ export default function InterfazComerciante() {
   const [error, setError] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
+  const [cambios, setCambios] = useState(false); // Nuevo estado para detectar cambios
   const navigation = useNavigation();
 
   const obtenerProductos = async () => {
+    setCargando(true); // Asegúrate de mostrar el indicador de carga
     try {
       const response = await fetch("http://localhost:3000/productos");
       const data = await response.json();
       setProductos(data);
+      setError(null); // Reiniciar el error si la obtención fue exitosa
     } catch (error) {
       console.error("Error al obtener productos:", error);
+      setError("Error al obtener productos.");
     } finally {
       setCargando(false);
     }
@@ -26,7 +38,7 @@ export default function InterfazComerciante() {
 
   useEffect(() => {
     obtenerProductos();
-  }, []);
+  }, [cambios]); // Escucha cambios en el nuevo estado
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -34,15 +46,16 @@ export default function InterfazComerciante() {
 
   const eliminarProducto = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/productos/${id}`, {
-        method: 'DELETE',
+      const response = await fetch("http://localhost:3000/productos/${id}", {
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+        throw new Error(Error`${response.status}: ${response.statusText}`);
       }
 
-      setProductos(prevProductos => prevProductos.filter(producto => producto.id_producto !== id));
+      // Actualiza la lista de productos después de eliminar
+      setCambios((prev) => !prev); // Cambia el estado para volver a obtener productos
     } catch (error) {
       console.error("Error al eliminar producto:", error);
       setError("Error al eliminar el producto. El producto ya fue vendido.");
@@ -71,6 +84,13 @@ export default function InterfazComerciante() {
     setMenuVisible(false);
   };
 
+  const navegarModificarProducto = (id) => {
+    navigation.navigate("ModificarProducto", {
+      productoId: id,
+      actualizarProductos: obtenerProductos, // Pasa la función para actualizar productos
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -80,7 +100,7 @@ export default function InterfazComerciante() {
         <Text style={styles.titulo}>Mis Productos</Text>
       </View>
       {menuVisible && <MenuDesplegable setPaginaActual={setPaginaActual} />}
-      
+
       {cargando ? (
         <ActivityIndicator size="large" color="#FF6347" />
       ) : (
@@ -95,7 +115,7 @@ export default function InterfazComerciante() {
               <View style={styles.botonContainer}>
                 <TouchableOpacity
                   style={styles.boton}
-                  onPress={() => navigation.navigate("ModificarProducto", { producto: item })}
+                  onPress={() => navegarModificarProducto(item.id_producto)}
                 >
                   <Icon name="create-outline" size={16} color="#fff" />
                   <Text style={styles.botonTexto}>Editar</Text>
@@ -191,7 +211,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semi-transparente
   },
   modalContent: {
     width: 300,

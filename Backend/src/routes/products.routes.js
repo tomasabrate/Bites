@@ -7,7 +7,7 @@ routerProductos.get("/productos", getProductos);
 
 routerProductos.post("/productos", postProducto);
 
-routerProductos.put("/productos", putProducto);
+routerProductos.put("/productos/:id_producto", putProducto);
 
 routerProductos.delete('/productos/:id_producto', deleteProducto);
 

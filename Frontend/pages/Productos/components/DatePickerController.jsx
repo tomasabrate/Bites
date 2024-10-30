@@ -19,7 +19,7 @@ export default function DatePickerController({ control, name, title, errors }) {
               style={styles.datePickerWeb}
               type="date"
               value={value ? value.toISOString().split("T")[0] : ""}
-              onChange={(e) => onChange(new Date(e.target.value))}
+              onChange={(e) => onChange(new Date(e.target.value)) && console.log(new Date(e.target.value))}
             />
             </>
           ) : (
@@ -40,7 +40,7 @@ export default function DatePickerController({ control, name, title, errors }) {
                   is24Hour={true}
                   onChange={(event, selectedDate) => {
                     setShow(false);
-                    onChange(selectedDate || value); // Actualiza la fecha
+                    onChange(selectedDate || value && console.log(selectedDate)); // Actualiza la fecha
                   }}
                 />
               )}

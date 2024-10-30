@@ -34,16 +34,16 @@ export default function TabNavigator() {
       <Tab.Screen
         name="StackNavigator"
         component={StackNavigator}
-        options={{ title: "Bites" }}
+        options={{ title: "Bites", }}
       />
-      <Tab.Screen name="Perfil" component={Perfil} />
+      <Tab.Screen name="Perfil" component={Perfil} options={{headerShown: true}} />
       <Tab.Screen
         name="Carrito"
         component={Cart}
         options={{
           tabBarLabel: 'Carrito',
           tabBarIcon: ({ color, size }) => (
-            <Icon name="shopping-basket" size={24} color="#ffffff" />
+            <Icon name="shopping-cart" size={24} color="#ffffff" />
           ),
         }}
       />

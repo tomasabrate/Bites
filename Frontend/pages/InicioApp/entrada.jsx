@@ -1,9 +1,17 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ImageBackground } from 'react-native';
+import React, { useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  ImageBackground,
+} from "react-native";
 
 export default function Entrada({ navigation }) {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const windowHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     Animated.loop(
@@ -22,19 +30,21 @@ export default function Entrada({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.backgroundContainer, { transform: [{ translateY }] }]}>
+      <Animated.View
+        style={[styles.backgroundContainer, { transform: [{ translateY }] }]}
+      >
         <ImageBackground
-          source={require('../../assets/fondo/fondo 2.png')}
+          source={require("../../assets/fondo/fondo 2.png")}
           style={styles.background}
           resizeMode="cover"
         />
         <ImageBackground
-          source={require('../../assets/fondo/fondo 2.png')}
+          source={require("../../assets/fondo/fondo 2.png")}
           style={styles.background}
           resizeMode="cover"
         />
         <ImageBackground
-          source={require('../../assets/fondo/fondo 2.png')}
+          source={require("../../assets/fondo/fondo 2.png")}
           style={styles.background}
           resizeMode="cover"
         />
@@ -47,9 +57,9 @@ export default function Entrada({ navigation }) {
           <Text style={styles.subtitle}>Uniendo sabores y oportunidades</Text>
         </View>
 
-        <TouchableOpacity 
-          style={styles.customButton} 
-          onPress={() => navigation.navigate('LoginSelection')}
+        <TouchableOpacity
+          style={styles.customButton}
+          onPress={() => navigation.navigate("LoginSelection")}
         >
           <Text style={styles.buttonText}>Comenzar a Comprar</Text>
         </TouchableOpacity>
@@ -61,64 +71,64 @@ export default function Entrada({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    overflow: 'hidden',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    overflow: "hidden",
   },
   backgroundContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    flexDirection: 'column', // Coloca las imágenes una debajo de la otra
+    flexDirection: "column", // Coloca las imágenes una debajo de la otra
   },
   background: {
-    width: '100%',
-    height: '100%', // Tamaño completo de cada imagen
+    width: "100%",
+    height: "100%", // Tamaño completo de cada imagen
   },
   contentContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   textContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 30,
     borderRadius: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
   },
   title: {
     fontSize: 48,
-    fontWeight: 'bold',
-    color: '#FF6347',
+    fontWeight: "bold",
+    color: "#FF6347",
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 20,
-    fontStyle: 'italic',
-    color: '#333',
-    textAlign: 'center',
+    fontStyle: "italic",
+    color: "#333",
+    textAlign: "center",
   },
   customButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: "#FF6347",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 30,
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 5,
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

@@ -2,12 +2,12 @@ import {  Text, StyleSheet, Pressable } from "react-native";
 
 import React from "react";
 
-export default function BotonGenerico({ title = "Boton", onPress, color = "#ff5226" }) {
+export default function BotonGenerico({ title = "Boton", onPress, colorInicial = "#ff5226", colorPressed = "#ff8566"}) {
   return (
     <Pressable
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: pressed ? "#ff8566" : color },
+        { backgroundColor: pressed ? colorPressed : colorInicial },
       ]}
       onPress={onPress}
     >
