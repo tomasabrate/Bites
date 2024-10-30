@@ -46,7 +46,7 @@ export default function InterfazComerciante() {
 
   const eliminarProducto = async (id) => {
     try {
-      const response = await fetch("http://localhost:3000/productos/${id}", {
+      const response = await fetch(`http://localhost:3000/productos/${id}`, {
         method: "DELETE",
       });
 

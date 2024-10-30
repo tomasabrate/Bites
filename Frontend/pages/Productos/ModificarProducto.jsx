@@ -70,9 +70,9 @@ export default function ModificarProducto() {
           setValue("id_vendedor", data.id_vendedor);
           setValue("nombre", data.nombre);
           setValue("descripcion", data.descripcion);
-          setValue("precio", data.precio.toString());
-          setValue("descuento", data.descuento.toString());
-          setValue("cantidad", data.cantidad.toString());
+          setValue("precio", data.precio);
+          setValue("descuento", data.descuento);
+          setValue("cantidad", data.cantidad);
           setValue("fecha_produccion", data.fecha_produccion);
           setValue("fecha_vencimiento", data.fecha_vencimiento);
           setValue("activo", 1);
