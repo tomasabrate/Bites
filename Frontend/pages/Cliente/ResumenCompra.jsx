@@ -165,7 +165,7 @@ export default function ResumenCompra({ navigation }) {
             style={styles.cancelButton}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.cancelButtonText}>Cancelar Compra</Text>
+            <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.confirmButton}
@@ -178,7 +178,7 @@ export default function ResumenCompra({ navigation }) {
               });
             }}
           >
-            <Text style={styles.confirmButtonText}>Confirmar Compra</Text>
+            <Text style={styles.confirmButtonText}>Comprar</Text>
           </TouchableOpacity>
         </View>
       </View>

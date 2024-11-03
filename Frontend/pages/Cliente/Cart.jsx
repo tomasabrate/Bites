@@ -84,7 +84,7 @@ const Cart = () => {
         >
           <Icon name="arrow-left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Carrito de Comrpas</Text>
+        <Text style={styles.headerTitle}>Carrito de Compras</Text>
       </View>
       {productosAgrupados.length === 0 ? (
         <View style={styles.emptyCart}>
@@ -107,16 +107,22 @@ const Cart = () => {
             <BotonGenerico
               title="Volver a Comprar"
               onPress={() => navigation.goBack()}
+              colorInicial="#ff6347"
+              colorPressed="#e5573e"
             />
             <BotonGenerico
               title="Vaciar carrito"
               onPress={vaciarCarrito}
               style={styles.vaciarButton}
+              colorInicial="#f44336"
+              colorPressed="#d32f2f"
             />
             <BotonGenerico
               title="Proceder al pago"
               onPress={() => navigation.navigate("ResumenCompra")}
               style={styles.checkoutButton}
+              colorInicial="#4CAF50"
+              colorPressed="#45a049"
             />
           </View>
         </>
@@ -145,7 +151,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
   },
-
   listContent: {
     flexGrow: 1,
   },
@@ -227,13 +232,11 @@ const styles = StyleSheet.create({
   },
   vaciarButton: {
     flex: 1,
-    marginRight: 10,
-    backgroundColor: "#f44336",
+    marginHorizontal: 5,
   },
   checkoutButton: {
     flex: 1,
-    marginLeft: 10,
-    backgroundColor: "#4CAF50",
+    marginHorizontal: 5,
   },
   emptyCart: {
     flex: 1,
@@ -244,7 +247,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#666",
     marginVertical: 20,
-    height: 20,
   },
 });
 
