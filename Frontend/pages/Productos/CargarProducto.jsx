@@ -72,29 +72,19 @@ Aquí se obtiene cada URL de las imágenes subidas y se almacena en el array url
 
       const urlsImagenes = await Promise.all(
         (data.imagenes || []).map(async (imagen) => {
-          if (!imagen) {
-            throw new Error('Imagen no tiene URI');
-          }
-
           const formData = new FormData();
-          formData.append('file', {
-            uri: imagen,
-            type: 'image/jpeg',
-            name: `producto_${Date.now()}.jpg`,
-          });
+          formData.append('file', imagen); // Asegúrate de que es un base64 o URI completo
           formData.append('upload_preset', 'BitesPreset');
-          formData.append('cloud_name', 'dturrtxzx');
 
           try {
             const response = await axios.post(
               'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-              formData,
-              { headers: { 'Content-Type': 'multipart/form-data' } }
+              formData
             );
             return response.data.secure_url;
           } catch (error) {
-            console.error('Error subiendo imagen:', imagen, error);
-            throw new Error('Error en la carga de imagen');
+            console.error('Error subiendo imagen:', error);
+            return null; // Retorna null para excluirla si falla
           }
         })
       );
