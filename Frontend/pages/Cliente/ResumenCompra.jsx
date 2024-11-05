@@ -127,12 +127,12 @@ export default function ResumenCompra({ navigation }) {
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Detalles de Envío</Text>
-            <RadioButton
+            {/* <RadioButton
               value="delivery"
               label="Envío Estándar"
               selected={metodoEnvio === "delivery"}
               onSelect={setMetodoEnvio}
-            />
+            /> */}
             {metodoEnvio === "delivery" && (
               <Text style={styles.smallText}>Entrega en 3-5 días hábiles</Text>
             )}

@@ -16,10 +16,17 @@ export const getProductosById = async (req, res) => {
   try {
     const [result] = await pool.query(
       "SELECT * FROM Productos WHERE id_producto = ?",
-      [id_producto]
+      [id_producto] // Asegúrate de pasar id_producto como un array
     );
-    console.log("Productos", result); //muestra en consola
-    res.status(200).json(result); //respuesta en el cliente
+
+    console.log("Productos", result); // muestra en consola
+
+    // Verifica si se obtuvo un producto
+    if (result.length > 0) {
+      res.status(200).json(result[0]); // devuelve el primer producto como objeto
+    } else {
+      res.status(404).json({ message: "Producto no encontrado" }); // Manejo de caso sin producto
+    }
   } catch (error) {
     console.log("ERROR en GET productos.", error);
     return res.status(500).send("500 - Error en la base de datos.");

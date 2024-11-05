@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import DatePickerController from "./components/DatePickerController";
 import FormInputController from "./components/FormInputController";
 import ImagePickerController from "./components/ImagePickerController";
-import { View, StyleSheet, ScrollView, Alert, Text, SafeAreaView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Text,
+  SafeAreaView,
+} from "react-native";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -10,6 +17,7 @@ import formatDate from "./utilities/formatDate.utilities";
 import BotonGenerico from "../../components/BotonGenerico";
 import schema from "./utilities/schemaCargaProducto.utilities";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { getProductoById, putProducto } from "../../services/productos";
 
 const categorias = [
   { value: "Comida Rápida", key: 1 },
@@ -27,13 +35,14 @@ const tipos = [
 export default function ModificarProducto() {
   const navigation = useNavigation();
   const route = useRoute();
-  const productoId = route.params?.productoId; // ID del producto a modificar
+  const { productoId, actualizarProductos } = route.params; // ID del producto a modificar
 
   console.log("Producto ID:", productoId); // Verificar productoId
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedTipo, setSelectedTipo] = useState("");
   const [cargando, setCargando] = useState(true);
+  const [producto, setProducto] = useState(null)
 
   const {
     handleSubmit,
@@ -45,6 +54,7 @@ export default function ModificarProducto() {
   useEffect(() => {
     // Función para obtener los datos del producto
     const obtenerProducto = async () => {
+      //Si no hay id, este "if" evita la llamada al backend
       if (!productoId) {
         console.log("Producto ID no válido"); // Verificación de productoId
         setCargando(false);
@@ -52,37 +62,24 @@ export default function ModificarProducto() {
       }
 
       try {
-        const response = await fetch(
-          `http://localhost:3000/productos/${productoId}`
-        );
+        // Obtener producto por id
+        const data = await getProductoById(productoId);
+        setProducto(data);
+        console.log("Datos del producto obtenidos:", data);
+        console.log(data.nombre)
 
-        if (!response.ok) {
-          throw new Error("Error en la respuesta del servidor");
-        }
-
-        const data = await response.json();
-
-        // Verifica que los datos sean válidos antes de prellenar los campos
-        if (data) {
-          console.log("Datos del producto obtenidos:", data); // Verificar datos del producto
-
-          // Prellenar los campos con los datos obtenidos
-          setValue("id_vendedor", data.id_vendedor);
-          setValue("nombre", data.nombre);
-          setValue("descripcion", data.descripcion);
-          setValue("precio", data.precio);
-          setValue("descuento", data.descuento);
-          setValue("cantidad", data.cantidad);
-          setValue("fecha_produccion", data.fecha_produccion);
-          setValue("fecha_vencimiento", data.fecha_vencimiento);
-          setValue("activo", 1);
-          setSelectedCategories(data.id_categoria);
-          setSelectedTipo(data.tipo);
-        } else {
-          throw new Error("No se encontraron datos para el producto");
-        }
+        setValue("id_vendedor", data.id_vendedor);
+        setValue("nombre", data.nombre);
+        setValue("descripcion", data.descripcion);
+        setValue("precio", data.precio);
+        setValue("descuento", data.descuento);
+        setValue("cantidad", data.cantidad);
+        setValue("fecha_produccion", data.fecha_produccion);
+        setValue("fecha_vencimiento", data.fecha_vencimiento);
+        setValue("activo", 1);
+        setSelectedCategories(data.id_categoria);
+        setSelectedTipo(data.tipo);
       } catch (error) {
-        console.error("Error al obtener producto:", error);
         Alert.alert("Error", "No se pudo cargar el producto.");
       } finally {
         setCargando(false);
@@ -103,38 +100,22 @@ export default function ModificarProducto() {
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/productos/${productoId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
+      await putProducto(productoId, formData);
+
+      Alert.alert(
+        "Producto modificado",
+        "El producto se ha modificado exitosamente."
       );
 
-      if (response.ok) {
-        Alert.alert(
-          "Producto modificado",
-          "El producto se ha modificado exitosamente."
-        );
-
-        // Aquí llamas a la función para actualizar la lista en InterfazComerciante
-        const { actualizarProductos } = route.params; // Asegúrate de importar route si usas react-navigation
-        actualizarProductos(); // Llama a la función para actualizar la lista
-
-        navigation.goBack(); // Navegar de vuelta a la pantalla anterior
-      } else {
-        const errorData = await response.json();
-        console.error("Error en la respuesta:", errorData);
-        Alert.alert("Error", "Hubo un error al modificar el producto.");
-      }
+      // Llama a la función para actualizar la lista en InterfazComerciante
+      actualizarProductos();
+      navigation.goBack(); // Regresa a la pantalla anterior
     } catch (error) {
-      console.error("Error al hacer la solicitud:", error);
       Alert.alert("Error", "No se pudo conectar con el servidor.");
     }
   };
 
-  if (cargando) {
+  if (cargando  || !producto) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Cargando...</Text>

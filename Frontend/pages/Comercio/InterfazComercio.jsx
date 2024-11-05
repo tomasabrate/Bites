@@ -16,6 +16,7 @@ import MenuDesplegable from "./MenuDeslizanteC";
 import Icon from "react-native-vector-icons/Ionicons";
 import BotonGenerico from "../../components/BotonGenerico";
 import calcularDescuento from "../Productos/utilities/calcularDescuento.utilities";
+import { deleteProducto, getProductos } from "../../services/productos";
 
 export default function InterfazComerciante() {
   const [productos, setProductos] = useState([]);
@@ -29,12 +30,11 @@ export default function InterfazComerciante() {
   const obtenerProductos = async () => {
     setCargando(true); // Asegúrate de mostrar el indicador de carga
     try {
-      const response = await fetch("http://localhost:3000/productos");
-      const data = await response.json();
+      //Obtener productos
+      const data = await getProductos();
       setProductos(data);
       setError(null); // Reiniciar el error si la obtención fue exitosa
     } catch (error) {
-      console.error("Error al obtener productos:", error);
       setError("Error al obtener productos.");
     } finally {
       setCargando(false);
@@ -51,18 +51,10 @@ export default function InterfazComerciante() {
 
   const eliminarProducto = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/productos/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error(Error`${response.status}: ${response.statusText}`);
-      }
-
-      // Actualiza la lista de productos después de eliminar
-      setCambios((prev) => !prev); // Cambia el estado para volver a obtener productos
+      //Eliminar producto
+      await deleteProducto(id);
+      setCambios((prev) => !prev); // Actualiza la lista de productos
     } catch (error) {
-      console.error("Error al eliminar producto:", error);
       setError("Error al eliminar el producto. El producto ya fue vendido.");
       setModalVisible(true); // Mostrar el modal en caso de error
     }
@@ -157,7 +149,7 @@ export default function InterfazComerciante() {
         <View style={styles.agregarProductoContainer}>
           <BotonGenerico
             title="Agregar Producto"
-            onPress={() => navigation.navigate("CargarProducto")}
+            onPress={() => navigation.navigate("CargarProducto", { onProductAdded: () => setCambios((prev) => !prev) })}
             colorInicial="#4CAF50"
             colorPressed="#45a049"
           />

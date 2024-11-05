@@ -21,6 +21,7 @@ import BotonGenerico from "../../components/BotonGenerico";
 import schema from "./utilities/schemaCargaProducto.utilities";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { postProducto } from "../../services/productos";
 
 const categorias = [
   { value: "Comida Rápida", key: 1 },
@@ -35,13 +36,13 @@ const tipos = [
   { value: "Bolson", key: 2 },
 ];
 
-export default function CargarProducto() {
+export default function CargarProducto({ route }) {
   const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías
   const [selectedTipo, setSelectedTipo] = useState(""); //
   const [modalMessage, setModalMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
-  
+
   const mostrar = false;
 
   const {
@@ -71,30 +72,22 @@ export default function CargarProducto() {
     console.log("Producto:", formData);
 
     try {
-      const response = await fetch("http://localhost:3000/productos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData), // Convierte los datos a formato JSON
-      });
+      //CrearProducto
+      await postProducto(formData);
+      setModalMessage("¡Producto cargado exitosamente!");
+      setModalVisible(true);
 
-      if (response.ok) {
-        console.log("Producto cargado");
-        setModalMessage("Producto cargado!"); //error -> mensaje
-        setModalVisible(true); // Mostrar el modal en caso de error
-      } else {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      //Actualizar pantalla principal "Mis productos"
+      if (route.params?.onProductAdded) {
+        route.params.onProductAdded();
       }
     } catch (error) {
-      console.error("Error al eliminar producto:", error);
       setModalMessage(
-        "Error al eliminar el producto. El producto ya fue vendido."
+        "Error al cargar el producto. Por favor, intente nuevamente."
       );
-      setModalVisible(true); // Mostrar el modal en caso de error
+      setModalVisible(true);
     }
   };
-
   const cerrarModal = () => {
     setModalVisible(false);
   };
@@ -258,19 +251,19 @@ export default function CargarProducto() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#ff6347',
+    backgroundColor: "#ff6347",
   },
   header: {
-    backgroundColor: '#ff6347',
+    backgroundColor: "#ff6347",
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 16,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 16,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginLeft: 16,
   },
   backButton: {
@@ -278,7 +271,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   scrollContent: {
     flexGrow: 1,
@@ -287,11 +280,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -302,54 +295,54 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 16,
-    color: '#333',
+    color: "#333",
   },
   input: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   selectBox: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   dropdown: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     marginTop: 4,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
     marginBottom: 20,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
-    width: '80%',
-    alignItems: 'center',
-    shadowColor: '#000',
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -361,7 +354,7 @@ const styles = StyleSheet.create({
   modalTexto: {
     fontSize: 18,
     marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
+    textAlign: "center",
+    color: "#333",
   },
 });

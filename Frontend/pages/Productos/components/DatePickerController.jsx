@@ -3,50 +3,64 @@ import { Controller } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import BotonGenerico from "../../../components/BotonGenerico";
+
 export default function DatePickerController({ control, name, title, errors }) {
   const [show, setShow] = useState(false);
+
   return (
     <>
       <Controller
         control={control}
-        name={name} //identificador del controller
-        render={({ field: { onChange, value } }) =>
-          //seccion para web
-          Platform.OS === "web" ? (
-            <>
-            <p style={styles.miniTitle}>{title}</p>
-            <input
-              style={styles.datePickerWeb}
-              type="date"
-              value={value ? value.toISOString().split("T")[0] : ""}
-              onChange={(e) => onChange(new Date(e.target.value)) && console.log(new Date(e.target.value))}
-            />
-            </>
-          ) : (
-            //seccion para mobile
-            <View style={styles.datePicker}>
-              <BotonGenerico
-                color="#26bdff"
-                title={title} //texto del boton
-                onPress={() => {
-                  setShow(true);
-                }}
-              />
+        name={name} // Identificador del controller
+        render={({ field: { onChange, value } }) => {
+          // Asegúrate de que value sea un objeto Date o inicialízalo
+          const dateValue = value instanceof Date ? value : new Date(value);
 
-              {show && (
-                <DateTimePicker
-                  mode={"date"}
-                  value={value || new Date()}
-                  is24Hour={true}
-                  onChange={(event, selectedDate) => {
-                    setShow(false);
-                    onChange(selectedDate || value && console.log(selectedDate)); // Actualiza la fecha
+          // Sección para web
+          if (Platform.OS === "web") {
+            return (
+              <>
+                <p style={styles.miniTitle}>{title}</p>
+                <input
+                  style={styles.datePickerWeb}
+                  type="date"
+                  value={dateValue ? dateValue.toISOString().split("T")[0] : ""}
+                  onChange={(e) => {
+                    const selectedDate = new Date(e.target.value);
+                    onChange(selectedDate);
+                    console.log(selectedDate);
                   }}
                 />
-              )}
-            </View>
-          )
-        }
+              </>
+            );
+          } else {
+            // Sección para mobile
+            return (
+              <View style={styles.datePicker}>
+                <BotonGenerico
+                  color="#26bdff"
+                  title={title} // Texto del botón
+                  onPress={() => {
+                    setShow(true);
+                  }}
+                />
+
+                {show && (
+                  <DateTimePicker
+                    mode={"date"}
+                    value={dateValue || new Date()} // Usa dateValue
+                    is24Hour={true}
+                    onChange={(event, selectedDate) => {
+                      setShow(false);
+                      onChange(selectedDate || dateValue); // Actualiza la fecha
+                      console.log(selectedDate);
+                    }}
+                  />
+                )}
+              </View>
+            );
+          }
+        }}
       />
       {errors && errors[name] && (
         <Text style={styles.inputError}>{errors[name].message}</Text>
@@ -70,8 +84,8 @@ const styles = StyleSheet.create({
     marginBottom: 10, // Espacio entre los DatePicker
     width: "100%",
   },
-  datePickerWeb:{
-    width:"90%",
+  datePickerWeb: {
+    width: "90%",
     height: "15px",
     borderColor: "gray",
     borderWidth: 1,
@@ -79,12 +93,12 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "white",
   },
-  miniTitle:{
+  miniTitle: {
     fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
     marginTop: 10,
     marginLeft: 10,
     color: "gray",
-  }
+  },
 });
