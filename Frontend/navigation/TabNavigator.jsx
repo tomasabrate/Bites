@@ -36,6 +36,7 @@ export default function TabNavigator() {
         component={StackNavigator}
         options={{ title: "Bites", }}
       />
+      {/* Si agrego el "headerShown:false" desaparece la barra superior pero no me andan los scrolls, verificar */}
       <Tab.Screen name="Perfil" component={Perfil} options={{headerShown: true}} />
       <Tab.Screen
         name="Carrito"

@@ -35,3 +35,4 @@ export default function Home() {
     </View>
   );
 }
+//Creo que hay que eliminarlo a este componente

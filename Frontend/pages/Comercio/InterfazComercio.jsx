@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import MenuDesplegable from "./MenuDeslizanteC";
@@ -23,6 +24,9 @@ export default function InterfazComerciante() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
+    useState(false); // Estado para modal de eliminacion
+  const [productoAEliminar, setProductoAEliminar] = useState(null); // Estado para almacenar el producto a eliminar
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
   const [cambios, setCambios] = useState(false); // Nuevo estado para detectar cambios
   const navigation = useNavigation();
@@ -47,6 +51,36 @@ export default function InterfazComerciante() {
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
+  };
+
+  const confirmarEliminacion = (id) => {
+    setProductoAEliminar(id);
+    if (Platform.OS === "web") {
+      setConfirmDeleteModalVisible(true); // Mostrar el modal en web
+    } else {
+      Alert.alert(
+        "¿Estás seguro de eliminar el producto?",
+        "Esta acción no se puede deshacer.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Eliminar",
+            style: "destructive",
+            onPress: () => eliminarProducto(id),
+          },
+        ]
+      );
+    }
+  };
+
+  const cerrarConfirmDeleteModal = () => {
+    setConfirmDeleteModalVisible(false);
+    setProductoAEliminar(null);
+  };
+
+  const confirmarEliminacionWeb = () => {
+    eliminarProducto(productoAEliminar);
+    cerrarConfirmDeleteModal();
   };
 
   const eliminarProducto = async (id) => {
@@ -111,7 +145,7 @@ export default function InterfazComerciante() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.botonAccion, styles.botonEliminar]}
-          onPress={() => eliminarProducto(item.id_producto)}
+          onPress={() => confirmarEliminacion(item.id_producto)}
         >
           <Icon name="trash-outline" size={20} color="#fff" />
           <Text style={styles.botonTexto}>Eliminar</Text>
@@ -149,7 +183,11 @@ export default function InterfazComerciante() {
         <View style={styles.agregarProductoContainer}>
           <BotonGenerico
             title="Agregar Producto"
-            onPress={() => navigation.navigate("CargarProducto", { onProductAdded: () => setCambios((prev) => !prev) })}
+            onPress={() =>
+              navigation.navigate("CargarProducto", {
+                onProductAdded: () => setCambios((prev) => !prev),
+              })
+            }
             colorInicial="#4CAF50"
             colorPressed="#45a049"
           />
@@ -170,6 +208,38 @@ export default function InterfazComerciante() {
                 colorInicial="#f44336"
                 colorPressed="#d32f2f"
               />
+            </View>
+          </View>
+        </Modal>
+
+        {/* Modal de confirmación para web */}
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={confirmDeleteModalVisible}
+          onRequestClose={cerrarConfirmDeleteModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTexto}>
+                ¿Estás seguro de eliminar el producto?
+              </Text>
+              <View style={styles.buttonContainerModal}>
+                <BotonGenerico
+                  title="Cancelar"
+                  onPress={cerrarConfirmDeleteModal}
+                  colorInicial="#888"
+                  colorPressed="#777"
+                  style={styles.button}
+                />
+                <BotonGenerico
+                  title="Eliminar"
+                  onPress={confirmarEliminacionWeb}
+                  colorInicial="#f44336"
+                  colorPressed="#d32f2f"
+                  style={styles.button}
+                />
+              </View>
             </View>
           </View>
         </Modal>
@@ -302,10 +372,20 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalTexto: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: 18,
     marginBottom: 20,
     textAlign: "center",
+    color: "#333",
+  },
+  buttonContainerModal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    width: "100%", // Asegura que ocupe el ancho total
+  },
+  button: {
+    flex: 1, // Permite que los botones crezcan para ocupar el espacio
+    marginHorizontal: 5, // Espaciado horizontal entre botones
   },
   agregarProductoContainer: {
     padding: 16,
