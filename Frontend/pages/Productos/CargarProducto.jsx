@@ -55,7 +55,9 @@ export default function CargarProducto({ route }) {
   // Asignar el id_vendedor cuando el componente se monte
   useEffect(() => {
     setValue("id_vendedor", 1); // Valor defecto hasta tener funcionalidad de perfiles
-    //setValue("descuento", 0); // Por defecto al cargar
+    //Por defecto las fechas son del dia actual
+    setValue("fecha_produccion", new Date())
+    setValue("fecha_vencimiento", new Date())
     setValue("tipo", "unidad");
     setValue("activo", 1);
   }, [setValue]);

@@ -13,8 +13,8 @@ export default function DatePickerController({ control, name, title, errors }) {
         control={control}
         name={name} // Identificador del controller
         render={({ field: { onChange, value } }) => {
-          // Asegúrate de que value sea un objeto Date o inicialízalo
-          const dateValue = value instanceof Date ? value : new Date(value);
+          //Por defecto es la fecha actual
+          const dateValue = value && !isNaN(new Date(value)) ? new Date(value) : new Date();
 
           // Sección para web
           if (Platform.OS === "web") {
@@ -48,12 +48,12 @@ export default function DatePickerController({ control, name, title, errors }) {
                 {show && (
                   <DateTimePicker
                     mode={"date"}
-                    value={dateValue || new Date()} // Usa dateValue
+                    value={dateValue} // Usa dateValue
                     is24Hour={true}
                     onChange={(event, selectedDate) => {
                       setShow(false);
                       onChange(selectedDate || dateValue); // Actualiza la fecha
-                      console.log(selectedDate);
+                      console.log("Fecha seleccionada",selectedDate);
                     }}
                   />
                 )}

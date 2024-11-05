@@ -12,6 +12,35 @@ import {
 import Producto from "./components/Producto";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { getProductos } from "../../services/productos";
+
+const categorias = [
+  {
+    value: "Comida Rápida",
+    key: 1,
+    imagen: require("../../assets/categorias/comida_rapida.jpg"),
+  },
+  {
+    value: "Saludable",
+    key: 2,
+    imagen: require("../../assets/categorias/comida_saludable.jpg"),
+  },
+  {
+    value: "Bebidas",
+    key: 3,
+    imagen: require("../../assets/categorias/bebidas.jpg"),
+  },
+  {
+    value: "Viandas",
+    key: 4,
+    imagen: require("../../assets/categorias/viandas.jpg"),
+  },
+  {
+    value: "Postres",
+    key: 5,
+    imagen: require("../../assets/categorias/postres.jpg"),
+  },
+];
 
 export default function Productos() {
   const navigation = useNavigation();
@@ -19,79 +48,63 @@ export default function Productos() {
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [busqueda, setBusqueda] = useState("");
   const [precioMin, setPrecioMin] = useState("");
   const [precioMax, setPrecioMax] = useState("");
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
-  const categorias = [
-    {
-      value: "Comida Rápida",
-      key: 1,
-      imagen: require("../../assets/categorias/comida_rapida.jpg"),
-    },
-    {
-      value: "Saludable",
-      key: 2,
-      imagen: require("../../assets/categorias/comida_saludable.jpg"),
-    },
-    {
-      value: "Bebidas",
-      key: 3,
-      imagen: require("../../assets/categorias/bebidas.jpg"),
-    },
-    {
-      value: "Viandas",
-      key: 4,
-      imagen: require("../../assets/categorias/viandas.jpg"),
-    },
-    {
-      value: "Postres",
-      key: 5,
-      imagen: require("../../assets/categorias/postres.jpg"),
-    },
-  ];
-
   const obtenerProductos = async () => {
     try {
-      const response = await fetch("http://localhost:3000/productos");
-      const data = await response.json();
+      //Obtener productos
+      const data = await getProductos();
       setProductos(data);
       setProductosFiltrados(data);
     } catch (error) {
-      console.error("Error al obtener productos:", error);
       setError("Error al obtener productos. Inténtalo de nuevo más tarde.");
     } finally {
       setCargando(false);
     }
   };
 
+  //Cada vez que se inicia la pantalla se cargan los productos
   useEffect(() => {
     obtenerProductos();
   }, []);
 
+  //Cada vez que cambien estas variables se aplican los filtros.
   useEffect(() => {
     aplicarFiltros();
-  }, [precioMin, precioMax, categoriaSeleccionada, productos]);
+  }, [precioMin, precioMax, categoriaSeleccionada, productos, busqueda]);
 
+  //Función para aplicar los filtros a los productos.
   const aplicarFiltros = () => {
     let resultado = productos;
 
+    // Filtro por precio mínimo
     if (precioMin !== "") {
       resultado = resultado.filter(
         (producto) => producto.precio >= parseFloat(precioMin)
       );
     }
 
+    // Filtro por precio máximo
     if (precioMax !== "") {
       resultado = resultado.filter(
         (producto) => producto.precio <= parseFloat(precioMax)
       );
     }
 
+    // Filtro por categoría
     if (categoriaSeleccionada) {
       resultado = resultado.filter(
         (producto) => producto.id_categoria === categoriaSeleccionada
+      );
+    }
+
+    // Filtro por búsqueda en el nombre del producto
+    if (busqueda !== "") {
+      resultado = resultado.filter((producto) =>
+        producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
       );
     }
 
@@ -106,8 +119,8 @@ export default function Productos() {
           style={styles.searchInput}
           placeholder="Locales y productos"
           placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
+          value={busqueda}
+          onChangeText={setBusqueda}
         />
       </View>
 
