@@ -21,6 +21,7 @@ import MisPedidosCo from "../pages/Comercio/MisPedidosCo";
 import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
+import Login from "../pages/InicioApp/Login";
 
 // Importar las nuevas pantallas
 import Home from "../pages/Home";
@@ -34,6 +35,11 @@ const Stack = createStackNavigator();
 export default function StackNavigator() {
   return (
     <Stack.Navigator initialRouteName="Splash">
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Splash"
         component={SplashScreen}

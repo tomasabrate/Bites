@@ -93,7 +93,6 @@ const MisPedidosCo = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Mis Ventas</Text>
       <FlatList
         data={pedidos}
         keyExtractor={(item) => item.id.toString()}
@@ -201,11 +200,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   backButton: {
-    backgroundColor: "#FF6347",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF6347',
     padding: 10,
     borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 20,
     width: 120,
   },
@@ -213,6 +212,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+    marginLeft: 5,
   },
   inputContainer: {
     marginTop: 10,
