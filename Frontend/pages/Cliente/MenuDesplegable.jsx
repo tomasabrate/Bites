@@ -1,8 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // O la familia de íconos que prefieras
+import { useAuth } from '../../context/AuthContext';
+import { useNavigation } from "@react-navigation/native";
 
 const MenuDesplegable = () => {
+  const navigation = useNavigation();
+  const { user, logout } = useAuth();
   return (
     <View style={styles.menu}>
       <TouchableOpacity style={styles.menuItem}>
@@ -13,7 +17,18 @@ const MenuDesplegable = () => {
         <Icon name="cog" size={20} color="#000" />
         <Text style={styles.menuText}>Configuraciones</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={async () => {
+          try {
+            await logout();
+            navigation.navigate('Login');
+            console.log('Sesion cerrada');
+          } catch (error) {
+            console.error('No se pudo cerrar sesión:', error);
+          }
+        }}
+      >
         <Icon name="sign-out" size={20} color="#000" />
         <Text style={styles.menuText}>Cerrar Sesión</Text>
       </TouchableOpacity>

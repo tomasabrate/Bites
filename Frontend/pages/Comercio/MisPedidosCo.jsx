@@ -80,7 +80,8 @@ const MisPedidosCo = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>Volver</Text>
+        <Icon name="arrow-back" size={24} color="#fff" />
+        <Text style={styles.backButtonText}> Volver</Text>
       </TouchableOpacity>
       <Text style={styles.titulo}>Mis Pedidos</Text>
       <FlatList
@@ -171,11 +172,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#FF6347',
     padding: 10,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
     width: 120,
   },
@@ -183,6 +184,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    marginLeft: 5,
   },
   inputContainer: {
     marginTop: 10,

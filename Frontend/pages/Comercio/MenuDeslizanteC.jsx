@@ -1,43 +1,74 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // O la familia de íconos que prefieras
+import { useAuth } from '../../context/AuthContext';
+import { useNavigation } from "@react-navigation/native";
 
-export default function MenuDesplegable({ setPaginaActual }) {
+const MenuDeslizanteC = ({ setPaginaActual }) => {
+  const navigation = useNavigation();
+  const { user, logout } = useAuth();
   return (
     <View style={styles.menu}>
-      <TouchableOpacity onPress={() => setPaginaActual("Dashboard")}>
-        <Text style={styles.menuItem}>Dashboard</Text>
+      <TouchableOpacity style={styles.menuItem}>
+        <Icon name="user" size={20} color="#000" />
+        <Text style={styles.menuText}>Mi Perfil</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setPaginaActual("Reportes")}>
-        <Text style={styles.menuItem}>Reportes</Text>
+      <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Dashboard")}>
+        <Icon name="bar-chart" size={20} color="#000" />
+        <Text style={styles.menuText}>Dashboard</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setPaginaActual("MisPedidosCo")}>
-        <Text style={styles.menuItem}>Mis Pedidos</Text>
+      <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Reportes")}>
+        <Icon name="line-chart" size={20} color="#000" />
+        <Text style={styles.menuText}>Reportes</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("MisPedidosCo")}>
+        <Icon name="bookmark" size={20} color="#000" />
+        <Text style={styles.menuText}>Mis Pedidos</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={async () => {
+          try {
+            await logout();
+            navigation.navigate('Login');
+            console.log('Sesion cerrada');
+          } catch (error) {
+            console.error('No se pudo cerrar sesión:', error);
+          }
+        }}
+      >
+        <Icon name="sign-out" size={20} color="#000" />
+        <Text style={styles.menuText}>Cerrar Sesión</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   menu: {
-    backgroundColor: "#F5F5F5",
-    padding: 10,
-    borderRadius: 5,
-    position: "absolute",
-    top: 50,
-    left: 10, // Cambiado de right a left
-    zIndex: 1,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5, // Para Android
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    width: 220,
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 10,
   },
   menuItem: {
-    padding: 10,
+    flexDirection: 'row', // Para alinear el ícono y el texto en fila
+    alignItems: 'center', // Centrar ícono y texto verticalmente
+    paddingVertical: 10,
+  },
+  menuText: {
+    marginLeft: 10, // Espacio entre el ícono y el texto
     fontSize: 16,
-    color: "#FF6347",
   },
 });
+
+export default MenuDeslizanteC;

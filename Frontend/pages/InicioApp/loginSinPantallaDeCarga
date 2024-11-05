@@ -1,5 +1,7 @@
+
+/* ... 
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SelectList } from "react-native-dropdown-select-list";
 
 import firebaseApp from '../../firebase_config';
@@ -9,7 +11,6 @@ const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
 const Login = ({ navigation }) => {
-    const [loading, setLoading] = useState(true); // Estado de carga
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -21,18 +22,9 @@ const Login = ({ navigation }) => {
         { value: "Comercio" },
     ];
 
-    useEffect(() => {
-        // Temporizador de carga de 1 segundo
-        const timer = setTimeout(() => {
-            setLoading(false); // Cambia el estado después de 1 segundo
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
     const getRol = async (uid) => {
         try {
-            const docuRef = doc(firestore, `usuarios/${uid}`);
+            const docuRef = doc(firestore, usuarios/${uid});
             const docuCifrada = await getDoc(docuRef);
     
             if (docuCifrada.exists()) {
@@ -52,7 +44,7 @@ const Login = ({ navigation }) => {
             if (userCredential) {
                 const rol = await getRol(userCredential.uid);
                 
-                if (rol) { // Solo continúa si `rol` no es nulo
+                if (rol) { // Solo continúa si rol no es nulo
                     const userData = {
                         uid: userCredential.uid,
                         email: userCredential.email,
@@ -80,11 +72,12 @@ const Login = ({ navigation }) => {
         return () => unsubscribe();
     }, [isAuthenticated]);
 
+
     const handleCreateAccount = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 console.log('Cuenta creada');
-                const docuRef = doc(firestore, `usuarios/${userCredential.user.uid}`);
+                const docuRef = doc(firestore, usuarios/${userCredential.user.uid});
                 await setDoc(docuRef, { email: email, rol: rol }); // guarda el mail y rol
             })
             .catch(error => { console.log(error) });
@@ -98,16 +91,6 @@ const Login = ({ navigation }) => {
             })
             .catch(error => { console.log(error) });
     };
-
-    if (loading) {
-        // Pantalla de carga
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#ff6347" />
-                <Text style={styles.loadingText}>Cargando...</Text>
-            </View>
-        );
-    }
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -141,6 +124,7 @@ const Login = ({ navigation }) => {
                     save="value"
                 />
 
+                {/* Botón para Inicar Sesion }
                 <TouchableOpacity
                     style={[styles.submitButton]}
                     onPress={handleSingIn}
@@ -148,6 +132,7 @@ const Login = ({ navigation }) => {
                     <Text style={styles.submitButtonText}>Iniciar Sesion</Text>
                 </TouchableOpacity>
 
+                {/* Botón para Crear Cuenta }
                 <TouchableOpacity
                     style={[styles.submitButton]}
                     onPress={handleCreateAccount}
@@ -177,17 +162,6 @@ const styles = StyleSheet.create({
         elevation: 5,
         width: '90%',
         marginTop: 20,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#ffe8e3', // Fondo mientras carga
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 18,
-        color: '#333',
     },
     title: {
         fontSize: 28,
@@ -227,6 +201,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
     },
+    disabledButton: {
+        backgroundColor: 'lightgray',
+    },
     submitButtonText: {
         color: 'white',
         fontSize: 18,
@@ -234,4 +211,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Login;
+export default Login;*/

@@ -29,7 +29,7 @@ export default function LoginSelectionScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>¿Qué deseas hacer hoy?</Text>
+      <Text style={styles.title}>Ventana de Administracion y Pruebas</Text>
 
       <Animated.View style={{ transform: [{ scale }] }}>
         <TouchableOpacity
@@ -52,7 +52,7 @@ export default function LoginSelectionScreen() {
       <Animated.View style={{ transform: [{ scale }] }}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigateTo("Login", { isRegistering: false })} // Asegúrate de que "Login" sea el nombre correcto
+          onPress={() => navigateTo("Login")} // Asegúrate de que "Login" sea el nombre correcto
         >
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>

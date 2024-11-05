@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import StatCard from './StatCard'; // Asegúrate de que la ruta sea correcta
 import { BarChart } from 'react-native-chart-kit';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Dashboard = ({ navigation }) => { // Asegúrate de que navigation se pase como prop
   const data = {
@@ -15,6 +16,10 @@ const Dashboard = ({ navigation }) => { // Asegúrate de que navigation se pase 
 
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-back" size={24} color="#fff" />
+        <Text style={styles.backButtonText}> Volver</Text>
+      </TouchableOpacity>
       <Text style={styles.titulo}>Dashboard</Text>
       <View style={styles.statsContainer}>
         <StatCard title="Ventas Hoy" value="10">
@@ -39,9 +44,7 @@ const Dashboard = ({ navigation }) => { // Asegúrate de que navigation se pase 
         }}
         style={styles.chart}
       />
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>Volver</Text>
-      </TouchableOpacity>
+
     </ScrollView>
   );
 };
@@ -79,18 +82,19 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#FF6347',
     padding: 10,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
+    marginBottom: 20,
     width: 120,
   },
   backButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    marginLeft: 5,
   },
 });
 
