@@ -22,6 +22,8 @@ import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
 import Login from "../pages/InicioApp/Login";
+import ComercioLayout from "../pages/Admin/interfazAdministrador";
+
 
 // Importar las nuevas pantallas
 import Home from "../pages/Home";
@@ -159,6 +161,11 @@ export default function StackNavigator() {
         name="ResumenCompra"
         component={ResumenCompra}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+       name="ComercioLayout"
+       component={ComercioLayout}
+       options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

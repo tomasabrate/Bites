@@ -75,6 +75,14 @@ export default function LoginSelectionScreen() {
           <Text style={styles.buttonText}>Registrar como Comercio</Text>
         </TouchableOpacity>
       </Animated.View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateTo("ComercioLayout")}
+        >
+          <Text style={styles.buttonText}>Interfaz Admin</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
