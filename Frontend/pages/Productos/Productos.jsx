@@ -1,9 +1,9 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
-import Producto from "./components/Producto";
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import Producto from './components/Producto';
 
-export default function Productos({navigation}) {
+export default function Productos({ navigation }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true); // Nuevo estado para indicar carga
   const [error, setError] = useState(null); // Estado para errores
@@ -11,12 +11,15 @@ export default function Productos({navigation}) {
   // Función para obtener productos del backend
   const obtenerProductos = async () => {
     try {
-      const response = await fetch("http://localhost:3000/productos"); // Aqui tiene que ir el dominio o puerto donde tengas corriendo el back.
+      const response = await fetch('http://localhost:3000/productos'); // Aqui tiene que ir el dominio o puerto donde tengas corriendo el back.
       const data = await response.json();
+      //Necesito renderizar las imagenes que tengo respecto a los productos, segun la url que tiene cada uno correspondiente a cloudinary
+      console.log(data);
+      console.log(data[6].imagenes); //Este campo es el que tiene la url de la imagen en cloudinary, ahora necesito renderizarla
       setProductos(data);
     } catch (error) {
-      console.error("Error al obtener productos:", error);
-      setError("Error al obtener productos. Inténtalo de nuevo más tarde.");
+      console.error('Error al obtener productos:', error);
+      setError('Error al obtener productos. Inténtalo de nuevo más tarde.');
     } finally {
       setCargando(false); // Finaliza el estado de carga
     }
@@ -28,14 +31,12 @@ export default function Productos({navigation}) {
   }, []);
 
   return (
-    <View
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Text style={styles.title}>Promociones del dia!</Text>
       {cargando ? (
         <Text>Cargando productos...</Text>
       ) : error ? (
-        <Text style={{ color: "red" }}>{error}</Text>
+        <Text style={{ color: 'red' }}>{error}</Text>
       ) : (
         <FlatList
           style={styles.flatList}
@@ -43,12 +44,14 @@ export default function Productos({navigation}) {
           keyExtractor={(item) => item.id_producto.toString()}
           renderItem={({ item }) => (
             <Producto
-              imagenes={item.imagenes}
+              imagenes={item.imagenes} // La URL de la imagen de Cloudinary
               id_producto={item.id_producto}
               nombre={item.nombre}
               precio={item.precio}
               descuento={item.descuento}
-              onPress={() => navigation.navigate("Detalle Producto", {producto: item})}
+              onPress={() =>
+                navigation.navigate('Detalle Producto', { producto: item })
+              }
             />
           )}
         />
@@ -56,7 +59,6 @@ export default function Productos({navigation}) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -68,10 +70,9 @@ const styles = StyleSheet.create({
   },
   flatList: {
     width: '100%',
-
   },
-  title:{
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-  }
-})
+  },
+});
