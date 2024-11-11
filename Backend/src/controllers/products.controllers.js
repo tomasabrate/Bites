@@ -20,7 +20,6 @@ export const getProductos = async (req, res) => {
 };
 
 export const postProducto = async (req, res) => {
-  console.log('LLAMANDO DESDE EL BACK' + req.body); // Verifica el contenido de req.body en la cons
   const {
     id_vendedor,
     id_categoria,
@@ -33,23 +32,40 @@ export const postProducto = async (req, res) => {
     tipo,
     cantidad,
     activo,
-    images, // Asegúrate de que este campo esté en tu frontend
+    imagenes, // Campo adicional para las URLs de las imágenes
   } = req.body;
 
+  console.log(req.body);
+
+  // Verifica si "imagenes" es un array o una cadena
+  let imagenesFinales;
+  if (Array.isArray(imagenes)) {
+    // Si es un array, une las imágenes con ';'
+    imagenesFinales = imagenes.join(';');
+  } else if (typeof imagenes === 'string') {
+    // Si es una cadena, solo usa el valor tal cual
+    imagenesFinales = imagenes;
+  } else {
+    // Si no es ni un array ni una cadena, usa null
+    imagenesFinales = null;
+  }
+
   try {
-    const imageUrls = [];
-
-    // Subir las imágenes a Cloudinary
-    for (const image of images) {
-      const result = await cloudinary.uploader.upload(image, {
-        folder: 'BitesImages', // Carpeta en Cloudinary
-      });
-      imageUrls.push(result.secure_url); // Guardar la URL
-    }
-
-    // Guardar el producto en la base de datos
     const [rows] = await pool.query(
-      'INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo,imagenes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
+      `INSERT INTO Productos (
+         id_vendedor,
+         id_categoria,
+         nombre,
+         descripcion,
+         precio,
+         descuento,
+         fecha_produccion,
+         fecha_vencimiento,
+         tipo,
+         cantidad,
+         activo,
+         imagenes
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id_vendedor,
         id_categoria,
@@ -62,12 +78,13 @@ export const postProducto = async (req, res) => {
         tipo,
         cantidad,
         activo,
-        JSON.stringify(imageUrls), // Guardar las URLs como JSON si son múltiples
+        imagenesFinales, // Envia la variable imagenesFinales procesada
       ]
     );
 
     res.status(201).send({
       id_producto: rows.insertId,
+      id_vendedor,
       id_categoria,
       nombre,
       descripcion,
@@ -78,8 +95,10 @@ export const postProducto = async (req, res) => {
       tipo,
       cantidad,
       activo,
-      imageUrls, // También puedes devolver las URLs si lo deseas
+      imagenes: imagenesFinales, // También devuelve el valor final de imagenes
     });
+
+    console.log('Producto añadido con éxito!', req.body);
   } catch (error) {
     console.log('ERROR en POST producto.', error);
     return res.status(500).send('500 - Error en la base de datos');

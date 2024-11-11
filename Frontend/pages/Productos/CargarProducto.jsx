@@ -90,19 +90,35 @@ Aquí se obtiene cada URL de las imágenes subidas y se almacena en el array url
       );
 
       const validUrlsImagenes = urlsImagenes.filter((url) => url !== null);
+
+      // Verifica si se subieron imágenes
       if (validUrlsImagenes.length === 0) {
         showAlert('No se pudo cargar ninguna imagen. Intenta nuevamente.');
         return;
       }
 
+      // Si solo hay una imagen, enviar solo la URL
+      let imagenesFinales;
+      if (validUrlsImagenes.length === 1) {
+        imagenesFinales = validUrlsImagenes[0]; // Enviar solo la URL
+      } else {
+        // Si hay más de una, unirlas con ';'
+        imagenesFinales = validUrlsImagenes.join(';');
+      }
+
+      // Ahora, crea el objeto final de los datos
       const formDataFinal = {
         ...data,
         tipo: selectedTipo,
         categorias: selectedCategories,
         fecha_produccion: formatDate(data.fecha_produccion),
         fecha_vencimiento: formatDate(data.fecha_vencimiento),
-        imagenes: validUrlsImagenes.join(';'),
+        imagenes: imagenesFinales, // Enviar solo una URL o las URLs separadas por ';'
       };
+
+      console.log('Enviando formulario...');
+      console.log(JSON.stringify(formDataFinal));
+      console.log('Datos de las imagenes: ', formDataFinal.imagenes);
 
       const response = await fetch('http://localhost:3000/productos', {
         method: 'POST',
