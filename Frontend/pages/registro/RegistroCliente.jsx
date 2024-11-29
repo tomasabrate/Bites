@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import ZorritoSelector from './zorritoSelector'; // Asegúrate de ajustar la ruta
+import ZorritoSelector from './ZorritoSelector'; // Asegúrate de ajustar la ruta
 import ClientTermsModal from '../TerminosyCond/TermCliente'; // Importa el modal de términos
+import { useAuth } from '../../context/AuthContext';
 
 const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
 
-const ZorritoForm = ({ onSubmit }) => {
+const RegistroCliente = ({ onSubmit }) => {
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [birthDate, setBirthDate] = useState(new Date());
@@ -17,6 +17,8 @@ const ZorritoForm = ({ onSubmit }) => {
   const [selectedZorrito, setSelectedZorrito] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false); // Estado para los términos
   const [showTermsModal, setShowTermsModal] = useState(false); // Estado para el modal
+
+  const { user, logout } = useAuth();
 
   const handleCategorySelect = (category) => {
     if (selectedCategories.includes(category)) {
@@ -27,14 +29,13 @@ const ZorritoForm = ({ onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    if (!fullName || !email || !phoneNumber || !address || !selectedZorrito) {
+    if (!fullName || !phoneNumber || !address || !selectedZorrito) {
       Alert.alert('Error', 'Por favor completa todos los campos.');
       return;
     }
 
     const formData = {
       fullName,
-      email,
       phoneNumber,
       address,
       birthDate: birthDate.toLocaleDateString(),
@@ -46,7 +47,6 @@ const ZorritoForm = ({ onSubmit }) => {
     Alert.alert('Formulario Enviado', JSON.stringify(formData));
 
     setFullName('');
-    setEmail('');
     setPhoneNumber('');
     setAddress('');
     setSelectedCategories([]);
@@ -79,15 +79,6 @@ const ZorritoForm = ({ onSubmit }) => {
           placeholder="Ej. Juan Pérez"
           value={fullName}
           onChangeText={setFullName}
-        />
-
-        <Text style={styles.label}>Correo Electrónico</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. correo@dominio.com"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
         />
 
         <Text style={styles.label}>Número de Teléfono</Text>
@@ -155,6 +146,20 @@ const ZorritoForm = ({ onSubmit }) => {
           disabled={!termsAccepted}
         >
           <Text style={styles.submitButtonText}>Registrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cerrarSesionButtom}
+          onPress={async () => {
+            try {
+              await logout();
+              navigation.navigate('Login');
+              console.log('Sesion cerrada');
+            } catch (error) {
+              console.error('No se pudo cerrar sesión:', error);
+            }
+          }}
+        >
+          <Text style={styles.cerrarSesionButtonText}>Cerrar Sesión, completar perfil más tarde</Text>
         </TouchableOpacity>
       </View>
 
@@ -276,6 +281,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  cerrarSesionButtom: {
+    backgroundColor: '#aa0e0e',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  cerrarSesionButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
 });
 
-export default ZorritoForm;
+export default RegistroCliente;

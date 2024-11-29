@@ -2,11 +2,10 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 // Importar las pantallas necesarias
-import SplashScreen from "../pages/InicioApp/inicio";
-import IntroScreen from "../pages/InicioApp/entrada";
+import SplashScreen from "../pages/InicioApp/Inicio";
+import IntroScreen from "../pages/InicioApp/Entrada";
 import LoginSelectionScreen from "../pages/InicioApp/LoginSelectionScreen";
 import ClienteProfile from "../pages/Cliente/ClienteProfile";
-import cliente from "../pages/registro/cliente";
 import ComercioProfile from "../pages/Comercio/ComercioProfile";
 import InterfazComerciante from "../pages/Comercio/InterfazComercio";
 import InterfazCliente from "../pages/Cliente/InterfazCliente";
@@ -16,16 +15,17 @@ import Locales from "../pages/Comercio/LocalPerfilC";
 import Mapa from "../pages/Cliente/Mapa";
 import Cart from "../pages/Cliente/Cart";
 import Dashboard from "../pages/Comercio/Dashboard";
-import Reportes from "../pages/Comercio/reporte";
+import Reportes from "../pages/Comercio/Reporte";
 import MisPedidosCo from "../pages/Comercio/MisPedidosCo";
 import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
 import Login from "../pages/InicioApp/Login";
 import ComercioLayout from "../pages/Admin/interfazAdministrador";
+import Registro from "../pages/Registro/Registro";
+import RegistroCliente from "../pages/Registro/RegistroCliente";
+import RegistroComercio from "../pages/Registro/RegistroComercio";
 
-
-// Importar las nuevas pantallas
 import Home from "../pages/Home";
 import Productos from "../pages/Productos/Productos";
 import DetalleProducto from "../pages/Productos/DetalleProducto";
@@ -40,6 +40,21 @@ export default function StackNavigator() {
       <Stack.Screen
         name="Login"
         component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Registro"
+        component={Registro}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RegistroCliente"
+        component={RegistroCliente}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RegistroComercio"
+        component={RegistroComercio}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -60,11 +75,6 @@ export default function StackNavigator() {
       <Stack.Screen
         name="ClienteProfile"
         component={ClienteProfile}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ZorritoForm"
-        component={cliente}
         options={{ headerShown: false }}
       />
       <Stack.Screen

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
-import ComercioForm from '../registro/Comercio'; // Asegúrate de que la ruta sea correcta
+import RegistroComercio from '../Registro/RegistroComercio'; // Asegúrate de que la ruta sea correcta
 
 const ComercioProfile = ({ navigation }) => {
   const handleFormSubmit = (formData) => {
@@ -10,7 +10,7 @@ const ComercioProfile = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ComercioForm onSubmit={handleFormSubmit} />
+      <RegistroComercio onSubmit={handleFormSubmit} />
       <Button
         title="Ver Perfil"
         onPress={() => navigation.navigate('Perfil')} // Navega a la pantalla de perfil

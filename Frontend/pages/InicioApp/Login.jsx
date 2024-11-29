@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { SelectList } from "react-native-dropdown-select-list";
 
 import firebaseApp from '../../firebase_config';
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
@@ -16,11 +15,6 @@ const Login = ({ navigation }) => {
     const [rol, setRol] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const tipo = [
-        { value: "Cliente" },
-        { value: "Comercio" },
-    ];
-
     useEffect(() => {
         // Temporizador de carga de 1 segundo
         const timer = setTimeout(() => {
@@ -34,15 +28,32 @@ const Login = ({ navigation }) => {
         try {
             const docuRef = doc(firestore, `usuarios/${uid}`);
             const docuCifrada = await getDoc(docuRef);
-    
+
             if (docuCifrada.exists()) {
                 return docuCifrada.data().rol;
             } else {
-                console.warn("Documento no encontrado para el usuario:", uid);
+                console.warn("Documento no encontrado para el usuario", uid);
                 return null;
             }
         } catch (error) {
-            console.error("Error al obtener rol:", error);
+            console.error("Error al obtener rol", error);
+            return null;
+        }
+    };
+
+    const getPerfilCompleto = async (uid) => {
+        try {
+            const docuRef = doc(firestore, `usuarios/${uid}`);
+            const docuCifrada = await getDoc(docuRef);
+
+            if (docuCifrada.exists()) {
+                return docuCifrada.data().perfilCompleto;
+            } else {
+                console.warn("Documento no encontrado para el usuario", uid);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error al obtener si el perfil esta completo", error);
             return null;
         }
     };
@@ -51,32 +62,44 @@ const Login = ({ navigation }) => {
         const unsubscribe = onAuthStateChanged(auth, async (userCredential) => {
             if (userCredential) {
                 const rol = await getRol(userCredential.uid);
-                
+                const perfilCompleto = await getPerfilCompleto(userCredential.uid);
+                console.log("Perfil completo: " + perfilCompleto)
+
                 if (rol) { // Solo continúa si `rol` no es nulo
                     const userData = {
                         uid: userCredential.uid,
                         email: userCredential.email,
                         rol: rol,
+                        perfilCompleto: perfilCompleto,
                     };
                     setUser(userData);
                     console.log("Info Usuario Final: ", userData);
-    
+
                     // Redirige basado en el rol del usuario
-                    if (userData.rol === 'Admin') {
-                        navigation.navigate('LoginSelection');
-                    } else if (userData.rol === 'Cliente') {
-                        navigation.navigate('InterfazCliente');
-                    } else if (userData.rol === 'Comercio') {
-                        navigation.navigate('InterfazComerciante');
+                    if (userData.perfilCompleto == true) {
+                        if (userData.rol === 'Admin') {
+                            navigation.navigate('LoginSelection');
+                        } else if (userData.rol === 'Cliente') {
+                            navigation.navigate('InterfazCliente');
+                        } else if (userData.rol === 'Comercio') {
+                            navigation.navigate('InterfazComerciante');
+                        }
+                    }
+                    else {
+                        if (userData.rol === 'Cliente') {
+                            navigation.navigate('RegistroCliente');
+                        } else if (userData.rol === 'Comercio') {
+                            navigation.navigate('RegistroComercio');
+                        }
                     }
                 } else {
-                    console.warn("El rol no está definido para el usuario.");
+                    console.warn("El rol o perfil no está definido para el usuario.");
                 }
             } else {
                 setUser(null);
             }
         });
-    
+
         return () => unsubscribe();
     }, [isAuthenticated]);
 
@@ -132,15 +155,6 @@ const Login = ({ navigation }) => {
                     onChangeText={setPassword}
                 />
 
-                <Text style={styles.label}>Cuenta</Text>
-                <SelectList
-                    setSelected={setRol}
-                    label="Tipo"
-                    data={tipo}
-                    styles={styles.picker}
-                    save="value"
-                />
-
                 <TouchableOpacity
                     style={[styles.submitButton]}
                     onPress={handleSingIn}
@@ -148,12 +162,13 @@ const Login = ({ navigation }) => {
                     <Text style={styles.submitButtonText}>Iniciar Sesion</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.submitButton]}
-                    onPress={handleCreateAccount}
+                <Text style={styles.PreLinkText}>¿No tienes una cuenta?</Text>
+                <Text
+                    style={styles.linkText}
+                    onPress={() => navigation.navigate("Registro")}
                 >
-                    <Text style={styles.submitButtonText}>Crear Cuenta</Text>
-                </TouchableOpacity>
+                    Regístrate como Cliente o Comercio
+                </Text>
             </View>
         </ScrollView>
     );
@@ -232,6 +247,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
+    linkText: {
+        color: '#333', 
+        textAlign: 'center',
+        fontSize: 16,
+        textDecorationLine: 'underline', 
+    },
+    PreLinkText: {
+        color: '#333', 
+        textAlign: 'center',
+        marginTop: 16,
+        fontSize: 16,
+    }
 });
 
 export default Login;

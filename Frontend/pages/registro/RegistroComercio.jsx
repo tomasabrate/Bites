@@ -4,12 +4,11 @@ import TermsModal from '../TerminosyCond/TermComercio'; // Asegúrate de importa
 
 const categories = ['Restaurante', 'Panadería', 'Supermercado', 'Otros'];
 
-const ComercioForm = ({ onSubmit }) => {
+const RegistroComercio = ({ onSubmit }) => {
   const [businessName, setBusinessName] = useState('');
   const [category, setCategory] = useState([]);
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [openingHours, setOpeningHours] = useState('');
   const [deliveryAreas, setDeliveryAreas] = useState('');
@@ -27,7 +26,7 @@ const ComercioForm = ({ onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    if (!businessName || !category.length || !description || !address || !email || !phone) {
+    if (!businessName || !category.length || !description || !address || !phone) {
       Alert.alert('Error', 'Por favor completa todos los campos.');
       return;
     }
@@ -37,7 +36,6 @@ const ComercioForm = ({ onSubmit }) => {
       category,
       description,
       address,
-      email,
       phone,
       openingHours,
       deliveryAreas,
@@ -57,7 +55,6 @@ const ComercioForm = ({ onSubmit }) => {
     setCategory([]);
     setDescription('');
     setAddress('');
-    setEmail('');
     setPhone('');
     setOpeningHours('');
     setDeliveryAreas('');
@@ -113,16 +110,6 @@ const ComercioForm = ({ onSubmit }) => {
           placeholder="Ej. Calle 123, Ciudad"
           value={address}
           onChangeText={setAddress}
-        />
-
-        {/* Email */}
-        <Text style={styles.label}>Correo Electrónico</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. correo@dominio.com"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
         />
 
         {/* Teléfono */}
@@ -192,6 +179,28 @@ const ComercioForm = ({ onSubmit }) => {
           disabled={!termsAccepted}
         >
           <Text style={styles.submitButtonText}>Crear Cuenta</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.submitButton, !termsAccepted && styles.disabledButton]}
+          onPress={termsAccepted ? handleSubmit : null}
+          disabled={!termsAccepted}
+        >
+          <Text style={styles.submitButtonText}>Registrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cerrarSesionButtom}
+          onPress={async () => {
+            try {
+              await logout();
+              navigation.navigate('Login');
+              console.log('Sesion cerrada');
+            } catch (error) {
+              console.error('No se pudo cerrar sesión:', error);
+            }
+          }}
+        >
+          <Text style={styles.cerrarSesionButtonText}>Cerrar Sesión, completar perfil más tarde</Text>
         </TouchableOpacity>
       </View>
 
@@ -308,6 +317,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  cerrarSesionButtom: {
+    backgroundColor: '#aa0e0e',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  cerrarSesionButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
 });
 
-export default ComercioForm;
+export default RegistroComercio;

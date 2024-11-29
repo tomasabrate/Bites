@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import ZorritoSelector from '../registro/zorritoSelector'; // Asegúrate de importar el selector
-import ZorritoForm from '../registro/cliente'; // Importa el formulario
+import ZorritoSelector from '../Registro/ZorritoSelector'; // Asegúrate de importar el selector
+import RegistroCliente from '../Registro/RegistroCliente'; // Importa el formulario
 
 const ClienteProfile = ({ navigation }) => { // Añadido 'navigation' como prop
   const [selectedZorrito, setSelectedZorrito] = useState(null);
@@ -22,7 +22,7 @@ const ClienteProfile = ({ navigation }) => { // Añadido 'navigation' como prop
     <View style={styles.container}>
       <Text style={styles.title}>Perfil del Cliente</Text>
       <ZorritoSelector onSelect={handleZorritoSelect} />
-      {showForm && <ZorritoForm onSubmit={handleFormSubmit} />}
+      {showForm && <RegistroCliente onSubmit={handleFormSubmit} />}
       {selectedZorrito && (
         <Text style={styles.selectedZorritoText}>Zorrito seleccionado.</Text>
       )}
