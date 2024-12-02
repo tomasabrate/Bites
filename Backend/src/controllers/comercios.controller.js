@@ -1,0 +1,54 @@
+import { pool } from "../database/connection.js";
+
+export const getComercios = async (req, res) => {
+  try {
+    const [result] = await pool.query("SELECT * FROM Comercios");
+    console.log("Lista de Comercios:", result); 
+    res.status(200).json(result); 
+  } catch (error) {
+    console.log("ERROR en GET Comercios.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
+
+export const getComercioByUid = async (req, res) => {
+  const { uid_comercio } = req.params;
+  try {
+    const [result] = await pool.query(
+      "SELECT * FROM Comercios WHERE uid_comercio = ?",
+      [uid_comercio]
+    );
+
+    console.log("Comercio: ", result);
+
+    if (result.length > 0) {
+      res.status(200).json(result[0]);
+    } else {
+      res.status(404).json({ message: "Comercio no encontrado" }); 
+    }
+  } catch (error) {
+    console.log("ERROR en GET Comercios.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
+
+export const postComercio = async (req, res) => {
+  const { uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, zonas_entrega, costo_entrega, metodos_pago, imagenes  
+  } = req.body;
+  console.log(req.body);
+  try {
+    const [rows] = await pool.query(
+      "INSERT INTO Comercios (uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, zonas_entrega, costo_entrega, metodos_pago, imagenes )"
+      + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+      [ uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, zonas_entrega, costo_entrega, metodos_pago, imagenes ]
+    );
+
+    res.status(201).send({
+        uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, zonas_entrega, costo_entrega, metodos_pago, imagenes});
+    console.log("Perfil de comercio añadido con exito!", req.body);
+  } catch (error) {
+    console.log("ERROR en POST Comercios.", error);
+    return res.status(500).send("500 - Error en la base de datos");
+  }
+};
+

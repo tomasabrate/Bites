@@ -2,6 +2,8 @@
 import { PUERTO } from "./config.js";
 import app from "./app.js";
 import  routerProductos  from "./routes/products.routes.js";
+import routerClientes from "./routes/clientes.routes.js";
+import routerComercios from "./routes/comercio.routes.js";
 
 
 //Home
@@ -12,20 +14,11 @@ app.get("/", (req, res) => {
 //Productos
 app.use(routerProductos);
 
-//Usuarios
-app.get("/usuarios", (req, res) => {
-  res.send("GET usuarios");
-})
+//Clientes
+app.use(routerClientes);
 
-//Locales
-app.get("/locales", (req, res) => {
-  res.send("GET locales");
-});
-
-//Ventas
-app.get("/ventas", (req, res) => {
-  res.send("GET ventas");
-})
+//Comercios
+app.use(routerComercios);
 
 //Middleware - Ruta no encontrada
 app.use((req, res, next)=>{
