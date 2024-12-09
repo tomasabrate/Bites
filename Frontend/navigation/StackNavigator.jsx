@@ -1,7 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
-// Importar las pantallas necesarias
 import SplashScreen from "../pages/InicioApp/Inicio";
 import IntroScreen from "../pages/InicioApp/Entrada";
 import LoginSelectionScreen from "../pages/InicioApp/LoginSelectionScreen";
@@ -9,7 +8,6 @@ import ClienteProfile from "../pages/Cliente/ClienteProfile";
 import ComercioProfile from "../pages/Comercio/ComercioProfile";
 import InterfazComerciante from "../pages/Comercio/InterfazComercio";
 import InterfazCliente from "../pages/Cliente/InterfazCliente";
-import Perfil from "../pages/Perfil";
 import MisPedidos from "../pages/Cliente/Mispedidos";
 import Locales from "../pages/Comercio/LocalPerfilC";
 import Mapa from "../pages/Cliente/Mapa";
@@ -25,8 +23,6 @@ import ComercioLayout from "../pages/Admin/interfazAdministrador";
 import Registro from "../pages/Registro/Registro";
 import RegistroCliente from "../pages/Registro/RegistroCliente";
 import RegistroComercio from "../pages/Registro/RegistroComercio";
-
-import Home from "../pages/Home";
 import Productos from "../pages/Productos/Productos";
 import DetalleProducto from "../pages/Productos/DetalleProducto";
 import CargarProducto from "../pages/Productos/CargarProducto";
@@ -36,147 +32,33 @@ const Stack = createStackNavigator();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Splash">
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Registro"
-        component={Registro}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="RegistroCliente"
-        component={RegistroCliente}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="RegistroComercio"
-        component={RegistroComercio}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Splash"
-        component={SplashScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Intro"
-        component={IntroScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="LoginSelection"
-        component={LoginSelectionScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ClienteProfile"
-        component={ClienteProfile}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ComercioProfile"
-        component={ComercioProfile}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="InterfazComerciante"
-        component={InterfazComerciante}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="InterfazCliente"
-        component={InterfazCliente}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Perfil"
-        component={Perfil}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MisPedidos"
-        component={MisPedidos}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Locales"
-        component={Locales}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Mapa"
-        component={Mapa}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Home"
-        component={Home}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Productos"
-        component={Productos}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="DetalleProducto"
-        component={DetalleProducto}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CargarProducto"
-        component={CargarProducto}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Carrito"
-        component={Cart}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Dashboard"
-        component={Dashboard}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Reportes"
-        component={Reportes}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MisPedidosCo"
-        component={MisPedidosCo}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="FloatingButton"
-        component={FloatingButton}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="StatCard"
-        component={StatCard}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ModificarProducto"
-        component={ModificarProducto}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ResumenCompra"
-        component={ResumenCompra}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-       name="ComercioLayout"
-       component={ComercioLayout}
-       options={{ headerShown: false }}
-      />
+    <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Registro" component={Registro} />
+      <Stack.Screen name="RegistroCliente" component={RegistroCliente} />
+      <Stack.Screen name="RegistroComercio" component={RegistroComercio} />
+      <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="Intro" component={IntroScreen} />
+      <Stack.Screen name="LoginSelection" component={LoginSelectionScreen} />
+      <Stack.Screen name="ClienteProfile" component={ClienteProfile} />
+      <Stack.Screen name="ComercioProfile" component={ComercioProfile} />
+      <Stack.Screen name="InterfazComerciante" component={InterfazComerciante} />
+      <Stack.Screen name="InterfazCliente" component={InterfazCliente} />
+      <Stack.Screen name="MisPedidos" component={MisPedidos} />
+      <Stack.Screen name="Locales" component={Locales} />
+      <Stack.Screen name="Mapa" component={Mapa} />
+      <Stack.Screen name="Productos" component={Productos} />
+      <Stack.Screen name="DetalleProducto" component={DetalleProducto} />
+      <Stack.Screen name="CargarProducto" component={CargarProducto} />
+      <Stack.Screen name="Carrito" component={Cart} />
+      <Stack.Screen name="Dashboard" component={Dashboard} />
+      <Stack.Screen name="Reportes" component={Reportes} />
+      <Stack.Screen name="MisPedidosCo" component={MisPedidosCo} />
+      <Stack.Screen name="FloatingButton" component={FloatingButton} />
+      <Stack.Screen name="StatCard" component={StatCard} />
+      <Stack.Screen name="ModificarProducto" component={ModificarProducto} />
+      <Stack.Screen name="ResumenCompra" component={ResumenCompra} />
+      <Stack.Screen name="ComercioLayout" component={ComercioLayout} />
     </Stack.Navigator>
   );
 }
