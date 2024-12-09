@@ -1,212 +1,252 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import TermsModal from '../TerminosyCond/TermComercio'; // Asegúrate de importar el modal
+import React, { useState, useEffect } from 'react';
+import { View, Text, Modal, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import ClientTermsModal from '../TerminosyCond/TermCliente';
+import { useAuth } from '../../context/AuthContext';
+import FormInputController from "../Productos/components/FormInputController";
+import DatePickerController from "../Productos/components/DatePickerController";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import schemaComercios from "./utilities/schemaRegistroComercio.utilities";
+import BotonGenerico from "../../components/BotonGenerico";
+import { useNavigation } from '@react-navigation/native';
+import { postComercio } from "../../services/comercios";
 
-const categories = ['Restaurante', 'Panadería', 'Supermercado', 'Otros'];
+import firebaseApp from '../../firebase_config';
+import { getFirestore, doc, updateDoc } from "firebase/firestore";
 
-const RegistroComercio = ({ onSubmit }) => {
-  const [businessName, setBusinessName] = useState('');
-  const [category, setCategory] = useState([]);
-  const [description, setDescription] = useState('');
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
-  const [openingHours, setOpeningHours] = useState('');
-  const [deliveryAreas, setDeliveryAreas] = useState('');
-  const [deliveryCost, setDeliveryCost] = useState('');
-  const [paymentMethods, setPaymentMethods] = useState('');
+
+const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
+
+const RegistroComercio = () => {
+  const navigation = useNavigation();
+
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+  const [textModal, setTextModal] = useState("Continuar")
+  const [envio, setEnvio] = useState(false)
 
-  const handleCategorySelect = (category) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter((item) => item !== category));
-    } else {
-      setSelectedCategories([...selectedCategories, category]);
-    }
-  };
+  const { user, logout } = useAuth();
 
-  const handleSubmit = () => {
-    if (!businessName || !category.length || !description || !address || !phone) {
-      Alert.alert('Error', 'Por favor completa todos los campos.');
-      return;
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schemaComercios) });
+
+  useEffect(() => {
+    if (user) {
+      setValue("uid_comercio", user.uid);
+      setValue("mail", user.email);
     }
+  }, [setValue, user]);
+
+  const onSubmit = async (data) => {
+    const firestore = getFirestore(firebaseApp);
+    const userDocRef = doc(firestore, "usuarios", user.uid);
 
     const formData = {
-      businessName,
-      category,
-      description,
-      address,
-      phone,
-      openingHours,
-      deliveryAreas,
-      deliveryCost,
-      paymentMethods,
-      termsAccepted,
+      ...data
     };
 
-    onSubmit(formData);
-    Alert.alert('Registro Completado', JSON.stringify(formData));
+    console.log("Comercio:", formData);
 
-    resetForm();
+    try {
+      await postComercio(formData);
+
+      await updateDoc(userDocRef, {
+        perfilCompleto: true,
+      });
+
+      setModalMessage("Perfil cargado, ya puede utilizar Bites");
+      setModalVisible(true);
+      setIsProfileLoaded(true);
+    } catch (error) {
+      console.error("Error al cargar perfil o actualizar Firestore:", error);
+      setModalMessage("Error al cargar perfil, inténtelo de nuevo más tarde");
+      setModalVisible(true);
+      setIsProfileLoaded(false);
+    }
   };
 
-  const resetForm = () => {
-    setBusinessName('');
-    setCategory([]);
-    setDescription('');
-    setAddress('');
-    setPhone('');
-    setOpeningHours('');
-    setDeliveryAreas('');
-    setDeliveryCost('');
-    setPaymentMethods('');
-    setTermsAccepted(false);
+  const cerrarModal = () => {
+    if (isProfileLoaded) {
+      setModalVisible(false);
+      navigation.navigate("InterfazComerciante");
+    } else {
+      setTextModal("Intentar nuevamente");
+      setModalVisible(false);
+    }
+  };
+
+  const toggleEnvio = () => {
+    setEnvio(!envio);
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Registro de Comercio</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Completa el perfil de tu Comercio</Text>
 
-        {/* Nombre del Comercio */}
-        <Text style={styles.label}>Nombre del Comercio</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. Mi Tienda"
-          value={businessName}
-          onChangeText={setBusinessName}
-        />
+          <View style={styles.section}>
+            <Text style={styles.label}>Nombre del Comercio</Text>
+            <FormInputController
+              control={control}
+              style={styles.input}
+              placeholder="Mi Tienda"
+              placeholderTextColor="#888"
+              name="nombre_comercio"
+              errors={errors}
+            />
+          </View>
 
-        {/* Categoría del Comercio */}
-        <Text style={styles.label}>Categoría del Comercio</Text>
-        <View style={styles.categoriesContainer}>
-          {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[
-                styles.categoryButton,
-                category.includes(cat) && styles.selectedCategory,
-              ]}
-              onPress={() => handleCategorySelect(cat)}
-            >
-              <Text style={styles.categoryText}>{cat}</Text>
+          <View style={styles.section}>
+            <Text style={styles.label}>Categoria del Comercio</Text>
+            <Text style={{ color: 'red' }}>Definir metodo y funcionalidad</Text>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Descripcion del Comercio</Text>
+            <FormInputController
+              control={control}
+              style={styles.input}
+              placeholder="Describe tu negocio"
+              placeholderTextColor="#888"
+              name="descripcion"
+              errors={errors}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Dirección</Text>
+            <FormInputController
+              control={control}
+              style={styles.input}
+              placeholder="Calle 123, Ciudad"
+              placeholderTextColor="#888"
+              name="direccion"
+              errors={errors}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Número de teléfono</Text>
+            <FormInputController
+              control={control}
+              style={styles.input}
+              placeholder="555-1234567"
+              placeholderTextColor="#888"
+              keyboardType="phone-pad"
+              name="telefono"
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Horario apertura y cierre</Text>
+            <Text style={{ color: 'red' }}>Definir metodo y funcionalidad</Text>
+          </View>
+
+          <View style={styles.container2}>
+            <BotonGenerico onPress={toggleEnvio} title={envio ? 'Con envio' : 'Sin envio'} colorInicial = {envio ? '#088304' : '#aa0e0e'}/>
+            {envio && (
+              <View>
+                <View style={styles.section}>
+                  <Text style={styles.label}>Costo de entrega</Text>
+                  <FormInputController
+                    control={control}
+                    style={styles.input}
+                    placeholder="$1000"
+                    placeholderTextColor="#888"
+                    name="costo_entrega"
+                    errors={errors}
+                  />
+                  <Text>¡Atención! $0 es considerado envio gratis</Text>
+                </View>
+
+                <View style={styles.section}>
+                  <Text style={styles.label}>Zona de entrega</Text>
+                  <FormInputController
+                    control={control}
+                    style={styles.input}
+                    placeholder="Ciudad"
+                    placeholderTextColor="#888"
+                    name="zonas_entrega"
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Metodos de pago</Text>
+            <Text style={{ color: 'red' }}>Definir metodo y funcionalidad</Text>
+          </View>
+
+
+          <View style={styles.termsContainer}>
+            <TouchableOpacity onPress={() => setShowTermsModal(true)}>
+              <Text style={styles.termsText}>Leer Términos y Condiciones</Text>
             </TouchableOpacity>
-          ))}
-        </View>
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setTermsAccepted(!termsAccepted)}
+            >
+              <View style={[styles.checkbox, termsAccepted && styles.checkedCheckbox]} />
+              <Text style={styles.checkboxText}>He leído y acepto los términos y condiciones</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Descripción del Comercio */}
-        <Text style={styles.label}>Descripción del Comercio</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Describe tu negocio..."
-          value={description}
-          onChangeText={setDescription}
-        />
-
-        {/* Dirección */}
-        <Text style={styles.label}>Dirección</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. Calle 123, Ciudad"
-          value={address}
-          onChangeText={setAddress}
-        />
-
-        {/* Teléfono */}
-        <Text style={styles.label}>Número de Teléfono</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. 555-1234567"
-          keyboardType="phone-pad"
-          value={phone}
-          onChangeText={setPhone}
-        />
-
-        {/* Horarios de Apertura */}
-        <Text style={styles.label}>Horarios de Apertura</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. 9:00 AM - 9:00 PM"
-          value={openingHours}
-          onChangeText={setOpeningHours}
-        />
-
-        {/* Zonas de Entrega */}
-        <Text style={styles.label}>Zonas de Entrega</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. Ciudad, Zonas específicas"
-          value={deliveryAreas}
-          onChangeText={setDeliveryAreas}
-        />
-
-        {/* Costo de Entrega */}
-        <Text style={styles.label}>Costo de Entrega</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. $5.00"
-          value={deliveryCost}
-          onChangeText={setDeliveryCost}
-        />
-
-        {/* Métodos de Pago */}
-        <Text style={styles.label}>Métodos de Pago Aceptados</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej. Tarjeta, Efectivo, Transferencia"
-          value={paymentMethods}
-          onChangeText={setPaymentMethods}
-        />
-
-        {/* Términos y Condiciones */}
-        <View style={styles.termsContainer}>
-          <TouchableOpacity onPress={() => setShowTermsModal(true)}>
-            <Text style={styles.termsText}>Leer Términos y Condiciones</Text>
-          </TouchableOpacity>
           <TouchableOpacity
-            style={styles.checkboxContainer}
-            onPress={() => setTermsAccepted(!termsAccepted)} // Cambia el estado al hacer clic
+            style={[styles.submitButton, !termsAccepted && styles.disabledButton]}
+            onPress={termsAccepted ? handleSubmit(onSubmit) : null}
+            disabled={!termsAccepted}
           >
-            <View style={[styles.checkbox, termsAccepted && styles.checkedCheckbox]} />
-            <Text style={styles.checkboxText}>He leído y acepto los términos y condiciones</Text>
+            <Text style={styles.submitButtonText}>Registrar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cerrarSesionButtom}
+            onPress={async () => {
+              try {
+                await logout();
+                navigation.navigate("Login");
+                console.log("Sesión cerrada");
+              } catch (error) {
+                console.error("No se pudo cerrar sesión:", error);
+              }
+            }}
+          >
+            <Text style={styles.cerrarSesionButtonText}>
+              Cerrar Sesión, completar perfil más tarde
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Botón para Crear Cuenta */}
-        <TouchableOpacity
-          style={[styles.submitButton, !termsAccepted && styles.disabledButton]}
-          onPress={handleSubmit}
-          disabled={!termsAccepted}
-        >
-          <Text style={styles.submitButtonText}>Crear Cuenta</Text>
-        </TouchableOpacity>
+        <ClientTermsModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />
+      </ScrollView>
 
-        <TouchableOpacity
-          style={[styles.submitButton, !termsAccepted && styles.disabledButton]}
-          onPress={termsAccepted ? handleSubmit : null}
-          disabled={!termsAccepted}
-        >
-          <Text style={styles.submitButtonText}>Registrar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cerrarSesionButtom}
-          onPress={async () => {
-            try {
-              await logout();
-              navigation.navigate('Login');
-              console.log('Sesion cerrada');
-            } catch (error) {
-              console.error('No se pudo cerrar sesión:', error);
-            }
-          }}
-        >
-          <Text style={styles.cerrarSesionButtonText}>Cerrar Sesión, completar perfil más tarde</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal de términos y condiciones */}
-      <TermsModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />
-    </ScrollView>
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={cerrarModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTexto}>{modalMessage}</Text>
+            <BotonGenerico
+              title={textModal}
+              onPress={cerrarModal}
+            />
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
   );
 };
 
@@ -225,9 +265,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '90%', // Asegúrate de que esto esté correcto
+    width: '90%',
     marginTop: 20,
   },
+  container2: {
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '100%',
+    marginTop: 20,
+  }
+  ,
   title: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -248,12 +301,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 15,
     fontSize: 16,
+    color: '#333'
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    lineHeight: 50,
   },
   categoriesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 15,
   },
   categoryButton: {
     borderColor: 'gray',
@@ -329,6 +388,41 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 20,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTexto: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  section: {
+    padding: 5,
+    marginTop: 2,
+  }
 });
 
 export default RegistroComercio;

@@ -9,6 +9,7 @@ export default function FormInputController({
   errors,
   name,
   placeholder,
+  placeholderTextColor
 }) {
   return (
     <>
@@ -19,6 +20,7 @@ export default function FormInputController({
           <TextInput
             style={styles.input}
             placeholder={placeholder}
+            placeholderTextColor={placeholderTextColor}
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}

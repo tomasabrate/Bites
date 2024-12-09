@@ -28,15 +28,15 @@ const Login = ({ navigation }) => {
         try {
             const docuRef = doc(firestore, `usuarios/${uid}`);
             const docuCifrada = await getDoc(docuRef);
-
+    
             if (docuCifrada.exists()) {
                 return docuCifrada.data().rol;
             } else {
-                console.warn("Documento no encontrado para el usuario", uid);
+                console.warn("Documento no encontrado");
                 return null;
             }
         } catch (error) {
-            console.error("Error al obtener rol", error);
+            console.error("Error al obtener rol:", error.message);
             return null;
         }
     };
@@ -141,6 +141,7 @@ const Login = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     placeholder="correo@dominio.com"
+                    placeholderTextColor="#888"
                     keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
@@ -150,6 +151,7 @@ const Login = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     placeholder="Ingresa tu contraseña"
+                    placeholderTextColor="#888"
                     secureTextEntry={true}
                     value={password}
                     onChangeText={setPassword}
