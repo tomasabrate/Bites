@@ -35,7 +35,7 @@ export const getProductosById = async (req, res) => {
 
 export const postProducto = async (req, res) => {
   const {
-    id_vendedor,
+    uid_comercio,
     id_categoria,
     nombre,
     descripcion,
@@ -50,9 +50,9 @@ export const postProducto = async (req, res) => {
   console.log(req.body);
   try {
     const [rows] = await pool.query(
-      "INSERT INTO Productos (id_vendedor,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO Productos (uid_comercio,id_categoria,nombre,descripcion,precio,descuento,fecha_produccion,fecha_vencimiento,tipo,cantidad,activo) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
       [
-        id_vendedor,
+        uid_comercio,
         id_categoria,
         nombre,
         descripcion,
@@ -90,7 +90,7 @@ export const putProducto = async (req, res) => {
   console.log("Datos recibidos:", req.body);
   const { id_producto } = req.params; // ID del producto desde los parámetros de la solicitud
   const {
-    id_vendedor,
+    uid_comercio,
     id_categoria,
     nombre,
     descripcion,
@@ -108,7 +108,7 @@ export const putProducto = async (req, res) => {
     // Construir la consulta SQL dinámica
     let query = `
       UPDATE Productos SET
-        id_vendedor = ?,
+        uid_comercio = ?,
         id_categoria = ?,
         nombre = ?,
         descripcion = ?,
@@ -121,7 +121,7 @@ export const putProducto = async (req, res) => {
         activo = ?
     `;
     const values = [
-      id_vendedor,
+      uid_comercio,
       id_categoria,
       nombre,
       descripcion,

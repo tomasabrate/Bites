@@ -22,6 +22,7 @@ import schema from "./utilities/schemaCargaProducto.utilities";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { postProducto } from "../../services/productos";
+import { useAuth } from "../../context/AuthContext";
 
 const categorias = [
   { value: "Comida Rápida", key: 1 },
@@ -42,6 +43,7 @@ export default function CargarProducto({ route }) {
   const [selectedTipo, setSelectedTipo] = useState(""); //
   const [modalMessage, setModalMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
+  const {user,} = useAuth();
 
   const mostrar = false;
 
@@ -54,13 +56,15 @@ export default function CargarProducto({ route }) {
 
   // Asignar el id_vendedor cuando el componente se monte
   useEffect(() => {
-    setValue("id_vendedor", 1); // Valor defecto hasta tener funcionalidad de perfiles
+    if(user){
+      setValue("uid_comercio", user.uid);
+    }
     //Por defecto las fechas son del dia actual
-    setValue("fecha_produccion", new Date())
-    setValue("fecha_vencimiento", new Date())
+    setValue("fecha_produccion", new Date());
+    setValue("fecha_vencimiento", new Date());
     setValue("tipo", "unidad");
     setValue("activo", 1);
-  }, [setValue]);
+  }, [setValue, user]);
 
   const onSubmit = async (data) => {
     const formData = {

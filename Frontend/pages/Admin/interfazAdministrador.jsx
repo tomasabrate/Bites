@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { useNavigation } from '@react-navigation/native';
 import firebaseApp from '../../firebase_config';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
-import axios from 'axios'; // Asegúrate de importar axios
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext'; // Import useAuth hook
 
 const firestore = getFirestore(firebaseApp);
 
@@ -12,24 +13,25 @@ const navItems = [
   { name: 'Dashboard', icon: 'bar-chart' },
   { name: 'Productos', icon: 'dropbox' },
   { name: 'Pedidos', icon: 'credit-card' },
+  { name: 'Mostrar Usuarios', icon: 'users' },
   { name: 'Denuncias y Soporte', icon: 'exclamation-triangle' },
   { name: 'Configuración', icon: 'cog' },
-  { name: 'Mostrar Usuarios', icon: 'users' },
+
 ];
 
 export default function InterfazAdministrador() {
   const [activeNav, setActiveNav] = useState('Dashboard');
   const [usuarios, setUsuarios] = useState([]);
-  const [productos, setProductos] = useState([]); // Para almacenar los productos
+  const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const { logout } = useAuth(); // Use the logout function from AuthContext
 
-  // Función para obtener los productos de SQL
   const fetchProductsSQL = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:3000/productos'); // Reemplaza con tu endpoint real
-      setProductos(response.data); // Asume que `response.data` contiene el array de productos
+      const response = await axios.get('http://localhost:3000/productos');
+      setProductos(response.data);
     } catch (error) {
       console.error("Error al obtener productos:", error);
     } finally {
@@ -37,7 +39,6 @@ export default function InterfazAdministrador() {
     }
   };
 
-  // Llamada a la API de usuarios
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -56,23 +57,31 @@ export default function InterfazAdministrador() {
     }
   };
 
-  // useEffect para obtener datos cuando se cambia la navegación
   useEffect(() => {
     if (activeNav === 'Mostrar Usuarios') {
       fetchUsers();
     } else if (activeNav === 'Productos') {
-      fetchProductsSQL(); // Llama a la función para obtener productos de SQL
+      fetchProductsSQL();
     }
   }, [activeNav]);
 
-  // Función para manejar la navegación
   const handleNavigation = (screenName) => {
     setActiveNav(screenName);
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigation.navigate('Login');
+      console.log('Sesión de administrador cerrada');
+    } catch (error) {
+      console.error('No se pudo cerrar sesión:', error);
+      Alert.alert('Error', 'No se pudo cerrar la sesión. Por favor, intente de nuevo.');
+    }
+  };
+
   return (
     <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#f3f4f6' }}>
-      {/* Menu de Navegación */}
       <View style={{ width: 250, backgroundColor: '#ffffff' }}>
         <View style={{ padding: 16 }}>
           <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#f87171' }}>Bites Administrador</Text>
@@ -99,14 +108,14 @@ export default function InterfazAdministrador() {
         </ScrollView>
       </View>
 
-      {/* Contenido Principal */}
       <View style={{ flex: 1 }}>
         <View style={{ backgroundColor: '#ffffff', padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={{ fontSize: 18, fontWeight: '600', color: '#374151' }}>{activeNav}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Icon name="bell" size={20} />
-            <TouchableOpacity style={{ marginLeft: 16 }}>
-              <Icon name="user-circle" size={40} />
+            <Icon name="bell" size={20} style={{ marginRight: 16 }} />
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+              <Icon name="sign-out" size={20} color="#ffffff" />
+              <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -114,7 +123,6 @@ export default function InterfazAdministrador() {
         <ScrollView contentContainerStyle={{ padding: 16 }}>
           {activeNav === 'Dashboard' && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-              {/* Tarjetas de información del Dashboard */}
               <View style={{ width: '30%', marginBottom: 16, padding: 16, backgroundColor: '#fff', borderRadius: 8 }}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Productos Activos</Text>
                 <Icon name="dropbox" size={24} color="#9ca3af" />
@@ -222,5 +230,18 @@ const styles = StyleSheet.create({
   productText: {
     fontSize: 16,
     marginBottom: 5,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f87171',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+  },
+  logoutButtonText: {
+    color: '#ffffff',
+    marginLeft: 8,
+    fontWeight: '600',
   },
 });

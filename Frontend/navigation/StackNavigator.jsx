@@ -13,7 +13,7 @@ import Locales from "../pages/Comercio/LocalPerfilC";
 import Mapa from "../pages/Cliente/Mapa";
 import Cart from "../pages/Cliente/Cart";
 import Dashboard from "../pages/Comercio/Dashboard";
-import Reportes from "../pages/Comercio/Reporte";
+import Reportes from "../pages/Comercio/Reportes";
 import MisPedidosCo from "../pages/Comercio/MisPedidosCo";
 import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";

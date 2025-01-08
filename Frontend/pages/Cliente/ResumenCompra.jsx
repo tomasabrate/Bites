@@ -12,9 +12,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import { useCart } from "../../context/CartContext";
 import CalcularDescuento from "../Productos/utilities/calcularDescuento.utilities";
+import { postVenta } from "../../services/ventas";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ResumenCompra({ navigation }) {
   const { carrito } = useCart();
+  const { user } = useAuth();
+  const uid_cliente = user.uid
+
   const [metodoPago, setMetodoPago] = useState("efectivo");
   const [metodoEnvio, setMetodoEnvio] = useState("pickup");
 
@@ -169,13 +174,20 @@ export default function ResumenCompra({ navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.confirmButton}
-            onPress={() => {
-              console.log("Compra confirmada", {
+            onPress={async () => {
+              await postVenta({
                 carrito,
                 total,
                 metodoPago,
                 metodoEnvio,
-              });
+                uid_cliente,
+              }) && (console.log("Compra confirmada", {
+                carrito,
+                total,
+                metodoPago,
+                metodoEnvio,
+                uid_cliente,
+              }))
             }}
           >
             <Text style={styles.confirmButtonText}>Comprar</Text>

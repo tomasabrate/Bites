@@ -1,4 +1,8 @@
-import { getClientes, getClienteByUid, postCliente } from "../controllers/clientes.controller.js";
+import {
+  getClientes,
+  getClienteByUid,
+  postCliente,
+} from "../controllers/clientes.controller.js";
 import { Router } from "express";
 const routerClientes = Router();
 
