@@ -108,6 +108,9 @@ export default function Productos() {
       );
     }
 
+    // Filtro por cantidad disponible
+    resultado = resultado.filter((producto) => producto.cantidad > 0);
+
     setProductosFiltrados(resultado);
   };
 
@@ -186,6 +189,7 @@ export default function Productos() {
               nombre={item.nombre}
               precio={item.precio}
               descuento={item.descuento}
+              nombre_comercio={item.nombre_comercio}
               onPress={() =>
                 navigation.navigate("DetalleProducto", { producto: item })
               }

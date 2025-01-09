@@ -2,7 +2,9 @@ import { pool } from "../database/connection.js";
 
 export const getProductos = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT * FROM Productos");
+    // const [result] = await pool.query("SELECT * FROM Productos p JOIN where p.cantidad > 0");//para que solo se devuelvan productos con cantidad > 0
+    const [result] = await pool.query("SELECT p.id_producto, p.uid_comercio, c.nombre_comercio, p.id_categoria, p.nombre, p.descripcion, p.precio, p.descuento, p.fecha_produccion, p.fecha_vencimiento, p.tipo, p.cantidad, p.imagenes, p.activo FROM Productos p JOIN Comercios c ON p.uid_comercio = c.uid_comercio WHERE p.cantidad > 0 ");
+    //esta consulta devuelve todos los datos de productos mas el nombre del comercio al que pertenece.
     console.log("Lista de Productos:", result); //muestra en consola
     res.status(200).json(result); //respuesta en el cliente
   } catch (error) {
@@ -182,6 +184,34 @@ export const deleteProducto = async (req, res) => {
       .send(`Producto con id ${id_producto} eliminado exitosamente`);
   } catch (error) {
     console.log("ERROR en DELETE producto.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
+
+
+// Función para eliminar productos vencidos o agotados
+export const deleteExpiredOrEmptyProducts = async (req, res) => {
+  try {
+    // Consulta SQL para eliminar productos con cantidad <= 0 o fecha vencida
+    const [result] = await pool.query(
+      `
+      DELETE FROM Productos
+      WHERE cantidad <= 0 OR fecha_vencimiento <= CURDATE();
+      `
+    );
+
+    // Verifica si se eliminaron productos
+    if (result.affectedRows === 0) {
+      return res
+        .status(200)
+        .send("No se encontraron productos para eliminar.");
+    }
+
+    res.status(200).send(
+      `Se eliminaron ${result.affectedRows} producto(s) cuya cantidad es menor o igual a 0 o cuya fecha de vencimiento ha pasado.`
+    );
+  } catch (error) {
+    console.error("ERROR al eliminar productos:", error);
     return res.status(500).send("500 - Error en la base de datos.");
   }
 };

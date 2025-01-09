@@ -51,7 +51,7 @@ export default function DetalleProducto({ navigation, route }) {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <Text style={styles.nombre}>{producto.nombre}</Text>
+          <Text style={styles.nombre}>{producto.nombre_comercio}</Text>
 
           <View style={styles.imageContainer}>
             <Image source={imagen} style={styles.imagen} resizeMode="cover" />
@@ -60,6 +60,10 @@ export default function DetalleProducto({ navigation, route }) {
           <View style={styles.card}>
             <View style={styles.infoSection}>
               <Text style={styles.sectionTitle}>Detalles del Producto</Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.label}>Nombre: </Text>
+                {producto.nombre}
+              </Text>
               <Text style={styles.infoText}>
                 <Text style={styles.label}>Descripción: </Text>
                 {producto.descripcion}

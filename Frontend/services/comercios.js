@@ -23,3 +23,20 @@ export const postComercio = async (data) => {
       throw error;
     }
   };
+
+//OBTENER UN COMERCIO POR UID
+export const getComercioById = async (uid_comercio) => {
+  try {
+    const response = await fetch(`${API_URL}/${uid_comercio}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener Comercio:", error);
+    throw error;
+  }
+};

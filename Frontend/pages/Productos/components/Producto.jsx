@@ -16,7 +16,7 @@ export default function Producto(props) {
         style={styles.imagen}
       />
       <View style={styles.content}>
-        <Text style={styles.nombre}>{props.nombre}</Text>
+        <Text style={styles.nombre}>{props.nombre} - {props.nombre_comercio}</Text>
         <Text style={styles.tipo}>{props.tipo}</Text>
         <View style={styles.priceContainer}>
           <Text style={styles.precioOriginal}>${props.precio}</Text>
