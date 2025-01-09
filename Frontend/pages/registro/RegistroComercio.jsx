@@ -3,24 +3,23 @@ import { View, Text, Modal, StyleSheet, TouchableOpacity, SafeAreaView, ScrollVi
 import ClientTermsModal from '../TerminosyCond/TermCliente';
 import { useAuth } from '../../context/AuthContext';
 import FormInputController from "../Productos/components/FormInputController";
-import DatePickerController from "../Productos/components/DatePickerController";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import schemaComercios from "./utilities/schemaRegistroComercio.utilities";
 import BotonGenerico from "../../components/BotonGenerico";
 import { useNavigation } from '@react-navigation/native';
 import { postComercio } from "../../services/comercios";
+import { SelectList } from "react-native-dropdown-select-list";
+import { getCategoriasComercio } from "../../services/categoriasComercio";
+import { TextField } from '@mui/material';
 
 import firebaseApp from '../../firebase_config';
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
 
 
-const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
-
 const RegistroComercio = () => {
   const navigation = useNavigation();
 
-  const [selectedCategories, setSelectedCategories] = useState([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -28,6 +27,9 @@ const RegistroComercio = () => {
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
   const [textModal, setTextModal] = useState("Continuar")
   const [envio, setEnvio] = useState(false)
+  const [categoriasComercio, setCategoriasComercio] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
 
   const { user, logout } = useAuth();
 
@@ -38,6 +40,8 @@ const RegistroComercio = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schemaComercios) });
 
+  console.log("Errores del formulario:", errors);
+
   useEffect(() => {
     if (user) {
       setValue("uid_comercio", user.uid);
@@ -45,18 +49,41 @@ const RegistroComercio = () => {
     }
   }, [setValue, user]);
 
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const categorias = await getCategoriasComercio();
+        setCategoriasComercio(categorias.map((categoria, index) => ({
+          value: categoria.nombre,
+          key: index + 1
+        })));
+      } catch (error) {
+        console.error("Error al obtener categorías:", error);
+      }
+    };
+
+    fetchCategorias();
+  }, []);
+
   const onSubmit = async (data) => {
+    console.log("Entró a onSubmit");
     const firestore = getFirestore(firebaseApp);
     const userDocRef = doc(firestore, "usuarios", user.uid);
 
+
     const formData = {
-      ...data
+      ...data,
+      id_categoria: selectedCategory,
     };
 
     console.log("Comercio:", formData);
+    console.log("Categoría seleccionada:", selectedCategory);
 
     try {
+      console.log("Intentando enviar datos...");
       await postComercio(formData);
+
+      console.log("Datos enviados correctamente");
 
       await updateDoc(userDocRef, {
         perfilCompleto: true,
@@ -107,7 +134,20 @@ const RegistroComercio = () => {
 
           <View style={styles.section}>
             <Text style={styles.label}>Categoria del Comercio</Text>
-            <Text style={{ color: 'red' }}>Definir metodo y funcionalidad</Text>
+            <SelectList
+              setSelected={(val) => {
+                console.log("Categoría seleccionada:", val); // Depuración
+                setSelectedCategory(val);
+              }}
+              control={control}
+              data={categoriasComercio}
+              save="key"
+              placeholder="Seleccionar categoría"
+              boxStyles={styles.selectBox}
+              dropdownStyles={styles.dropdown}
+              searchPlaceholder="Buscar categoría..."
+              errors={errors}
+            />
           </View>
 
           <View style={styles.section}>
@@ -146,13 +186,66 @@ const RegistroComercio = () => {
             />
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.label}>Horario apertura y cierre</Text>
-            <Text style={{ color: 'red' }}>Definir metodo y funcionalidad</Text>
+          <View style={styles.container2}>
+            <Text style={styles.label}>Horario</Text>
+            <View style={styles.row}>
+              <Controller
+                control={control}
+                name="horario_apertura"
+                rules={{ required: "El horario de apertura es obligatorio" }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <View style={styles.sectionHorario}>
+                    <TextField
+                      id="horario_apertura"
+                      label="Horario apertura"
+                      type="time"
+                      defaultValue="08:00"
+                      value={value}
+                      onChange={(e) => onChange(e.target.value)}
+                      style={styles.inputHorario}
+                      InputLabelProps={{
+                        style: { color: '#888' },
+                      }}
+                      inputProps={{
+                        style: { fontSize: 16 },
+                      }}
+                      error={!!error} // Indica si hay un error
+                      helperText={error?.message} // Muestra el mensaje de error
+                    />
+                  </View>
+                )}
+              />
+              <Controller
+                control={control}
+                name="horario_cierre"
+                rules={{ required: "El horario de apertura es obligatorio" }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <View style={styles.sectionHorario}>
+                    <TextField
+                      id="horario_cierre"
+                      label="Horario cierre"
+                      type="time"
+                      defaultValue="20:00"
+                      value={value}
+                      onChange={(e) => onChange(e.target.value)}
+                      style={styles.inputHorario}
+                      InputLabelProps={{
+                        style: { color: '#888' },
+                      }}
+                      inputProps={{
+                        style: { fontSize: 16 },
+                      }}
+                      error={!!error} 
+                      helperText={error?.message} 
+                    />
+                  </View>
+                )}
+              />
+            </View>
           </View>
 
           <View style={styles.container2}>
-            <BotonGenerico onPress={toggleEnvio} title={envio ? 'Con envio' : 'Sin envio'} colorInicial = {envio ? '#088304' : '#aa0e0e'}/>
+            <BotonGenerico onPress={toggleEnvio} title={envio ? 'Con envio' : 'Sin envio'} colorInicial={envio ? '#088304' : '#aa0e0e'} />
             {envio && (
               <View>
                 <View style={styles.section}>
@@ -182,12 +275,6 @@ const RegistroComercio = () => {
             )}
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.label}>Metodos de pago</Text>
-            <Text style={{ color: 'red' }}>Definir metodo y funcionalidad</Text>
-          </View>
-
-
           <View style={styles.termsContainer}>
             <TouchableOpacity onPress={() => setShowTermsModal(true)}>
               <Text style={styles.termsText}>Leer Términos y Condiciones</Text>
@@ -203,7 +290,10 @@ const RegistroComercio = () => {
 
           <TouchableOpacity
             style={[styles.submitButton, !termsAccepted && styles.disabledButton]}
-            onPress={termsAccepted ? handleSubmit(onSubmit) : null}
+            onPress={termsAccepted ? () => {
+              console.log("Botón presionado");
+              handleSubmit(onSubmit)();
+            } : null}
             disabled={!termsAccepted}
           >
             <Text style={styles.submitButtonText}>Registrar</Text>
@@ -422,7 +512,41 @@ const styles = StyleSheet.create({
   section: {
     padding: 5,
     marginTop: 2,
-  }
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  sectionHorario: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  selectBox: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  dropdown: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  inputHorario: {
+    width: '100%',
+    borderWidth: 1,
+    marginBottom: 5,
+    marginTop: 10,
+    paddingHorizontal: 15,
+  },
 });
 
 export default RegistroComercio;

@@ -5,6 +5,7 @@ import routerProductos from "./routes/products.routes.js";
 import routerClientes from "./routes/clientes.routes.js";
 import routerComercios from "./routes/comercio.routes.js";
 import routerVentas from "./routes/ventas.routes.js";
+import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
 
 //Home
 app.get("/", (req, res) => {
@@ -22,6 +23,9 @@ app.use(routerComercios);
 
 //Ventas
 app.use(routerVentas);
+
+//Categorias Comercio
+app.use(routerCategoriasComercio);
 
 //Middleware - Ruta no encontrada
 app.use((req, res, next) => {

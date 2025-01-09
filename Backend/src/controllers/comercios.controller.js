@@ -42,6 +42,7 @@ export const postComercio = async (req, res) => {
     direccion,
     telefono,
     horario_apertura,
+    horario_cierre,
     zonas_entrega,
     costo_entrega,
     metodos_pago,
@@ -50,8 +51,8 @@ export const postComercio = async (req, res) => {
   console.log(req.body);
   try {
     const [rows] = await pool.query(
-      "INSERT INTO Comercios (uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, zonas_entrega, costo_entrega, metodos_pago, imagenes )" +
-        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO Comercios (uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega, metodos_pago, imagenes )" +
+        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
       [
         uid_comercio,
         mail,
@@ -61,6 +62,7 @@ export const postComercio = async (req, res) => {
         direccion,
         telefono,
         horario_apertura,
+        horario_cierre,
         zonas_entrega,
         costo_entrega,
         metodos_pago,
@@ -77,6 +79,7 @@ export const postComercio = async (req, res) => {
       direccion,
       telefono,
       horario_apertura,
+      horario_cierre,
       zonas_entrega,
       costo_entrega,
       metodos_pago,
