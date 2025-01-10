@@ -2,7 +2,7 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import SplashScreen from "../pages/InicioApp/Inicio";
-import IntroScreen from "../pages/InicioApp/Entrada";
+import IntroScreen from "../pages/InicioApp/IntroScreen";
 import LoginSelectionScreen from "../pages/InicioApp/LoginSelectionScreen";
 import ClienteProfile from "../pages/Cliente/ClienteProfile";
 import ComercioProfile from "../pages/Comercio/ComercioProfile";
@@ -38,7 +38,7 @@ export default function StackNavigator() {
       <Stack.Screen name="RegistroCliente" component={RegistroCliente} />
       <Stack.Screen name="RegistroComercio" component={RegistroComercio} />
       <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="Intro" component={IntroScreen} />
+      <Stack.Screen name="IntroScreen" component={IntroScreen} />
       <Stack.Screen name="LoginSelection" component={LoginSelectionScreen} />
       <Stack.Screen name="ClienteProfile" component={ClienteProfile} />
       <Stack.Screen name="ComercioProfile" component={ComercioProfile} />

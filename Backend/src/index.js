@@ -6,7 +6,7 @@ import routerClientes from "./routes/clientes.routes.js";
 import routerComercios from "./routes/comercio.routes.js";
 import routerVentas from "./routes/ventas.routes.js";
 import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
-import cron from "node-cron.js";
+import cron from "node-cron";
 import { deleteExpiredOrEmptyProducts } from "./controllers/products.controllers.js";
 
 //Home

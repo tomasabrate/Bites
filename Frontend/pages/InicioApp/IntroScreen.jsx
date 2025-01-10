@@ -61,7 +61,7 @@ export default function Entrada({ navigation }) {
           style={styles.customButton}
           onPress={() => navigation.navigate("Login")}
         >
-          <Text style={styles.buttonText}>Comenzar a Comprar</Text>
+          <Text style={styles.buttonText}>Comenzar</Text>
         </TouchableOpacity>
       </View>
     </View>
