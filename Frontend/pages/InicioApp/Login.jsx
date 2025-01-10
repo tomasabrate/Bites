@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { validate as validateEmail } from 'email-validator';
+import { createTheme, ThemeProvider, TextField } from '@mui/material';
+import CustomModal from "../../components/CustomModal";
 
 import firebaseApp from "../../firebase_config";
 import {
@@ -20,6 +22,15 @@ import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
+const theme = createTheme({
+  palette: {
+    customGris: {
+      main: '#ded8cd',
+      contrastText: '#fff',
+    },
+  },
+});
+
 const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(true); // Estado de carga
   const [user, setUser] = useState(null);
@@ -27,6 +38,8 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [rol, setRol] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     // Temporizador de carga de 1 segundo
@@ -36,6 +49,7 @@ const Login = ({ navigation }) => {
 
     return () => clearTimeout(timer);
   }, []);
+
 
   const getRol = async (uid) => {
     try {
@@ -129,13 +143,18 @@ const Login = ({ navigation }) => {
   };
 
   const handleSingIn = () => {
+    if (!validateEmail(email)) {
+      setError(true);
+      return;
+    }
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log("Sesion iniciada");
         setIsAuthenticated(true); // cambia el estado para indicar que el usuario se autentico
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Error al iniciar sesión:", error);
+        showModal();
       });
   };
 
@@ -149,29 +168,53 @@ const Login = ({ navigation }) => {
     );
   }
 
+  const handleChangeMail = (event) => {
+    setEmail(event.target.value);
+    setError(false); // Reset error on change
+  };
+
+  const handleChangePass = (event) => {
+    setPassword(event.target.value);
+    setError(false); // Reset error on change
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const hideModal = () => {
+    setIsModalVisible(false);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Text style={styles.title}>Inicio de Sesion</Text>
 
-        <Text style={styles.label}>Correo Electrónico</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="correo@dominio.com"
-          placeholderTextColor="#888"
-          keyboardType="email-address"
+        <TextField
+          id="email-field"
+          label="Correo electrónico"
+          variant="outlined"
+          color="customGris"
           value={email}
-          onChangeText={setEmail}
+          onChange={handleChangeMail}
+          error={error} // Cambia el estado visual a error si es true
+          helperText={error ? "Por favor ingresa un correo válido" : ""}
+          fullWidth
+          sx={{
+            marginBottom: 2,
+          }}
         />
 
-        <Text style={styles.label}>Contraseña</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ingresa tu contraseña"
-          placeholderTextColor="#888"
-          secureTextEntry={true}
+        <TextField
+          id="password-field"
+          label="Contraseña"
+          type="password"
+          variant="outlined"
+          color="customGris"
           value={password}
-          onChangeText={setPassword}
+          onChange={handleChangePass}
+          fullWidth
         />
 
         <TouchableOpacity style={[styles.submitButton]} onPress={handleSingIn}>
@@ -185,6 +228,7 @@ const Login = ({ navigation }) => {
         >
           Regístrate como Cliente o Comercio
         </Text>
+        <CustomModal visible={isModalVisible} onClose={hideModal} errorMessage="El correo o la contraseña son incorrectos." />
       </View>
     </ScrollView>
   );
@@ -227,20 +271,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333",
     marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 5,
-  },
-  input: {
-    height: 50,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 10,
-    marginBottom: 15,
-    paddingHorizontal: 15,
-    fontSize: 16,
   },
   picker: {
     height: 50,

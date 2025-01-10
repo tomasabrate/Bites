@@ -76,6 +76,13 @@ export default function SplashScreen({ navigation }) {
                 navigation.navigate("InterfazComerciante");
               }
             }
+            else {
+              if (userData.rol === "Cliente") {
+                navigation.navigate("RegistroCliente");
+              } else if (userData.rol === "Comercio") {
+                navigation.navigate("RegistroComercio");
+              }
+            }
           } else {
             console.warn("El rol o perfil no está definido para el usuario.");
           }
