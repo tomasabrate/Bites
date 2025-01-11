@@ -106,8 +106,8 @@ export default function InterfazComerciante() {
       case "Reportes":
         navigation.navigate("Reportes");
         break;
-      case "MisPedidosCo":
-        navigation.navigate("MisPedidosCo");
+      case "MisVentas":
+        navigation.navigate("MisVentas");
         break;
       default:
         break;

@@ -9,12 +9,10 @@ import ComercioProfile from "../pages/Comercio/ComercioProfile";
 import InterfazComerciante from "../pages/Comercio/InterfazComercio";
 import InterfazCliente from "../pages/Cliente/InterfazCliente";
 import MisPedidos from "../pages/Cliente/Mispedidos";
-import Locales from "../pages/Comercio/LocalPerfilC";
 import Mapa from "../pages/Cliente/Mapa";
 import Cart from "../pages/Cliente/Cart";
 import Dashboard from "../pages/Comercio/Dashboard";
 import Reportes from "../pages/Comercio/Reportes";
-import MisPedidosCo from "../pages/Comercio/MisPedidosCo";
 import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
@@ -27,6 +25,8 @@ import Productos from "../pages/Productos/Productos";
 import DetalleProducto from "../pages/Productos/DetalleProducto";
 import CargarProducto from "../pages/Productos/CargarProducto";
 import ModificarProducto from "../pages/Productos/ModificarProducto";
+import MisVentas from "../pages/Comercio/Ventas/MisVentas"
+import DetalleVenta from "../pages/Comercio/Ventas/DetalleVenta";
 
 const Stack = createStackNavigator();
 
@@ -45,7 +45,6 @@ export default function StackNavigator() {
       <Stack.Screen name="InterfazComerciante" component={InterfazComerciante} />
       <Stack.Screen name="InterfazCliente" component={InterfazCliente} />
       <Stack.Screen name="MisPedidos" component={MisPedidos} />
-      <Stack.Screen name="Locales" component={Locales} />
       <Stack.Screen name="Mapa" component={Mapa} />
       <Stack.Screen name="Productos" component={Productos} />
       <Stack.Screen name="DetalleProducto" component={DetalleProducto} />
@@ -53,7 +52,8 @@ export default function StackNavigator() {
       <Stack.Screen name="Carrito" component={Cart} />
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="Reportes" component={Reportes} />
-      <Stack.Screen name="MisPedidosCo" component={MisPedidosCo} />
+      <Stack.Screen name="MisVentas" component={MisVentas} />
+      <Stack.Screen name="DetalleVenta" component={DetalleVenta} />
       <Stack.Screen name="FloatingButton" component={FloatingButton} />
       <Stack.Screen name="StatCard" component={StatCard} />
       <Stack.Screen name="ModificarProducto" component={ModificarProducto} />

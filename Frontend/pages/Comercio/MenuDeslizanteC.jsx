@@ -15,15 +15,15 @@ const MenuDeslizanteC = ({ setPaginaActual }) => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Dashboard")}>
         <Icon name="bar-chart" size={20} color="#000" />
-        <Text style={styles.menuText}>Dashboard</Text>
+        <Text style={styles.menuText}>Estadisticas</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Reportes")}>
         <Icon name="line-chart" size={20} color="#000" />
         <Text style={styles.menuText}>Reportes</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("MisPedidosCo")}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("MisVentas")}>
         <Icon name="bookmark" size={20} color="#000" />
-        <Text style={styles.menuText}>Mis Pedidos</Text>
+        <Text style={styles.menuText}>Mis Ventas</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.menuItem}

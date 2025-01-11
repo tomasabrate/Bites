@@ -35,6 +35,34 @@ export const getVentaById = async (req, res) => {
   }
 };
 
+// Obtener ventas por comercio
+export const getVentasByComercio = async (req, res) => {
+  try {
+    const { uid_comercio } = req.query;
+
+    if (!uid_comercio) {
+      return res.status(400).send("El parámetro 'uid_comercio' es requerido");
+    }
+
+    const [rows] = await pool.query(
+      "SELECT * FROM Ventas WHERE uid_comercio = ?",
+      [uid_comercio]
+    );
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .send(`No se encontraron ventas para el comercio con UID: ${uid_comercio}`);
+    }
+
+    console.log(rows)
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Error al obtener ventas por comercio:", error);
+    res.status(500).send("500 - Error en la base de datos");
+  }
+};
+
 // Crear una nueva venta
 export const postVenta = async (req, res) => {
   const { carrito, total, metodoPago, uid_cliente } = req.body;
@@ -111,7 +139,7 @@ export const postVenta = async (req, res) => {
       );
     }
 
-    console.log(" - - - VENTA REALIZADA CON EXITO!...")
+    console.log(" - - - VENTA REALIZADA CON EXITO!...", req.body)
     // Responder con éxito
     res.status(201).json({
       message: "Venta registrada con éxito.",

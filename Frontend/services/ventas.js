@@ -17,6 +17,24 @@ export const getVentas = async () => {
   }
 };
 
+//OBTENER VENTAS por uid_comercio
+
+export const getVentasByComercio = async (uid_comercio) => {
+  try {
+    const response = await fetch(`${API_URL}?uid_comercio=${uid_comercio}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener ventas por comercio:", error);
+    throw error;
+  }
+};
+
 //MODIFICAR UN venta
 export const putVenta = async (ventaId, data) => {
   try {
@@ -41,7 +59,7 @@ export const putVenta = async (ventaId, data) => {
   }
 };
 
-//OBTENER UN venta POR ID
+//OBTENER una venta POR ID
 export const getVentaById = async (ventaId) => {
   try {
     const response = await fetch(`${API_URL}/${ventaId}`);
@@ -58,7 +76,7 @@ export const getVentaById = async (ventaId) => {
   }
 };
 
-//CREAR UN venta
+//CREAR una venta
 export const postVenta = async (data) => {
   try {
     const response = await fetch(API_URL, {

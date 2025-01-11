@@ -18,7 +18,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function ResumenCompra({ navigation }) {
   const { carrito } = useCart();
   const { user } = useAuth();
-  const uid_cliente = user.uid
+  const uid_cliente = user.uid;
 
   const [metodoPago, setMetodoPago] = useState("efectivo");
   const [metodoEnvio, setMetodoEnvio] = useState("pickup");
@@ -44,6 +44,20 @@ export default function ResumenCompra({ navigation }) {
     );
     return { subtotal, total, cantidadProductos, descuento };
   }, [carrito, metodoEnvio]);
+
+  // const RealizarCompra = async () => {
+  //   try{
+  //     await postVenta({
+  //       carrito,
+  //       total,
+  //       metodoPago,
+  //       metodoEnvio,
+  //       uid_cliente,
+  //     })
+  //   }catch(err){
+
+  //   }
+  // };
 
   const RadioButton = ({ value, label, selected, onSelect }) => (
     <TouchableOpacity
@@ -175,19 +189,20 @@ export default function ResumenCompra({ navigation }) {
           <TouchableOpacity
             style={styles.confirmButton}
             onPress={async () => {
-              await postVenta({
+              (await postVenta({
                 carrito,
                 total,
                 metodoPago,
                 metodoEnvio,
                 uid_cliente,
-              }) && (console.log("Compra confirmada", {
-                carrito,
-                total,
-                metodoPago,
-                metodoEnvio,
-                uid_cliente,
-              }))
+              })) &&
+                console.log("Compra confirmada", {
+                  carrito,
+                  total,
+                  metodoPago,
+                  metodoEnvio,
+                  uid_cliente,
+                });
             }}
           >
             <Text style={styles.confirmButtonText}>Comprar</Text>
