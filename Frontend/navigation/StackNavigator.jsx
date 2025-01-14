@@ -27,6 +27,7 @@ import CargarProducto from "../pages/Productos/CargarProducto";
 import ModificarProducto from "../pages/Productos/ModificarProducto";
 import MisVentas from "../pages/Comercio/Ventas/MisVentas"
 import DetalleVenta from "../pages/Comercio/Ventas/DetalleVenta";
+import DetalleUsuario from "../pages/Admin/detalleUsuario";
 
 const Stack = createStackNavigator();
 
@@ -59,6 +60,7 @@ export default function StackNavigator() {
       <Stack.Screen name="ModificarProducto" component={ModificarProducto} />
       <Stack.Screen name="ResumenCompra" component={ResumenCompra} />
       <Stack.Screen name="ComercioLayout" component={ComercioLayout} />
+      <Stack.Screen name="DetalleUsuario" component={DetalleUsuario} />
     </Stack.Navigator>
   );
 }
