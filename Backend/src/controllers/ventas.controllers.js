@@ -52,10 +52,12 @@ export const getVentasByComercio = async (req, res) => {
     if (rows.length === 0) {
       return res
         .status(404)
-        .send(`No se encontraron ventas para el comercio con UID: ${uid_comercio}`);
+        .send(
+          `No se encontraron ventas para el comercio con UID: ${uid_comercio}`
+        );
     }
 
-    console.log(rows)
+    console.log(rows);
     res.status(200).json(rows);
   } catch (error) {
     console.error("Error al obtener ventas por comercio:", error);
@@ -75,7 +77,7 @@ export const postVenta = async (req, res) => {
 
     // Validar que todos los productos sean del mismo vendedor
     const vendedores = carrito.map((item) => item.uid_comercio);
-    const vendedoresUnicos = [...new Set(vendedores)]; // Obtiene un array de vendedores únicos
+    const vendedoresUnicos = [...new Set(vendedores)];
 
     if (vendedoresUnicos.length > 1) {
       return res.status(400).json({
@@ -87,69 +89,84 @@ export const postVenta = async (req, res) => {
     // Usar el vendedor único para registrar la venta
     const uid_comercio = vendedoresUnicos[0];
 
-    // Crear la venta
-    const [ventaResult] = await pool.query(
-      `
-      INSERT INTO Ventas (uid_comercio, uid_cliente, total, metodo_pago, fecha_venta)
-      VALUES (?, ?, ?, ?, NOW())
-    `,
-      [uid_comercio, uid_cliente, total, metodoPago]
-    );
-    const ventaId = ventaResult.insertId;
+    // Iniciar transacción
+    await pool.query("START TRANSACTION");
 
-    // Insertar los detalles de la venta y actualizar la cantidad de cada producto
-    for (const item of carrito) {
-      const { id_producto, cantidad: cantidadCarrito } = item;
-
-      // Obtener precio y cantidad del producto
-      const [productoResult] = await pool.query(
-        "SELECT precio, cantidad FROM Productos WHERE id_producto = ?",
-        [id_producto]
-      );
-      if (productoResult.length === 0) {
-        return res
-          .status(404)
-          .json({ message: `Producto con ID ${id_producto} no encontrado.` });
-      }
-      const { precio, cantidad: cantidadDisponible } = productoResult[0];
-
-      // Validar cantidad disponible
-      if (cantidadDisponible < cantidadCarrito) {
-        return res.status(400).json({
-          message: `Cantidad insuficiente para el producto con ID ${id_producto}. Cantidad disponible: ${cantidadDisponible}.`,
-        });
-      }
-
-      // Insertar el detalle de la venta
-      const subtotal = precio * cantidadCarrito;
-      await pool.query(
+    try {
+      // Crear la venta
+      const [ventaResult] = await pool.query(
         `
-        INSERT INTO DetallesVenta (id_venta, id_producto, cantidad, subtotal)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO Ventas (uid_comercio, uid_cliente, total, metodo_pago, fecha_venta)
+        VALUES (?, ?, ?, ?, NOW())
       `,
-        [ventaId, id_producto, cantidadCarrito, subtotal]
+        [uid_comercio, uid_cliente, total, metodoPago]
       );
+      const ventaId = ventaResult.insertId;
 
-      // Actualizar la cantidad del producto
-      await pool.query(
-        `
-        UPDATE Productos SET cantidad = cantidad - ? WHERE id_producto = ?
-      `,
-        [cantidadCarrito, id_producto]
-      );
+      // Insertar los detalles de la venta y actualizar la cantidad de cada producto
+      for (const item of carrito) {
+        const { id_producto, cantidad, precio } = item;
+
+        // Obtener cantidad disponible del producto
+        const [productoResult] = await pool.query(
+          "SELECT cantidad FROM Productos WHERE id_producto = ?",
+          [id_producto]
+        );
+
+        if (productoResult.length === 0) {
+          throw new Error(`Producto con ID ${id_producto} no encontrado.`);
+        }
+
+        const { cantidad: cantidadDisponible } = productoResult[0];
+
+        // Validar cantidad disponible
+        if (cantidadDisponible < cantidad) {
+          throw new Error(
+            `Cantidad insuficiente para el producto con ID ${id_producto}. Cantidad disponible: ${cantidadDisponible}.`
+          );
+        }
+
+        // Insertar el detalle de la venta
+        const subtotal = cantidad * precio;
+        await pool.query(
+          `
+          INSERT INTO DetallesVenta (id_venta, id_producto, cantidad, precio_unitario, subtotal)
+          VALUES (?, ?, ?, ?, ?)
+        `,
+          [ventaId, id_producto, cantidad, precio, subtotal]
+        );
+
+        // Actualizar la cantidad del producto
+        await pool.query(
+          `
+          UPDATE Productos SET cantidad = cantidad - ? WHERE id_producto = ?
+        `,
+          [cantidad, id_producto]
+        );
+      }
+
+      // Confirmar transacción
+      await pool.query("COMMIT");
+
+      console.log(" - - - VENTA REALIZADA CON EXITO!...", {
+        ventaId,
+        carrito,
+        total,
+      });
+      res.status(201).json({
+        message: "Venta registrada con éxito.",
+        ventaId,
+      });
+    } catch (error) {
+      // Revertir transacción en caso de error
+      await pool.query("ROLLBACK");
+      throw error;
     }
-
-    console.log(" - - - VENTA REALIZADA CON EXITO!...", req.body)
-    // Responder con éxito
-    res.status(201).json({
-      message: "Venta registrada con éxito.",
-      ventaId,
-    });
   } catch (error) {
     console.error("ERROR en POST venta.", error);
     return res.status(500).json({
       message: "Error en la base de datos.",
-      error: error.message
+      error: error.message,
     });
   }
 };
