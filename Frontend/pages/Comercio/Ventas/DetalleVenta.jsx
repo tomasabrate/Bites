@@ -6,24 +6,27 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getVentaById } from '../../../services/ventas';
+import { getDetallesByIdVenta } from '../../../services/detallesVenta';
 
 const DetalleVenta = () => {
-  const [venta, setVenta] = useState(null);
+  const [ventaCompleta, setVentaCompleta] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const route = useRoute();
-  const { ventaId } = route.params;
+  const { ventaId, venta } = route.params;
 
   useEffect(() => {
     const fetchVentaDetails = async () => {
       try {
-        const ventaData = await getVentaById(ventaId);
-        setVenta(ventaData);
+        console.log(ventaId)
+        const data = await getDetallesByIdVenta(ventaId);
+        console.log(data);
+        setVentaCompleta(data);
       } catch (error) {
         console.error('Error fetching venta details:', error);
         // You might want to show an error message to the user here
@@ -43,7 +46,7 @@ const DetalleVenta = () => {
     );
   }
 
-  if (!venta) {
+  if (!ventaCompleta) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>No se pudo cargar los detalles de la venta.</Text>
@@ -64,27 +67,30 @@ const DetalleVenta = () => {
         <ScrollView style={styles.content}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Información General</Text>
-            <Text style={styles.infoText}>Venta #{venta.id_venta}</Text>
+            <Text style={styles.infoText}>Venta #{ventaId}</Text>
             <Text style={styles.infoText}>Fecha: {new Date(venta.fecha_venta).toLocaleString()}</Text>
             <Text style={styles.infoText}>Total: ${venta.total}</Text>
             <Text style={styles.infoText}>Método de Pago: {venta.metodo_pago}</Text>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Detalles del Cliente</Text>
             <Text style={styles.infoText}>ID Cliente: {venta.uid_cliente}</Text>
-            {/* Add more customer details if available */}
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Productos</Text>
-            {venta.productos && venta.productos.map((producto, index) => (
+            {ventaCompleta.detalles.map((detalle, index) => (
               <View key={index} style={styles.productoItem}>
-                <Text style={styles.productoNombre}>{producto.nombre}</Text>
-                <Text style={styles.productoCantidad}>Cantidad: {producto.cantidad}</Text>
-                <Text style={styles.productoPrecio}>
-                  Precio: ${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : 'N/A'}
-                </Text>
+                <View style={styles.productoInfo}>
+                  <Text style={styles.productoNombre}>{detalle.nombre_producto}</Text>
+                  <Text style={styles.productoCantidad}>Cantidad: {detalle.cantidad}</Text>
+                  <Text style={styles.productoPrecio}>
+                    Precio unitario: ${detalle.precio_unitario}
+                  </Text>
+                  <Text style={styles.productoSubtotal}>
+                    Subtotal: ${detalle.subtotal}
+                  </Text>
+                </View>
               </View>
             ))}
           </View>
@@ -162,9 +168,19 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   productoItem: {
+    flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     paddingVertical: 8,
+  },
+  productoImagen: {
+    width: 60,
+    height: 60,
+    borderRadius: 4,
+    marginRight: 12,
+  },
+  productoInfo: {
+    flex: 1,
   },
   productoNombre: {
     fontSize: 16,
@@ -178,6 +194,12 @@ const styles = StyleSheet.create({
   productoPrecio: {
     fontSize: 14,
     color: '#4CAF50',
+  },
+  productoSubtotal: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginTop: 4,
   },
 });
 

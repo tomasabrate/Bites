@@ -32,7 +32,8 @@ const MisVentas = () => {
 
     try {
       const ventasData = await getVentasByComercio(user.uid);
-      setVentas(ventasData);
+      const sortedVentas = ventasData.sort((a, b) => new Date(b.fecha_venta) - new Date(a.fecha_venta));
+      setVentas(sortedVentas);
     } catch (error) {
       console.error('Error fetching ventas:', error);
       Alert.alert('Error', 'No se pudieron cargar las ventas. Por favor, intente de nuevo.');
@@ -54,11 +55,11 @@ const MisVentas = () => {
   const renderVentaItem = ({ item }) => (
     <TouchableOpacity
       style={styles.ventaItem}
-      onPress={() => navigation.navigate('DetalleVenta', { ventaId: item.id_venta })}
+      onPress={() => navigation.navigate('DetalleVenta', { ventaId: item.id_venta, venta: item })}
     >
       <View style={styles.ventaHeader}>
         <Text style={styles.ventaId}>Venta #{item.id_venta}</Text>
-        <Text style={styles.ventaFecha}>{new Date(item.fecha_venta).toLocaleDateString()}</Text>
+        <Text style={styles.ventaFecha}>{new Date(item.fecha_venta).toLocaleString()}</Text>
       </View>
       <View style={styles.ventaBody}>
         <Text style={styles.ventaTotal}>
