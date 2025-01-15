@@ -40,3 +40,24 @@ export const getComercioById = async (uid_comercio) => {
     throw error;
   }
 };
+
+export const deleteComercio = async (uid_comercio) => {
+  try {
+    const response = await fetch(`${API_URL}/${uid_comercio}`, {
+      method: "DELETE"
+    });
+
+    if (response.ok) {
+      console.log(`Comercio eliminado: ${uid_comercio}`);
+      return { success: true };
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+  } catch (error) {
+    console.error("Error al eliminar comercio:", error);
+    throw error;
+  }
+};

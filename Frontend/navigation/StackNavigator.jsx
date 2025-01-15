@@ -17,7 +17,7 @@ import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
 import Login from "../pages/InicioApp/Login";
-import ComercioLayout from "../pages/Admin/interfazAdministrador";
+import InterfazAdministrador from "../pages/Admin/interfazAdministrador";
 import Registro from "../pages/Registro/Registro";
 import RegistroCliente from "../pages/Registro/RegistroCliente";
 import RegistroComercio from "../pages/Registro/RegistroComercio";
@@ -59,7 +59,7 @@ export default function StackNavigator() {
       <Stack.Screen name="StatCard" component={StatCard} />
       <Stack.Screen name="ModificarProducto" component={ModificarProducto} />
       <Stack.Screen name="ResumenCompra" component={ResumenCompra} />
-      <Stack.Screen name="ComercioLayout" component={ComercioLayout} />
+      <Stack.Screen name="InterfazAdministrador" component={InterfazAdministrador} />
       <Stack.Screen name="DetalleUsuario" component={DetalleUsuario} />
     </Stack.Navigator>
   );

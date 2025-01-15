@@ -78,3 +78,23 @@ export const postCliente = async (req, res) => {
     return res.status(500).send("500 - Error en la base de datos");
   }
 };
+
+
+export const deleteCliente = async (req, res) => {
+  const { uid_cliente } = req.params;
+
+  try {
+    const [result] = await pool.query("DELETE FROM Clientes WHERE uid_cliente = ?", [
+      uid_cliente,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Cliente no encontrado o ya eliminado" });
+    }
+
+    res.status(200).send(`Cliente con uid ${uid_cliente} eliminado exitosamente`);
+  } catch (error) {
+    console.log("ERROR en DELETE cliente.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};

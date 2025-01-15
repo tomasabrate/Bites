@@ -91,3 +91,27 @@ export const postComercio = async (req, res) => {
     return res.status(500).send("500 - Error en la base de datos");
   }
 };
+
+
+export const deleteComercio = async (req, res) => {
+  const { uid_comercio } = req.params;
+
+  if (!uid_comercio) {
+    return res.status(400).json({ message: "UID de comercio inválido" });
+  }
+
+  try {
+    const [result] = await pool.query("DELETE FROM Comercios WHERE uid_comercio = ?", [
+      uid_comercio,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Comercio no encontrado o ya eliminado" });
+    }
+
+    res.status(200).send(`Comercio con uid ${uid_comercio} eliminado exitosamente`);
+  } catch (error) {
+    console.log("ERROR en DELETE comercio.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};

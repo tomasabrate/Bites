@@ -106,7 +106,7 @@ const Login = ({ navigation }) => {
           // Redirige basado en el rol del usuario
           if (userData.perfilCompleto == true) {
             if (userData.rol === "Admin") {
-              navigation.navigate("LoginSelection");
+              navigation.navigate("InterfazAdministrador");
             } else if (userData.rol === "Cliente") {
               navigation.navigate("InterfazCliente");
             } else if (userData.rol === "Comercio") {

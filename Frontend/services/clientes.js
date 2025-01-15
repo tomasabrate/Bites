@@ -40,3 +40,25 @@ export const postCliente = async (data) => {
       throw error;
     }
   };
+
+
+  export const deleteCliente = async (uid_cliente) => {
+    try {
+      const response = await fetch(`${API_URL}/${uid_cliente}`, {
+        method: "DELETE"
+      });
+  
+      if (response.ok) {
+        console.log(`Cliente eliminado: ${uid_cliente}`);
+        return { success: true };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Error ${response.status}: ${response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("Error al eliminar cliente:", error);
+      throw error;
+    }
+  };

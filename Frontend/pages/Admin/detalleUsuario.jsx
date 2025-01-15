@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Platform, StatusBar, } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Platform, StatusBar, Modal } from 'react-native';
 import BotonGenerico from "../../components/BotonGenerico";
-import { getClienteById } from '../../services/clientes';
-import { getComercioById } from '../../services/comercios';
+import { deleteCliente, getClienteById } from '../../services/clientes';
+import { deleteComercio, getComercioById } from '../../services/comercios';
+
+import firebaseApp from '../../firebase_config';
+import { getFirestore, doc, deleteDoc } from "firebase/firestore";
+
+const firestore = getFirestore(firebaseApp);
 
 const DetalleUsuario = ({ navigation, route }) => {
     const user = route.params.user;
 
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
+    const [textModal, setTextModal] = useState("")
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         const obtenerDatos = async () => {
@@ -16,7 +23,7 @@ const DetalleUsuario = ({ navigation, route }) => {
                 let resultado = null;
                 if (user.rol === 'Cliente') {
                     resultado = await getClienteById(user.id);
-                    console.log("UID: " ,user.id);
+                    console.log("UID: ", user.id);
                     console.log(resultado);
                 } else if (user.rol === 'Comercio') {
                     resultado = await getComercioById(user.id);
@@ -47,6 +54,11 @@ const DetalleUsuario = ({ navigation, route }) => {
             </SafeAreaView>
         );
     }
+
+    const cerrarModal = () => {
+        setModalVisible(false)
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -99,12 +111,62 @@ const DetalleUsuario = ({ navigation, route }) => {
                     colorPressed="#d32f2f"
                 />
                 <BotonGenerico
-                    title="Eliminar"
+                    title="Dar de baja"
                     onPress={null}
                     colorInicial="#f44336"
                     colorPressed="#d32f2f"
                 />
+                <BotonGenerico
+                    title="Eliminar"
+                    onPress={() => {
+                        setTextModal("¿Estas seguro que deseas eliminar este usuario?");
+                        setModalVisible(true);
+                    }}
+                    colorInicial="#f44336"
+                    colorPressed="#d32f2f"
+                />
             </View>
+
+            <Modal
+                transparent={true}
+                animationType="slide"
+                visible={modalVisible}
+                onRequestClose={cerrarModal}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTexto}>{textModal}</Text>
+                        <View style={styles.modalBotones}>
+                            <BotonGenerico
+                                title="Eliminar"
+                                onPress={async () => {
+                                    try {
+                                        const docuRef = doc(firestore, `usuarios/${user.id}`);
+                                        await deleteDoc(docuRef);
+
+                                        if (user.rol === 'Cliente') {
+                                            await deleteCliente(user.id);
+                                        } else if (user.rol === 'Comercio') {
+                                            await deleteComercio(user.id);
+                                        } else {
+                                            console.warn('Rol no reconocido');
+                                        }
+
+                                        cerrarModal();
+                                        navigation.goBack();
+                                    } catch (error) {
+                                        console.error('Error al eliminar el usuario:', error);
+                                    }
+                                }}
+                            />
+                            <BotonGenerico
+                                title="Cancelar"
+                                onPress={cerrarModal}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -161,6 +223,40 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
         fontSize: 18,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+        backgroundColor: "white",
+        borderRadius: 12,
+        padding: 20,
+        width: "80%",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalTexto: {
+        fontSize: 18,
+        marginBottom: 20,
+        textAlign: "center",
+        color: "#333",
+    },
+    modalBotones: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        flexWrap: 'nowrap',
+        gap: 8,
     },
 });
 
