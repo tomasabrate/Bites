@@ -28,6 +28,8 @@ import ModificarProducto from "../pages/Productos/ModificarProducto";
 import MisVentas from "../pages/Comercio/Ventas/MisVentas"
 import DetalleVenta from "../pages/Comercio/Ventas/DetalleVenta";
 import DetalleUsuario from "../pages/Admin/detalleUsuario";
+import MisCompras from "../pages/Cliente/MisCompras"
+import DetalleCompra from "../pages/Cliente/DetalleCompra";
 
 const Stack = createStackNavigator();
 
@@ -61,6 +63,8 @@ export default function StackNavigator() {
       <Stack.Screen name="ResumenCompra" component={ResumenCompra} />
       <Stack.Screen name="InterfazAdministrador" component={InterfazAdministrador} />
       <Stack.Screen name="DetalleUsuario" component={DetalleUsuario} />
+      <Stack.Screen name="MisCompras" component={MisCompras} />
+      <Stack.Screen name="DetalleCompra" component={DetalleCompra} />
     </Stack.Navigator>
   );
 }

@@ -5,6 +5,7 @@ import routerProductos from "./routes/products.routes.js";
 import routerClientes from "./routes/clientes.routes.js";
 import routerComercios from "./routes/comercio.routes.js";
 import routerVentas from "./routes/ventas.routes.js";
+import routerCompras from "./routes/compras.routes.js";
 import routerDetalleVenta from "./routes/detalleVentas.routes.js";
 import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
 // import cron from "node-cron.js";
@@ -29,6 +30,9 @@ app.use(routerVentas);
 
 //DetalleVenta
 app.use(routerDetalleVenta);
+
+//Compras
+app.use(routerCompras);
 
 //Categorias Comercio
 app.use(routerCategoriasComercio);

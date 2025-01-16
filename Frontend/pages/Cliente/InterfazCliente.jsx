@@ -49,7 +49,7 @@ const InterfazCliente = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.footerButton}
-          onPress={() => navigation.navigate("MisPedidos")}
+          onPress={() => navigation.navigate("MisCompras")}
         >
           <Icon name="list" size={24} color="#FF6347" />
           <Text style={styles.footerButtonText}>Pedidos</Text>

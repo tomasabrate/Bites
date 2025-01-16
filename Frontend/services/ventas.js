@@ -123,3 +123,4 @@ export const deleteVenta = async (ventaId) => {
     throw error;
   }
 };
+
