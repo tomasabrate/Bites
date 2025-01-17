@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, StyleSheet, Alert, TextInput, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Picker } from '@react-native-picker/picker'; 
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import firebaseApp from '../../firebase_config';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
@@ -57,7 +57,7 @@ export default function InterfazAdministrador() {
         usuariosRef,
         where('rol', 'in', ['Comercio', 'Cliente']),
         where('perfilCompleto', '==', true)
-    );
+      );
       const querySnapshot = await getDocs(q);
       const usersList = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -107,8 +107,8 @@ export default function InterfazAdministrador() {
   const handleLogout = async () => {
     try {
       await logout();
-      navigation.navigate('Login');
-      console.log('Sesión de administrador cerrada');
+      navigation.navigate("Login");
+      console.log("Sesión de administrador cerrada");
     } catch (error) {
       console.error('No se pudo cerrar sesión:', error);
       Alert.alert('Error', 'No se pudo cerrar la sesión. Por favor, intente de nuevo.');
@@ -156,7 +156,7 @@ export default function InterfazAdministrador() {
         </View>
 
         <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {activeNav === 'Dashboard' && (
+          {activeNav === 'Dashboard' && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
               <View style={{ width: '30%', marginBottom: 16, padding: 16, backgroundColor: '#fff', borderRadius: 8 }}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Productos Activos</Text>

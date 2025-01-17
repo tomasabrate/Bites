@@ -5,20 +5,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
+  ActivityIndicator 
 } from "react-native";
 import { validate as validateEmail } from 'email-validator';
-import { createTheme, ThemeProvider, TextField } from '@mui/material';
+import { createTheme, TextField } from '@mui/material';
 import CustomModal from "../../components/CustomModal";
 
 import firebaseApp from "../../firebase_config";
 import {
   getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
@@ -32,115 +30,11 @@ const theme = createTheme({
 });
 
 const Login = ({ navigation }) => {
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rol, setRol] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  useEffect(() => {
-    // Temporizador de carga de 1 segundo
-    const timer = setTimeout(() => {
-      setLoading(false); // Cambia el estado después de 1 segundo
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-
-  const getRol = async (uid) => {
-    try {
-      const docuRef = doc(firestore, `usuarios/${uid}`);
-      const docuCifrada = await getDoc(docuRef);
-
-      if (docuCifrada.exists()) {
-        return docuCifrada.data().rol;
-      } else {
-        console.warn("Documento no encontrado");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error al obtener rol:", error.message);
-      return null;
-    }
-  };
-
-  const getPerfilCompleto = async (uid) => {
-    try {
-      const docuRef = doc(firestore, `usuarios/${uid}`);
-      const docuCifrada = await getDoc(docuRef);
-
-      if (docuCifrada.exists()) {
-        return docuCifrada.data().perfilCompleto;
-      } else {
-        console.warn("Documento no encontrado para el usuario", uid);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error al obtener si el perfil esta completo", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (userCredential) => {
-      if (userCredential) {
-        const rol = await getRol(userCredential.uid);
-        const perfilCompleto = await getPerfilCompleto(userCredential.uid);
-        console.log("Perfil completo: " + perfilCompleto);
-
-        if (rol) {
-          // Solo continúa si `rol` no es nulo
-          const userData = {
-            uid: userCredential.uid,
-            email: userCredential.email,
-            rol: rol,
-            perfilCompleto: perfilCompleto,
-          };
-          setUser(userData);
-          console.log("Info Usuario Final: ", userData);
-
-          // Redirige basado en el rol del usuario
-          if (userData.perfilCompleto == true) {
-            if (userData.rol === "Admin") {
-              navigation.navigate("InterfazAdministrador");
-            } else if (userData.rol === "Cliente") {
-              navigation.navigate("InterfazCliente");
-            } else if (userData.rol === "Comercio") {
-              navigation.navigate("InterfazComerciante");
-            }
-          } else {
-            if (userData.rol === "Cliente") {
-              navigation.navigate("RegistroCliente");
-            } else if (userData.rol === "Comercio") {
-              navigation.navigate("RegistroComercio");
-            }
-          }
-        } else {
-          console.warn("El rol o perfil no está definido para el usuario.");
-        }
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [isAuthenticated]);
-
-  const handleCreateAccount = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        console.log("Cuenta creada");
-        const docuRef = doc(firestore, `usuarios/${userCredential.user.uid}`);
-        await setDoc(docuRef, { email: email, rol: rol }); // guarda el mail y rol
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   const handleSingIn = () => {
     if (!validateEmail(email)) {
@@ -157,16 +51,6 @@ const Login = ({ navigation }) => {
         showModal();
       });
   };
-
-  if (loading) {
-    // Pantalla de carga
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ff6347" />
-        <Text style={styles.loadingText}>Cargando...</Text>
-      </View>
-    );
-  }
 
   const handleChangeMail = (event) => {
     setEmail(event.target.value);
