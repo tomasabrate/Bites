@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, Platform, StatusBar, Modal } from 'react-native';
 import BotonGenerico from "../../components/BotonGenerico";
-import { deleteCliente, getClienteById } from '../../services/clientes';
-import { deleteComercio, getComercioById } from '../../services/comercios';
+import { deleteCliente, getClienteById, deleteLogicoCliente } from '../../services/clientes';
+import { deleteComercio, getComercioById, deleteLogicoComercio } from '../../services/comercios';
 
 import firebaseApp from '../../firebase_config';
-import { getFirestore, doc, deleteDoc } from "firebase/firestore";
+import { getFirestore, doc, deleteDoc, updateDoc } from "firebase/firestore";
 
 const firestore = getFirestore(firebaseApp);
 
@@ -16,6 +16,7 @@ const DetalleUsuario = ({ navigation, route }) => {
     const [error, setError] = useState(null);
     const [textModal, setTextModal] = useState("")
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible2, setModalVisible2] = useState(false);
 
     useEffect(() => {
         const obtenerDatos = async () => {
@@ -58,6 +59,12 @@ const DetalleUsuario = ({ navigation, route }) => {
     const cerrarModal = () => {
         setModalVisible(false)
     }
+
+    const cerrarModal2 = () => {
+        setModalVisible2(false)
+    }
+
+    const userDocRef = doc(firestore, "usuarios", user.id);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -112,7 +119,10 @@ const DetalleUsuario = ({ navigation, route }) => {
                 />
                 <BotonGenerico
                     title="Dar de baja"
-                    onPress={null}
+                    onPress={() => {
+                        setTextModal("¿Estas seguro que deseas dar de baja este usuario?");
+                        setModalVisible2(true);
+                    }}
                     colorInicial="#f44336"
                     colorPressed="#d32f2f"
                 />
@@ -126,7 +136,8 @@ const DetalleUsuario = ({ navigation, route }) => {
                     colorPressed="#d32f2f"
                 />
             </View>
-
+            
+            {/* Modal para eliminar */}
             <Modal
                 transparent={true}
                 animationType="slide"
@@ -162,6 +173,49 @@ const DetalleUsuario = ({ navigation, route }) => {
                             <BotonGenerico
                                 title="Cancelar"
                                 onPress={cerrarModal}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            
+            {/* Modal para bajar */}
+            <Modal
+                transparent={true}
+                animationType="slide"
+                visible={modalVisible2}
+                onRequestClose={cerrarModal2}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTexto}>{textModal}</Text>
+                        <View style={styles.modalBotones}>
+                            <BotonGenerico
+                                title="Bajar"
+                                onPress={async () => {
+                                    try {
+                                        await updateDoc(userDocRef, {
+                                                activo: false,
+                                              });
+
+                                        if (user.rol === 'Cliente') {
+                                            await deleteLogicoCliente(user.id);
+                                        } else if (user.rol === 'Comercio') {
+                                            await deleteLogicoComercio(user.id);
+                                        } else {
+                                            console.warn('Rol no reconocido');
+                                        }
+
+                                        cerrarModal2();
+                                        navigation.goBack();
+                                    } catch (error) {
+                                        console.error('Error al bajar el usuario:', error);
+                                    }
+                                }}
+                            />
+                            <BotonGenerico
+                                title="Cancelar"
+                                onPress={cerrarModal2}
                             />
                         </View>
                     </View>

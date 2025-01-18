@@ -115,3 +115,16 @@ export const deleteComercio = async (req, res) => {
     return res.status(500).send("500 - Error en la base de datos.");
   }
 };
+
+export const deleteLogicoCormecio = async (req, res) => {
+  const { uid_comercio } = req.params;
+  try {
+    const [result] = await pool.query("UPDATE Comercios SET activo = 0 WHERE uid_comercio = ?", [uid_comercio]);
+    console.log("El comercio se dio de baja correctamente."); 
+    res.status(200).json(result);
+  } catch (error) {
+    console.log("ERROR en PUT comercio.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
+

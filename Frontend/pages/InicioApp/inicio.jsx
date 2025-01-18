@@ -58,11 +58,29 @@ export default function SplashScreen({ navigation }) {
     }
   };
 
+  const getActivo = async (uid) => {
+    try {
+      const docuRef = doc(firestore, `usuarios/${uid}`);
+      const docuCifrada = await getDoc(docuRef);
+
+      if (docuCifrada.exists()) {
+        return docuCifrada.data().activo;
+      } else {
+        console.warn("Documento no encontrado");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al obtener estado activo:", error.message);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userCredential) => {
       if (userCredential) {
         const rol = await getRol(userCredential.uid);
         const perfilCompleto = await getPerfilCompleto(userCredential.uid);
+        const activo = await getActivo(userCredential.uid);
         console.log("Perfil completo: " + perfilCompleto);
 
         if (rol) {
@@ -74,8 +92,14 @@ export default function SplashScreen({ navigation }) {
           };
           setUser(userData);
 
+          if (activo === false) {
+            setTextModal("Lo sentimos, la cuenta ha sido desactivada. Contacte con soporte para más información. Correo: bitesgrupo1@gmail.com");
+            setModalVisible(true);
+            return;
+          }
+
           if (screenWidth < 820 && rol === "Admin") {
-            setTextModal("Lo sentimos. El dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución.");
+            setTextModal("Lo sentimos, el dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución.");
             setModalVisible(true);
             return;
           }
@@ -132,13 +156,12 @@ export default function SplashScreen({ navigation }) {
             <Text style={styles.modalTexto}>{textModal}</Text>
             <View style={styles.modalBotones}>
               <BotonGenerico
-                title="Cerrar sesion"
+                title="Salir"
                 onPress={async () => {
                   try {
                     await logout();
                     cerrarModal();
                     navigation.navigate("Login");
-                    console.log("Sesión de administrador cerrada");
                   } catch (error) {
                     console.error('No se pudo cerrar sesión:', error);
                   }

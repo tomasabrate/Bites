@@ -61,3 +61,24 @@ export const deleteComercio = async (uid_comercio) => {
     throw error;
   }
 };
+
+  export const deleteLogicoComercio = async (uid_comercio) => {
+    try {
+      const response = await fetch(`${API_URL}/baja/${uid_comercio}`, {
+        method: "DELETE"
+      });
+  
+      if (response.ok) {
+        console.log(`Ha sido de baja el comercio: ${uid_comercio}`);
+        return { success: true };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Error ${response.status}: ${response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("Error al dar de baja comercio:", error);
+      throw error;
+    }
+  };

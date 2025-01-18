@@ -56,7 +56,8 @@ export default function InterfazAdministrador() {
       const q = query(
         usuariosRef,
         where('rol', 'in', ['Comercio', 'Cliente']),
-        where('perfilCompleto', '==', true)
+        where('perfilCompleto', '==', true),
+        where('activo', '==', true)
       );
       const querySnapshot = await getDocs(q);
       const usersList = querySnapshot.docs.map((doc) => ({

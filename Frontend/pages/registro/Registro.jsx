@@ -33,6 +33,7 @@ const Registro = ({ navigation }) => {
           email: email,
           rol: rol,
           perfilCompleto: false,
+          activo: true,
         }); // guarda el mail y rol
       })
       .catch((error) => {

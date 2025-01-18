@@ -98,3 +98,15 @@ export const deleteCliente = async (req, res) => {
     return res.status(500).send("500 - Error en la base de datos.");
   }
 };
+
+export const deleteLogicoCliente = async (req, res) => {
+  const { uid_cliente } = req.params;
+  try {
+    const [result] = await pool.query("UPDATE Clientes SET activo = 0 WHERE uid_cliente = ?", [uid_cliente]);
+    console.log("El cliente se dio de baja correctamente."); 
+    res.status(200).json(result);
+  } catch (error) {
+    console.log("ERROR en PUT cliente.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};

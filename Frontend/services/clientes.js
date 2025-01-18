@@ -62,3 +62,24 @@ export const postCliente = async (data) => {
       throw error;
     }
   };
+
+  export const deleteLogicoCliente = async (uid_cliente) => {
+    try {
+      const response = await fetch(`${API_URL}/baja/${uid_cliente}`, {
+        method: "DELETE"
+      });
+  
+      if (response.ok) {
+        console.log(`Ha sido de baja el cliente: ${uid_cliente}`);
+        return { success: true };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Error ${response.status}: ${response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("Error al dar de baja cliente:", error);
+      throw error;
+    }
+  };
