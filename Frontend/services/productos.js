@@ -105,3 +105,27 @@ export const deleteProducto = async (productoId) => {
     throw error;
   }
 };
+
+//BAJA LOGICA DE UN PRODUCTO
+export const deleteLogicoProducto = async (productoId) => {
+  try {
+    const response = await fetch(`${API_URL}/baja/${productoId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+    console.log(`Producto bajado: ${productoId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error al bajar producto:", error);
+    throw error;
+  }
+};

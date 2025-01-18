@@ -1,4 +1,4 @@
-import { deleteProducto, getProductos, postProducto, putProducto, getProductosById } from "../controllers/products.controllers.js";
+import { deleteProducto, getProductos, postProducto, putProducto, getProductosById, deleteLogicoProducto } from "../controllers/products.controllers.js";
 import { Router } from "express";
 const routerProductos = Router();
 
@@ -12,5 +12,7 @@ routerProductos.post("/productos", postProducto);
 routerProductos.put("/productos/:id_producto", putProducto);
 
 routerProductos.delete('/productos/:id_producto', deleteProducto);
+
+routerProductos.delete('/productos/baja/:id_producto', deleteLogicoProducto);
 
 export default routerProductos;

@@ -17,7 +17,7 @@ import MenuDesplegable from "./MenuDeslizanteC";
 import Icon from "react-native-vector-icons/Ionicons";
 import BotonGenerico from "../../components/BotonGenerico";
 import calcularDescuento from "../Productos/utilities/calcularDescuento.utilities";
-import { deleteProducto, getProductos } from "../../services/productos";
+import { deleteLogicoProducto, getProductos } from "../../services/productos";
 
 export default function InterfazComerciante() {
   const [productos, setProductos] = useState([]);
@@ -86,7 +86,7 @@ export default function InterfazComerciante() {
   const eliminarProducto = async (id) => {
     try {
       //Eliminar producto
-      await deleteProducto(id);
+      await deleteLogicoProducto(id);
       setCambios((prev) => !prev); // Actualiza la lista de productos
     } catch (error) {
       setError("Error al eliminar el producto. El producto ya fue vendido.");

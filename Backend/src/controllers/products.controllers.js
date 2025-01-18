@@ -3,7 +3,7 @@ import { pool } from "../database/connection.js";
 export const getProductos = async (req, res) => {
   try {
     // const [result] = await pool.query("SELECT * FROM Productos p JOIN where p.cantidad > 0");//para que solo se devuelvan productos con cantidad > 0
-    const [result] = await pool.query("SELECT p.id_producto, p.uid_comercio, c.nombre_comercio, p.id_categoria, p.nombre, p.descripcion, p.precio, p.descuento, p.fecha_produccion, p.fecha_vencimiento, p.tipo, p.cantidad, p.imagenes, p.activo FROM Productos p JOIN Comercios c ON p.uid_comercio = c.uid_comercio WHERE p.cantidad > 0 ");
+    const [result] = await pool.query("SELECT p.id_producto, p.uid_comercio, c.nombre_comercio, p.id_categoria, p.nombre, p.descripcion, p.precio, p.descuento, p.fecha_produccion, p.fecha_vencimiento, p.tipo, p.cantidad, p.imagenes, p.activo FROM Productos p JOIN Comercios c ON p.uid_comercio = c.uid_comercio WHERE p.cantidad > 0  AND p.activo = 1");
     //esta consulta devuelve todos los datos de productos mas el nombre del comercio al que pertenece.
     console.log("Lista de Productos:", result); //muestra en consola
     res.status(200).json(result); //respuesta en el cliente
@@ -212,6 +212,19 @@ export const deleteExpiredOrEmptyProducts = async (req, res) => {
     );
   } catch (error) {
     console.error("ERROR al eliminar productos:", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
+
+
+export const deleteLogicoProducto = async (req, res) => {
+  const { id_producto } = req.params;
+  try {
+    const [result] = await pool.query("UPDATE Productos SET activo = 0 WHERE id_producto = ?", [id_producto]);
+    console.log("El producto se dio de baja correctamente."); 
+    res.status(200).json(result);
+  } catch (error) {
+    console.log("ERROR en PUT producto.", error);
     return res.status(500).send("500 - Error en la base de datos.");
   }
 };
