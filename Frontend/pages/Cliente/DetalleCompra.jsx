@@ -23,16 +23,16 @@ const DetalleCompra = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { compra } = route.params;
-  console.log(compra)
+  console.log(compra);
+
   useEffect(() => {
-    const fetchDetalleCompra = async () => {
+    const fetchDatosCompra = async () => {
       try {
         const dataComercio = await getComercioById(compra.uid_comercio);
         setComercio(dataComercio);
 
         const data = await getDetallesByIdVenta(compra.id_venta);
         setDetalleCompra(data);
-        console.log(data)
       } catch (error) {
         console.error("Error al obtener detalles de la compra:", error);
         Alert.alert("Error", "No se pudieron cargar los detalles de la compra");
@@ -41,7 +41,7 @@ const DetalleCompra = () => {
       }
     };
 
-    fetchDetalleCompra();
+    fetchDatosCompra();
   }, [compra.id_venta]);
 
   if (loading) {
@@ -84,10 +84,6 @@ const DetalleCompra = () => {
             >
               <Icon name="arrow-left" size={24} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.helpButton}>
-              <Icon name="headphones" size={20} color="#333" />
-              <Text style={styles.helpButtonText}>Ayuda</Text>
-            </TouchableOpacity>
           </View>
           <Text style={styles.comercioNombre}>{comercio?.nombre_comercio}</Text>
           <TouchableOpacity style={styles.verRestaurante}>
@@ -96,22 +92,42 @@ const DetalleCompra = () => {
         </ImageBackground>
 
         <View style={styles.estadoContainer}>
-          <Icon
-            name={compra.estado === "ENTREGADO" ? "check-circle" : "x-circle"}
-            size={24}
-            color={compra.estado === "ENTREGADO" ? "#4CAF50" : "#dc2626"}
-          />
           <View>
-            <Text style={styles.estadoText}>{compra.estado}</Text>
-            <Text style={styles.fechaText}>
-              {new Date(compra.fecha_venta).toLocaleDateString("es-AR", {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
+            <Icon
+              name={
+                compra.estado === "ENTREGADO"
+                  ? "check-circle"
+                  : compra.estado === "EN CURSO"
+                  ? "clock"
+                  : "x-circle"
+              }
+              size={24}
+              color={
+                compra.estado === "ENTREGADO"
+                  ? "#4CAF50"
+                  : compra.estado === "EN CURSO"
+                  ? "#FFA500"
+                  : "#dc2626"
+              }
+            />
+            <View>
+              <Text style={styles.estadoText}>{compra.estado}</Text>
+
+              <Text style={styles.fechaText}>
+                {new Date(compra.fecha_venta).toLocaleDateString("es-AR", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.estadoRight}>
+            <Text style={styles.codigoRetiroLabel}>Código de Retiro:</Text>
+            <Text style={styles.codigoRetiroText}>{compra.codigo_retiro}</Text>
           </View>
         </View>
 
@@ -121,8 +137,7 @@ const DetalleCompra = () => {
             <View key={index} style={styles.productoItem}>
               <Image
                 source={{
-                  uri:
-                    producto.imagen || "https://via.placeholder.com/60x60",
+                  uri: producto.imagen || "https://via.placeholder.com/60x60",
                 }}
                 style={styles.productoImagen}
               />
@@ -230,6 +245,7 @@ const styles = StyleSheet.create({
   estadoContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
     backgroundColor: "white",
     borderBottomWidth: 1,
@@ -237,6 +253,20 @@ const styles = StyleSheet.create({
   },
   estadoIconContainer: {
     marginRight: 16,
+  },
+  estadoRight: {
+    alignItems: "flex-end",
+  },
+  codigoRetiroLabel: {
+    paddingTop:15,
+    fontSize: 17,
+    underline: true,
+    color: "#666",
+  },
+  codigoRetiroText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
   },
   estadoText: {
     fontSize: 18,

@@ -4,7 +4,8 @@ import {
   getVentas,
   getVentasByComercio,
   postVenta,
-  putVenta,
+  putEstadoVenta,
+  // putVenta,
 } from "../controllers/ventas.controllers.js";
 import { Router } from "express";
 
@@ -19,7 +20,9 @@ routerVentas.get("ventas/", getVentasByComercio);
 
 routerVentas.post("/ventas", postVenta);
 
-routerVentas.put("/ventas/:id_venta", putVenta);
+// routerVentas.put("/ventas/:id_venta", putVenta);
+
+routerVentas.put("/ventas/:id_venta", putEstadoVenta);
 
 routerVentas.delete("/ventas/:id_venta", deleteVenta);
 

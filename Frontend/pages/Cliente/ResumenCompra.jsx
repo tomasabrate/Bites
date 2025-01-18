@@ -14,6 +14,7 @@ import { useCart } from "../../context/CartContext";
 import CalcularDescuento from "../Productos/utilities/calcularDescuento.utilities";
 import { postVenta } from "../../services/ventas";
 import { useAuth } from "../../context/AuthContext";
+import { generarCodigoDeRetiro } from "../../utils/generarCodigoDeRetiro";
 
 export default function ResumenCompra({ navigation }) {
   const { carrito } = useCart();
@@ -45,19 +46,31 @@ export default function ResumenCompra({ navigation }) {
     return { subtotal, total, cantidadProductos, descuento };
   }, [carrito, metodoEnvio]);
 
-  // const RealizarCompra = async () => {
-  //   try{
-  //     await postVenta({
-  //       carrito,
-  //       total,
-  //       metodoPago,
-  //       metodoEnvio,
-  //       uid_cliente,
-  //     })
-  //   }catch(err){
-
-  //   }
-  // };
+  const HandleCompra = async () => {
+    const codigo_retiro = generarCodigoDeRetiro();
+    try {
+      await postVenta({
+        carrito,
+        total,
+        metodoPago,
+        metodoEnvio,
+        uid_cliente,
+        codigo_retiro,
+      });
+      console.log("Compra confirmada: ", {
+        carrito,
+        total,
+        metodoPago,
+        metodoEnvio,
+        uid_cliente,
+        codigo_retiro,
+      });
+      navigation.navigate("MisCompras")
+    } catch (err) {
+      console.error(err);
+      alert("Error: " + err);
+    }
+  };
 
   const RadioButton = ({ value, label, selected, onSelect }) => (
     <TouchableOpacity
@@ -186,25 +199,7 @@ export default function ResumenCompra({ navigation }) {
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={async () => {
-              (await postVenta({
-                carrito,
-                total,
-                metodoPago,
-                metodoEnvio,
-                uid_cliente,
-              })) &&
-                console.log("Compra confirmada", {
-                  carrito,
-                  total,
-                  metodoPago,
-                  metodoEnvio,
-                  uid_cliente,
-                });
-            }}
-          >
+          <TouchableOpacity style={styles.confirmButton} onPress={HandleCompra}>
             <Text style={styles.confirmButtonText}>Comprar</Text>
           </TouchableOpacity>
         </View>
