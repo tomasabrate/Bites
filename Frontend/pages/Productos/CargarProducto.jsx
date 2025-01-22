@@ -74,24 +74,61 @@ export default function CargarProducto({ route }) {
   }, [setValue, user]);
 
   // Función para manejar la carga de las imágenes
-  const handleImageUpload = async (selectedImages) => {
-    if (!Array.isArray(selectedImages) || selectedImages.length === 0) {
+  const handleImageUpload = async (imagenes) => {
+    try {
+      const uploadedUrls = await Promise.all(
+        imagenes.map(async (image) => {
+          const formData = new FormData();
+          formData.append('file', {
+            uri: image.uri,
+            type: image.type || 'image/jpeg', // Asegúrate de pasar el tipo MIME correcto
+            name: image.fileName || 'image.jpg', // Nombre del archivo (opcional)
+          });
+          formData.append('upload_preset', 'BitesPreset'); // Reemplaza con tu `upload_preset`
+
+          const response = await fetch(
+            'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+            {
+              method: 'POST',
+              body: formData,
+            }
+          );
+
+          const result = await response.json();
+
+          if (result.secure_url) {
+            console.log('Imagen subida:', result.secure_url);
+            return result.secure_url;
+          } else {
+            console.error('Error en la subida:', result);
+            return null;
+          }
+        })
+      );
+
+      // Filtra las URLs válidas
+      return uploadedUrls.filter((url) => url !== null);
+    } catch (error) {
+      console.error('Error al subir las imágenes:', error);
       return [];
     }
-
-    try {
-      const uploadPromises = selectedImages.map(uploadToCloudinary);
-      const urls = await Promise.all(uploadPromises);
-      return urls.filter((url) => url != null);
-    } catch (error) {
-      console.error('Bulk upload error:', error);
-      throw error;
-    }
   };
-  const onSubmit = async (data) => {
-    const uploadedImages = await handleImageUpload(imagenes); // Subir las imágenes a Cloudinary
 
-    console.log('Imagenes subidas:', uploadedImages);
+  const onSubmit = async (data) => {
+    if (!imagenes || imagenes.length === 0) {
+      console.error('No hay imágenes seleccionadas.');
+      setModalMessage('Por favor selecciona al menos una imagen.');
+      setModalVisible(true);
+      return;
+    }
+
+    const uploadedImages = await handleImageUpload(imagenes);
+
+    if (uploadedImages.length === 0) {
+      setModalMessage('Error al subir las imágenes.');
+      setModalVisible(true);
+      return;
+    }
 
     const formData = {
       ...data,
@@ -99,9 +136,7 @@ export default function CargarProducto({ route }) {
       id_categoria: selectedCategories,
       fecha_produccion: formatDate(data.fecha_produccion),
       fecha_vencimiento: formatDate(data.fecha_vencimiento),
-      //imagenes, // Enviar las rutas locales o base64
-
-      imagenes: uploadedImages, // Agregar las imágenes subidas a la data
+      imagenes: uploadedImages, // Usar las URLs de Cloudinary
     };
 
     console.log('Formulario enviado:', formData);

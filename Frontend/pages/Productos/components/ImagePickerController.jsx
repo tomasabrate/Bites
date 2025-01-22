@@ -34,12 +34,12 @@ export default function ImagePickerController({
       });
 
       console.log(JSON.stringify(result, null, 2));
-      if (result.cancelled) {
+      if (result.assets && result.assets.length > 0) {
         const selectedImages = result.assets.map((asset) => ({
           uri: asset.uri,
           type: 'image/jpeg',
           name: asset.uri.split('/').pop() || 'image.jpg',
-        })); // Obtener las URIs de las imágenes
+        }));
         setImages(selectedImages); // Actualizar el estado local
         onChange(selectedImages); // Pasar las imágenes seleccionadas al formulario
         setImagenes(selectedImages);
