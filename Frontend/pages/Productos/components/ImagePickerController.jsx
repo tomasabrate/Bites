@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Controller } from "react-hook-form";
+import React, { useState } from 'react';
+import { Controller } from 'react-hook-form';
 import {
   FlatList,
   StyleSheet,
@@ -7,9 +7,10 @@ import {
   View,
   Image,
   Dimensions,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import BotonGenerico from "../../../components/BotonGenerico";
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import BotonGenerico from '../../../components/BotonGenerico';
+import { set } from '@react-native-firebase/database';
 
 export default function ImagePickerController({
   name,
@@ -17,6 +18,7 @@ export default function ImagePickerController({
   title,
   label,
   errors,
+  setImagenes,
 }) {
   const [images, setImages] = useState([]);
 
@@ -26,19 +28,24 @@ export default function ImagePickerController({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
         // allowsEditing: true,
-        selectionLimit: 1,
+        //selectionLimit: 1,
         aspect: [4, 3],
         quality: 0.5,
       });
 
       console.log(JSON.stringify(result, null, 2));
-      if (!result.canceled) {
-        const selectedImages = result.assets.map((asset) => asset.uri); // Obtener las URIs de las imágenes
+      if (result.cancelled) {
+        const selectedImages = result.assets.map((asset) => ({
+          uri: asset.uri,
+          type: 'image/jpeg',
+          name: asset.uri.split('/').pop() || 'image.jpg',
+        })); // Obtener las URIs de las imágenes
         setImages(selectedImages); // Actualizar el estado local
         onChange(selectedImages); // Pasar las imágenes seleccionadas al formulario
+        setImagenes(selectedImages);
       }
     } catch (error) {
-      console.error("Error al seleccionar imágenes:", error.message);
+      console.error('Error en pickImages:', error);
     }
   };
 
@@ -73,24 +80,24 @@ export default function ImagePickerController({
   );
 }
 
-const  width  = Dimensions.get("screen").width;
+const width = Dimensions.get('screen').width;
 const styles = StyleSheet.create({
   container: {
     marginVertical: 10,
   },
   buttonContainer: {
     marginBottom: 15,
-    height:70
+    height: 70,
   },
   inputError: {
-    color: "red",
+    color: 'red',
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 5,
   },
   imageListContainer: {
     paddingVertical: 10,
-    height: width * 0.6
+    height: width * 0.6,
   },
   image: {
     width: width * 0.5,
@@ -98,6 +105,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 10,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: '#ddd',
   },
 });
