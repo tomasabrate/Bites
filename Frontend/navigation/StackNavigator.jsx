@@ -1,5 +1,5 @@
-import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import SplashScreen from "../pages/InicioApp/Inicio";
 import IntroScreen from "../pages/InicioApp/IntroScreen";
@@ -36,7 +36,10 @@ const Stack = createStackNavigator();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Registro" component={Registro} />
       <Stack.Screen name="RegistroCliente" component={RegistroCliente} />
@@ -46,7 +49,10 @@ export default function StackNavigator() {
       <Stack.Screen name="LoginSelection" component={LoginSelectionScreen} />
       <Stack.Screen name="ClienteProfile" component={ClienteProfile} />
       <Stack.Screen name="ComercioProfile" component={ComercioProfile} />
-      <Stack.Screen name="InterfazComerciante" component={InterfazComerciante} />
+      <Stack.Screen
+        name="InterfazComerciante"
+        component={InterfazComerciante}
+      />
       <Stack.Screen name="InterfazCliente" component={InterfazCliente} />
       <Stack.Screen name="MisPedidos" component={MisPedidos} />
       <Stack.Screen name="Mapa" component={Mapa} />
@@ -62,7 +68,10 @@ export default function StackNavigator() {
       <Stack.Screen name="StatCard" component={StatCard} />
       <Stack.Screen name="ModificarProducto" component={ModificarProducto} />
       <Stack.Screen name="ResumenCompra" component={ResumenCompra} />
-      <Stack.Screen name="InterfazAdministrador" component={InterfazAdministrador} />
+      <Stack.Screen
+        name="InterfazAdministrador"
+        component={InterfazAdministrador}
+      />
       <Stack.Screen name="DetalleUsuario" component={DetalleUsuario} />
       <Stack.Screen name="MisCompras" component={MisCompras} />
       <Stack.Screen name="DetalleCompra" component={DetalleCompra} />

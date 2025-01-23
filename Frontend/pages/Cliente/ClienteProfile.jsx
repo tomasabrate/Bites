@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import ZorritoSelector from '../Registro/ZorritoSelector'; // Asegúrate de importar el selector
-import RegistroCliente from '../Registro/RegistroCliente'; // Importa el formulario
+import ZorritoSelector from '../registro/ZorritoSelector'; // Asegúrate de importar el selector
+import RegistroCliente from '../registro/RegistroCliente'; // Importa el formulario
 
-const ClienteProfile = ({ navigation }) => { // Añadido 'navigation' como prop
+const ClienteProfile = ({ navigation }) => {
+  // Añadido 'navigation' como prop
   const [selectedZorrito, setSelectedZorrito] = useState(null);
   const [showForm, setShowForm] = useState(false); // Estado para controlar la visibilidad del formulario
 
@@ -26,7 +27,7 @@ const ClienteProfile = ({ navigation }) => { // Añadido 'navigation' como prop
       {selectedZorrito && (
         <Text style={styles.selectedZorritoText}>Zorrito seleccionado.</Text>
       )}
-      
+
       {/* Botón para navegar al perfil */}
       <Button
         title="Ver Perfil"

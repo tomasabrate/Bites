@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, Modal } from 'react-native';
-import firebaseApp from "../../firebase_config";
+import firebaseApp from '../../firebase_config';
 import {
   getAuth,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-import BotonGenerico from "../../components/BotonGenerico";
+  //signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import BotonGenerico from '../../components/BotonGenerico';
 
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
@@ -16,7 +16,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function SplashScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [textModal, setTextModal] = useState("")
+  const [textModal, setTextModal] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
@@ -32,11 +32,11 @@ export default function SplashScreen({ navigation }) {
       if (docuCifrada.exists()) {
         return docuCifrada.data().rol;
       } else {
-        console.warn("Documento no encontrado");
+        console.warn('Documento no encontrado');
         return null;
       }
     } catch (error) {
-      console.error("Error al obtener rol:", error.message);
+      console.error('Error al obtener rol:', error.message);
       return null;
     }
   };
@@ -49,11 +49,11 @@ export default function SplashScreen({ navigation }) {
       if (docuCifrada.exists()) {
         return docuCifrada.data().perfilCompleto;
       } else {
-        console.warn("Documento no encontrado para el usuario", uid);
+        console.warn('Documento no encontrado para el usuario', uid);
         return null;
       }
     } catch (error) {
-      console.error("Error al obtener si el perfil esta completo", error);
+      console.error('Error al obtener si el perfil esta completo', error);
       return null;
     }
   };
@@ -66,11 +66,11 @@ export default function SplashScreen({ navigation }) {
       if (docuCifrada.exists()) {
         return docuCifrada.data().activo;
       } else {
-        console.warn("Documento no encontrado");
+        console.warn('Documento no encontrado');
         return null;
       }
     } catch (error) {
-      console.error("Error al obtener estado activo:", error.message);
+      console.error('Error al obtener estado activo:', error.message);
       return null;
     }
   };
@@ -81,7 +81,7 @@ export default function SplashScreen({ navigation }) {
         const rol = await getRol(userCredential.uid);
         const perfilCompleto = await getPerfilCompleto(userCredential.uid);
         const activo = await getActivo(userCredential.uid);
-        console.log("Perfil completo: " + perfilCompleto);
+        console.log('Perfil completo: ' + perfilCompleto);
 
         if (rol) {
           const userData = {
@@ -93,30 +93,34 @@ export default function SplashScreen({ navigation }) {
           setUser(userData);
 
           if (activo === false) {
-            setTextModal("Lo sentimos, la cuenta ha sido desactivada. Contacte con soporte para más información. Correo: bitesgrupo1@gmail.com");
+            setTextModal(
+              'Lo sentimos, la cuenta ha sido desactivada. Contacte con soporte para más información. Correo: bitesgrupo1@gmail.com'
+            );
             setModalVisible(true);
             return;
           }
 
-          if (screenWidth < 820 && rol === "Admin") {
-            setTextModal("Lo sentimos, el dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución.");
+          if (screenWidth < 820 && rol === 'Admin') {
+            setTextModal(
+              'Lo sentimos, el dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución.'
+            );
             setModalVisible(true);
             return;
           }
 
           if (userData.perfilCompleto == true) {
-            if (userData.rol === "Admin") {
-              navigation.navigate("InterfazAdministrador");
-            } else if (userData.rol === "Cliente") {
-              navigation.navigate("InterfazCliente");
-            } else if (userData.rol === "Comercio") {
-              navigation.navigate("InterfazComerciante");
+            if (userData.rol === 'Admin') {
+              navigation.navigate('InterfazAdministrador');
+            } else if (userData.rol === 'Cliente') {
+              navigation.navigate('InterfazCliente');
+            } else if (userData.rol === 'Comercio') {
+              navigation.navigate('InterfazComerciante');
             }
           } else {
-            if (userData.rol === "Cliente") {
-              navigation.navigate("RegistroCliente");
-            } else if (userData.rol === "Comercio") {
-              navigation.navigate("RegistroComercio");
+            if (userData.rol === 'Cliente') {
+              navigation.navigate('RegistroCliente');
+            } else if (userData.rol === 'Comercio') {
+              navigation.navigate('RegistroComercio');
             }
           }
         }
@@ -131,7 +135,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     if (user === null && !isAuthenticated) {
       const timer = setTimeout(() => {
-        navigation.navigate("IntroScreen");
+        navigation.navigate('IntroScreen');
       }, 1000);
 
       return () => clearTimeout(timer);
@@ -139,8 +143,8 @@ export default function SplashScreen({ navigation }) {
   }, [isAuthenticated]);
 
   const cerrarModal = () => {
-    setModalVisible(false)
-  }
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -161,11 +165,10 @@ export default function SplashScreen({ navigation }) {
                   try {
                     await logout();
                     cerrarModal();
-                    navigation.navigate("Login");
+                    navigation.navigate('Login');
                   } catch (error) {
                     console.error('No se pudo cerrar sesión:', error);
                   }
-
                 }}
               />
             </View>
@@ -195,17 +198,17 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -217,7 +220,7 @@ const styles = StyleSheet.create({
   modalTexto: {
     fontSize: 18,
     marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
-  }
+    textAlign: 'center',
+    color: '#333',
+  },
 });

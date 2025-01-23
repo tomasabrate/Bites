@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
 import ZorritoSelector from './ZorritoSelector'; // Asegúrate de ajustar la ruta
 import ClientTermsModal from '../TerminosyCond/TermCliente';
 import { useAuth } from '../../context/AuthContext';
-import FormInputController from "../Productos/components/FormInputController";
-import DatePickerController from "../Productos/components/DatePickerController";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import schemaClientes from "./utilities/schemaRegistroCliente.utilities";
+import FormInputController from '../Productos/components/FormInputController';
+import DatePickerController from '../Productos/components/DatePickerController';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import schemaClientes from './utilities/schemaRegistroCliente.utilities';
 import formatDate from '../Productos/utilities/formatDate.utilities';
-import BotonGenerico from "../../components/BotonGenerico";
+import BotonGenerico from '../../components/BotonGenerico';
 import { useNavigation } from '@react-navigation/native';
-import { postCliente } from "../../services/clientes";
+import { postCliente } from '../../services/clientes';
 
 import firebaseApp from '../../firebase_config';
-import { getFirestore, doc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 
-
-const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
+const categories = [
+  'Postres',
+  'Comida Saludable',
+  'Bebidas',
+  'Viandas',
+  'Comida Rápida',
+];
 
 const RegistroCliente = () => {
   const navigation = useNavigation();
@@ -26,16 +39,18 @@ const RegistroCliente = () => {
   const [selectedZorrito, setSelectedZorrito] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [modalMessage, setModalMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
-  const [textModal, setTextModal] = useState("Continuar")
+  const [textModal, setTextModal] = useState('Continuar');
 
   const { user, logout } = useAuth();
 
   const handleCategorySelect = (category) => {
     if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter((item) => item !== category));
+      setSelectedCategories(
+        selectedCategories.filter((item) => item !== category)
+      );
     } else {
       setSelectedCategories([...selectedCategories, category]);
     }
@@ -50,21 +65,21 @@ const RegistroCliente = () => {
 
   useEffect(() => {
     if (user) {
-      setValue("uid_cliente", user.uid);
-      setValue("mail", user.email);
+      setValue('uid_cliente', user.uid);
+      setValue('mail', user.email);
     }
   }, [setValue, user]);
 
   const onSubmit = async (data) => {
     const firestore = getFirestore(firebaseApp);
-    const userDocRef = doc(firestore, "usuarios", user.uid);
+    const userDocRef = doc(firestore, 'usuarios', user.uid);
 
     const formData = {
       ...data,
       fecha_nacimiento: formatDate(data.fecha_nacimiento),
     };
 
-    console.log("Cliente:", formData);
+    console.log('Cliente:', formData);
 
     try {
       await postCliente(formData);
@@ -73,12 +88,12 @@ const RegistroCliente = () => {
         perfilCompleto: true,
       });
 
-      setModalMessage("Perfil cargado, ya puede utilizar Bites");
+      setModalMessage('Perfil cargado, ya puede utilizar Bites');
       setModalVisible(true);
       setIsProfileLoaded(true);
     } catch (error) {
-      console.error("Error al cargar perfil o actualizar Firestore:", error);
-      setModalMessage("Error al cargar perfil, inténtelo de nuevo más tarde");
+      console.error('Error al cargar perfil o actualizar Firestore:', error);
+      setModalMessage('Error al cargar perfil, inténtelo de nuevo más tarde');
       setModalVisible(true);
       setIsProfileLoaded(false);
     }
@@ -87,9 +102,9 @@ const RegistroCliente = () => {
   const cerrarModal = () => {
     if (isProfileLoaded) {
       setModalVisible(false);
-      navigation.navigate("InterfazCliente");
+      navigation.navigate('InterfazCliente');
     } else {
-      setTextModal("Intentar nuevamente");
+      setTextModal('Intentar nuevamente');
       setModalVisible(false);
     }
   };
@@ -166,7 +181,8 @@ const RegistroCliente = () => {
                   key={category}
                   style={[
                     styles.categoryButton,
-                    selectedCategories.includes(category) && styles.selectedCategory,
+                    selectedCategories.includes(category) &&
+                      styles.selectedCategory,
                   ]}
                   onPress={() => handleCategorySelect(category)}
                 >
@@ -182,15 +198,25 @@ const RegistroCliente = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.checkboxContainer}
-              onPress={() => setTermsAccepted(!termsAccepted)} 
+              onPress={() => setTermsAccepted(!termsAccepted)}
             >
-              <View style={[styles.checkbox, termsAccepted && styles.checkedCheckbox]} />
-              <Text style={styles.checkboxText}>He leído y acepto los términos y condiciones</Text>
+              <View
+                style={[
+                  styles.checkbox,
+                  termsAccepted && styles.checkedCheckbox,
+                ]}
+              />
+              <Text style={styles.checkboxText}>
+                He leído y acepto los términos y condiciones
+              </Text>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
-            style={[styles.submitButton, !termsAccepted && styles.disabledButton]}
+            style={[
+              styles.submitButton,
+              !termsAccepted && styles.disabledButton,
+            ]}
             onPress={termsAccepted ? handleSubmit(onSubmit) : null}
             disabled={!termsAccepted}
           >
@@ -202,10 +228,10 @@ const RegistroCliente = () => {
             onPress={async () => {
               try {
                 await logout();
-                navigation.navigate("Login");
-                console.log("Sesión cerrada");
+                navigation.navigate('Login');
+                console.log('Sesión cerrada');
               } catch (error) {
-                console.error("No se pudo cerrar sesión:", error);
+                console.error('No se pudo cerrar sesión:', error);
               }
             }}
           >
@@ -215,7 +241,10 @@ const RegistroCliente = () => {
           </TouchableOpacity>
         </View>
 
-        <ClientTermsModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />
+        <ClientTermsModal
+          visible={showTermsModal}
+          onClose={() => setShowTermsModal(false)}
+        />
       </ScrollView>
 
       <Modal
@@ -225,12 +254,9 @@ const RegistroCliente = () => {
         onRequestClose={cerrarModal}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}> 
+          <View style={styles.modalContent}>
             <Text style={styles.modalTexto}>{modalMessage}</Text>
-            <BotonGenerico
-              title={textModal}
-              onPress={cerrarModal}
-            />
+            <BotonGenerico title={textModal} onPress={cerrarModal} />
           </View>
         </View>
       </Modal>
@@ -253,7 +279,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '90%', 
+    width: '90%',
     marginTop: 20,
   },
   title: {
@@ -276,7 +302,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: '#333'
+    color: '#333',
   },
   dateText: {
     fontSize: 16,
@@ -365,17 +391,17 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center", 
-    alignItems: "center", 
-    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -387,17 +413,17 @@ const styles = StyleSheet.create({
   modalTexto: {
     fontSize: 18,
     marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
+    textAlign: 'center',
+    color: '#333',
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
   },
   section: {
     padding: 5,
     marginTop: 2,
-  }
+  },
 });
 
 export default RegistroCliente;

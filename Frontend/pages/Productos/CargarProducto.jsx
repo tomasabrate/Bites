@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import DatePickerController from "./components/DatePickerController";
-import FormInputController from "./components/FormInputController";
-import ImagePickerController from "./components/ImagePickerController";
+import React, { useState, useEffect } from 'react';
+import DatePickerController from './components/DatePickerController';
+import FormInputController from './components/FormInputController';
+import ImagePickerController from './components/ImagePickerController';
 import {
   View,
   StyleSheet,
@@ -12,38 +12,45 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
-} from "react-native";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { SelectList } from "react-native-dropdown-select-list";
-import formatDate from "./utilities/formatDate.utilities";
-import BotonGenerico from "../../components/BotonGenerico";
-import schema from "./utilities/schemaCargaProducto.utilities";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { postProducto } from "../../services/productos";
-import { useAuth } from "../../context/AuthContext";
+} from 'react-native';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { SelectList } from 'react-native-dropdown-select-list';
+import formatDate from './utilities/formatDate.utilities';
+import BotonGenerico from '../../components/BotonGenerico';
+import schema from './utilities/schemaCargaProducto.utilities';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { postProducto } from '../../services/productos';
+import { useAuth } from '../../context/AuthContext';
+
+//Imagenes
+import { uploadToCloudinary } from '../../utils/cloudinary';
 
 const categorias = [
-  { value: "Comida Rápida", key: 1 },
-  { value: "Saludable", key: 2 },
-  { value: "Bebidas", key: 3 },
-  { value: "Viandas", key: 4 },
-  { value: "Postres", key: 5 },
+  { value: 'Comida Rápida', key: 1 },
+  { value: 'Saludable', key: 2 },
+  { value: 'Bebidas', key: 3 },
+  { value: 'Viandas', key: 4 },
+  { value: 'Postres', key: 5 },
 ];
 
 const tipos = [
-  { value: "Unidad", key: 1 },
-  { value: "Bolson", key: 2 },
+  { value: 'Unidad', key: 1 },
+  { value: 'Bolson', key: 2 },
 ];
 
 export default function CargarProducto({ route }) {
   const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías
-  const [selectedTipo, setSelectedTipo] = useState(""); //
-  const [modalMessage, setModalMessage] = useState("");
+  const [selectedTipo, setSelectedTipo] = useState(''); //
+  const [modalMessage, setModalMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
-  const {user,} = useAuth();
+
+  const { user } = useAuth();
+
+  //Testing imagenes
+  const [imagenes, setImagenes] = useState([]);
 
   const mostrar = false;
 
@@ -56,44 +63,95 @@ export default function CargarProducto({ route }) {
 
   // Asignar el id_vendedor cuando el componente se monte
   useEffect(() => {
-    if(user){
-      setValue("uid_comercio", user.uid);
+    if (user) {
+      setValue('uid_comercio', user.uid);
     }
     //Por defecto las fechas son del dia actual
-    setValue("fecha_produccion", new Date());
-    setValue("fecha_vencimiento", new Date());
-    setValue("tipo", "unidad");
-    setValue("activo", 1);
+    setValue('fecha_produccion', new Date());
+    setValue('fecha_vencimiento', new Date());
+    setValue('tipo', 'unidad');
+    setValue('activo', 1);
   }, [setValue, user]);
 
+  // Función para manejar la carga de las imágenes
+  const handleImageUpload = async (imagenes) => {
+    try {
+      const uploadedUrls = await Promise.all(
+        imagenes.map(async (image) => {
+          const formData = new FormData();
+          formData.append('file', {
+            uri: image.uri,
+            type: image.type || 'image/jpeg', // Asegúrate de pasar el tipo MIME correcto
+            name: image.fileName || 'image.jpg', // Nombre del archivo (opcional)
+          });
+          formData.append('upload_preset', 'BitesPreset'); // Reemplaza con tu `upload_preset`
+
+          const response = await fetch(
+            'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+            {
+              method: 'POST',
+              body: formData,
+            }
+          );
+
+          const result = await response.json();
+
+          if (result.secure_url) {
+            console.log('Imagen subida:', result.secure_url);
+            return result.secure_url;
+          } else {
+            console.error('Error en la subida:', result);
+            return null;
+          }
+        })
+      );
+
+      // Filtra las URLs válidas
+      return uploadedUrls.filter((url) => url !== null);
+    } catch (error) {
+      console.error('Error al subir las imágenes:', error);
+      return [];
+    }
+  };
+
   const onSubmit = async (data) => {
+    if (!imagenes || imagenes.length === 0) {
+      console.error('No hay imágenes seleccionadas.');
+      setModalMessage('Por favor selecciona al menos una imagen.');
+      setModalVisible(true);
+      return;
+    }
+
+    const uploadedImages = await handleImageUpload(imagenes);
+
+    if (uploadedImages.length === 0) {
+      setModalMessage('Error al subir las imágenes.');
+      setModalVisible(true);
+      return;
+    }
+
     const formData = {
       ...data,
       tipo: selectedTipo,
-      id_categoria: selectedCategories, // Añade las categorías seleccionadas
-      fecha_produccion: formatDate(data.fecha_produccion), // Formatear fecha de producción
-      fecha_vencimiento: formatDate(data.fecha_vencimiento), // Formatear fecha de vencimiento
+      id_categoria: selectedCategories,
+      fecha_produccion: formatDate(data.fecha_produccion),
+      fecha_vencimiento: formatDate(data.fecha_vencimiento),
+      imagenes: uploadedImages, // Usar las URLs de Cloudinary
     };
 
-    console.log("Producto:", formData);
+    console.log('Formulario enviado:', formData);
 
     try {
-      //CrearProducto
       await postProducto(formData);
-      setModalMessage("¡Producto cargado exitosamente!");
+      setModalMessage('¡Producto cargado exitosamente!');
       setModalVisible(true);
-
-      //Actualizar pantalla principal "Mis productos"
-      if (route.params?.onProductAdded) {
-        route.params.onProductAdded();
-      }
     } catch (error) {
-      setModalMessage(
-        "Error al cargar el producto. Por favor, intente nuevamente."
-      );
+      console.error('Error al enviar:', error);
+      setModalMessage('Error al cargar el producto.');
       setModalVisible(true);
     }
   };
+
   const cerrarModal = () => {
     setModalVisible(false);
   };
@@ -209,6 +267,7 @@ export default function CargarProducto({ route }) {
               name="imagenes"
               title="Seleccionar imágenes"
               errors={errors}
+              setImagenes={setImagenes} //Array de imagenes
             />
           </View>
 
@@ -257,19 +316,19 @@ export default function CargarProducto({ route }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#ff6347",
+    backgroundColor: '#ff6347',
   },
   header: {
-    backgroundColor: "#ff6347",
+    backgroundColor: '#ff6347',
     padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 16,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: 'bold',
+    color: 'white',
     marginLeft: 16,
   },
   backButton: {
@@ -277,7 +336,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
@@ -286,11 +345,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   section: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -301,54 +360,54 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 16,
-    color: "#333",
+    color: '#333',
   },
   input: {
-    backgroundColor: "#f8f9fa",
+    backgroundColor: '#f8f9fa',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: '#e9ecef',
   },
   selectBox: {
-    backgroundColor: "#f8f9fa",
+    backgroundColor: '#f8f9fa',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: '#e9ecef',
   },
   dropdown: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 8,
     marginTop: 4,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: '#e9ecef',
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
     marginBottom: 20,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -360,7 +419,7 @@ const styles = StyleSheet.create({
   modalTexto: {
     fontSize: 18,
     marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
+    textAlign: 'center',
+    color: '#333',
   },
 });
