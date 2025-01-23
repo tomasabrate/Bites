@@ -17,7 +17,7 @@ import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
 import Login from "../pages/InicioApp/Login";
-import InterfazAdministrador from "../pages/Admin/interfazAdministrador";
+import InterfazAdministrador from "../pages/Admin/InterfazAdministrador";
 import Registro from "../pages/Registro/Registro";
 import RegistroCliente from "../pages/Registro/RegistroCliente";
 import RegistroComercio from "../pages/Registro/RegistroComercio";
@@ -27,9 +27,10 @@ import CargarProducto from "../pages/Productos/CargarProducto";
 import ModificarProducto from "../pages/Productos/ModificarProducto";
 import MisVentas from "../pages/Comercio/Ventas/MisVentas"
 import DetalleVenta from "../pages/Comercio/Ventas/DetalleVenta";
-import DetalleUsuario from "../pages/Admin/detalleUsuario";
+import DetalleUsuario from "../pages/Admin/DetalleUsuario";
 import MisCompras from "../pages/Cliente/MisCompras"
 import DetalleCompra from "../pages/Cliente/DetalleCompra";
+import ModificarUsuario from "../pages/Admin/ModificarUsuario";
 
 const Stack = createStackNavigator();
 
@@ -65,6 +66,7 @@ export default function StackNavigator() {
       <Stack.Screen name="DetalleUsuario" component={DetalleUsuario} />
       <Stack.Screen name="MisCompras" component={MisCompras} />
       <Stack.Screen name="DetalleCompra" component={DetalleCompra} />
+      <Stack.Screen name="ModificarUsuario" component={ModificarUsuario} />
     </Stack.Navigator>
   );
 }

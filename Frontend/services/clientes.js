@@ -83,3 +83,26 @@ export const postCliente = async (data) => {
       throw error;
     }
   };
+
+  export const putCliente = async (uid_cliente, data) => {
+    try {
+      const response = await fetch(`${API_URL}/${uid_cliente}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Error ${response.status}: ${response.statusText}`
+        );
+      }
+      console.log(`Cliente ${uid_cliente} actualizado con exito!`)
+      return await response.json();
+    } catch (error) {
+      console.error("Error al modificar cliente:", error);
+      throw error;
+    }
+  };

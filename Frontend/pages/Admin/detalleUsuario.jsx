@@ -113,7 +113,7 @@ const DetalleUsuario = ({ navigation, route }) => {
                 />
                 <BotonGenerico
                     title="Modificar"
-                    onPress={null}
+                    onPress={() => navigation.navigate('ModificarUsuario', { uid: user.id, rol: user.rol })}
                     colorInicial="#f44336"
                     colorPressed="#d32f2f"
                 />
