@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView, Platform, StatusBar, 
 import BotonGenerico from "../../components/BotonGenerico";
 import { deleteCliente, getClienteById, deleteLogicoCliente } from '../../services/clientes';
 import { deleteComercio, getComercioById, deleteLogicoComercio } from '../../services/comercios';
+import { useFocusEffect } from '@react-navigation/native';
 
 import firebaseApp from '../../firebase_config';
 import { getFirestore, doc, deleteDoc, updateDoc } from "firebase/firestore";
@@ -18,25 +19,25 @@ const DetalleUsuario = ({ navigation, route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisible2, setModalVisible2] = useState(false);
 
-    useEffect(() => {
-        const obtenerDatos = async () => {
-            try {
-                let resultado = null;
-                if (user.rol === 'Cliente') {
-                    resultado = await getClienteById(user.id);
-                    console.log("UID: ", user.id);
-                    console.log(resultado);
-                } else if (user.rol === 'Comercio') {
-                    resultado = await getComercioById(user.id);
+    useFocusEffect(
+        React.useCallback(() => {
+            const obtenerDatos = async () => {
+                try {
+                    let resultado = null;
+                    if (user.rol === 'Cliente') {
+                        resultado = await getClienteById(user.id);
+                    } else if (user.rol === 'Comercio') {
+                        resultado = await getComercioById(user.id);
+                    }
+                    setData(resultado);
+                } catch (err) {
+                    setError("Error al cargar usuario. Inténtalo de nuevo más tarde.");
                 }
-                setData(resultado);
-            } catch (err) {
-                setError("Error al cargar usuario. Inténtalo de nuevo más tarde.");
-            }
-        };
-
-        obtenerDatos();
-    }, [user.id, user.rol]);
+            };
+    
+            obtenerDatos();
+        }, [user.id, user.rol])
+    );
 
     if (error) {
         return (

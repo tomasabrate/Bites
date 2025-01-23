@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import ZorritoSelector from '../registro/ZorritoSelector'; // Asegúrate de importar el selector
-import RegistroCliente from '../registro/RegistroCliente'; // Importa el formulario
+import ZorritoSelector from '../Registro/ZorritoSelector'; // Asegúrate de importar el selector
+import RegistroCliente from '../Registro/RegistroCliente'; // Importa el formulario
 
 const ClienteProfile = ({ navigation }) => {
   // Añadido 'navigation' como prop
