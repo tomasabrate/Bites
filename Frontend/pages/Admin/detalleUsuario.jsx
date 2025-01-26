@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Platform, StatusBar, Modal } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import BotonGenerico from "../../components/BotonGenerico";
 import { deleteCliente, getClienteById, deleteLogicoCliente } from '../../services/clientes';
 import { deleteComercio, getComercioById, deleteLogicoComercio } from '../../services/comercios';
@@ -51,8 +51,8 @@ const DetalleUsuario = ({ navigation, route }) => {
 
     if (!data) {
         return (
-            <SafeAreaView style={styles.safeArea}>
-                <Text style={styles.loadingText}>Cargando...</Text>
+            <SafeAreaView style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#ff6347" />
             </SafeAreaView>
         );
     }
@@ -71,13 +71,13 @@ const DetalleUsuario = ({ navigation, route }) => {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 <View style={styles.content}>
-                    <Text style={styles.title}>Detalle Usuario</Text>
 
                     <View style={styles.card}>
+                    <Text style={styles.title}>Detalles del usuario</Text>
                         <View style={styles.container}>
-                            <Text style={styles.text}>UID: {user.id}</Text>
-                            <Text style={styles.text}>Correo: {user.email}</Text>
-                            <Text style={styles.text}>Rol: {user.rol}</Text>
+                            <Text style={styles.text1}>UID: {user.id}</Text>
+                            <Text style={styles.text1}>Correo: {user.email}</Text>
+                            <Text style={styles.text1}>Rol: {user.rol}</Text>
                             {user.rol === 'Cliente' ? (
                                 <View>
                                     <Text style={styles.text}>Nombre: {data.nombre}</Text>
@@ -229,8 +229,7 @@ const DetalleUsuario = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: "#ffe8e3",
-        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        backgroundColor: "#f5f5f5",
     },
     container: {
         flex: 1,
@@ -244,6 +243,7 @@ const styles = StyleSheet.create({
         color: "#333",
         marginBottom: 16,
         textAlign: "center",
+        paddingBottom: 15,
     },
     card: {
         backgroundColor: "white",
@@ -259,9 +259,15 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 3,
     },
-    text: {
+    text1: {
         fontSize: 16,
         fontWeight: "600",
+        color: "#333",
+        marginBottom: 8,
+    },
+    text: {
+        fontSize: 16,
+        fontWeight: "400",
         color: "#666",
         marginBottom: 8,
     },
@@ -313,6 +319,11 @@ const styles = StyleSheet.create({
         flexWrap: 'nowrap',
         gap: 8,
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
 });
 
 

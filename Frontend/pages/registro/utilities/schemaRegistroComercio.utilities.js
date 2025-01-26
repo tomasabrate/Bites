@@ -17,8 +17,9 @@ const schemaComercio = yup.object({
         .required("La dirección del comercio es obligatoria"),
     zonas_entrega: yup
         .string()
-        .min(3, "Minimo 3 caracteres")
-        .max(250, "Maximo 250 caracteres."),
+        .nullable()
+        .notRequired()
+        .min(0, "Minimo 3 caracteres"),
     telefono: yup
         .string()
         .min(3, "Minimo 3 caracteres")
@@ -26,10 +27,15 @@ const schemaComercio = yup.object({
         .required("El numero de telefono es obligatorio"),
     costo_entrega: yup
         .number()
-        .typeError("El precio debe ser un número"),
+        .nullable()
+        .notRequired()
+        .transform((value, originalValue) => originalValue === "" ? null : value) 
+    .typeError("El precio debe ser un número"),
     id_categoria: yup
         .number()
-        .typeError("Error en la categoria"),
+        .typeError("Error en la categoria")
+        .nullable()
+        .notRequired(),
 });
 
 
