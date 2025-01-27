@@ -3,7 +3,8 @@ import {
   getClienteByUid,
   postCliente,
   deleteCliente,
-  deleteLogicoCliente
+  deleteLogicoCliente,
+  putCliente,
 } from "../controllers/clientes.controller.js";
 import { Router } from "express";
 const routerClientes = Router();
@@ -18,5 +19,7 @@ routerClientes.post("/clientes", postCliente);
 routerClientes.delete("/clientes/:uid_cliente", deleteCliente);
 
 routerClientes.delete("/clientes/baja/:uid_cliente", deleteLogicoCliente);
+
+routerClientes.put("/clientes/:uid_cliente", putCliente);
 
 export default routerClientes;

@@ -17,7 +17,9 @@ const schemaCliente = yup.object({
   domicilio: yup
     .string()
     .min(3, "Minimo 3 caracteres")
-    .max(250, "Maximo 250 caracteres."),
+    .max(250, "Maximo 250 caracteres.")
+    .nullable()
+    .notRequired(),
   telefono: yup
     .string()
     .min(3, "Minimo 3 caracteres")

@@ -1,4 +1,4 @@
-import { getComercios, getComercioByUid, postComercio, deleteComercio, deleteLogicoCormecio } from "../controllers/comercios.controller.js";
+import { getComercios, getComercioByUid, postComercio, deleteComercio, deleteLogicoCormecio, putComercio } from "../controllers/comercios.controller.js";
 import { Router } from "express";
 const routerComercios = Router();
 
@@ -12,5 +12,7 @@ routerComercios.post("/comercios", postComercio);
 routerComercios.delete("/comercios/:uid_comercio", deleteComercio);
 
 routerComercios.delete("/comercios/baja/:uid_comercio", deleteLogicoCormecio);
+
+routerComercios.put("/comercios/:uid_comercio", putComercio);
 
 export default routerComercios;

@@ -128,3 +128,39 @@ export const deleteLogicoCormecio = async (req, res) => {
   }
 };
 
+export const putComercio = async (req, res) => {
+  console.log("Datos recibidos:", req.body);
+  const { uid_comercio } = req.params; 
+  const { mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega, 
+    metodos_pago, imagenes, activo } = req.body;
+
+  try {
+    let query = `
+      UPDATE Comercios SET
+      uid_comercio = ?, mail = ?, nombre_comercio = ?, id_categoria = ?, descripcion = ?, direccion = ?, telefono = ?, horario_apertura = ?, horario_cierre = ?, 
+      zonas_entrega = ?, costo_entrega = ?, metodos_pago = ?, imagenes = ?, activo = ?`;
+
+    const values = [
+      uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, 
+      costo_entrega, metodos_pago, imagenes, activo
+    ];
+
+    query += ` WHERE uid_comercio = ?`;
+    values.push(uid_comercio); 
+
+    const [result] = await pool.query(query, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Comercio no encontrado" });
+    }
+
+    console.log("Comercio actualizado: ", req.body);
+    res.status(200).json({ message: "Comercio actualizado exitosamente" });
+  } catch (error) {
+    console.error("Error al actualizar el comercio:", error);
+    res.status(500).json({
+      message: "Error al actualizar el comercio",
+      error: error.message,
+    });
+  }
+};

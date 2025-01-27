@@ -110,3 +110,43 @@ export const deleteLogicoCliente = async (req, res) => {
     return res.status(500).send("500 - Error en la base de datos.");
   }
 };
+
+export const putCliente = async (req, res) => {
+  console.log("Datos recibidos:", req.body);
+  const { uid_cliente } = req.params; 
+  const { mail, nombre, apellido, fecha_nacimiento, domicilio, telefono, preferencias_alimentarias, foto_perfil, activo } = req.body;
+
+  try {
+    let query = `
+      UPDATE Clientes SET
+      uid_cliente = ?, mail = ?, nombre = ?, apellido = ?, fecha_nacimiento = ?, domicilio = ?, telefono = ?, 
+      preferencias_alimentarias = ?, foto_perfil = ?, activo = ?`;
+
+    const values = [
+      uid_cliente, mail, nombre, apellido, fecha_nacimiento, domicilio, telefono, preferencias_alimentarias, foto_perfil, activo
+    ];
+
+    if (foto_perfil && foto_perfil.length > 0) {
+      query += `, foto_perfil = ?`;
+      values.push(foto_perfil.join(',')); 
+    }
+
+    query += ` WHERE uid_cliente = ?`;
+    values.push(uid_cliente); 
+
+    const [result] = await pool.query(query, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+
+    console.log("Cliente actualizado: ", req.body);
+    res.status(200).json({ message: "Cliente actualizado exitosamente" });
+  } catch (error) {
+    console.error("Error al actualizar el cliente:", error);
+    res.status(500).json({
+      message: "Error al actualizar el cliente",
+      error: error.message,
+    });
+  }
+};

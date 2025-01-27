@@ -82,3 +82,26 @@ export const deleteComercio = async (uid_comercio) => {
       throw error;
     }
   };
+
+  export const putComercio = async (uid_comercio, data) => {
+      try {
+        const response = await fetch(`${API_URL}/${uid_comercio}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.message || `Error ${response.status}: ${response.statusText}`
+          );
+        }
+        console.log(`Comercio ${uid_comercio} actualizado con exito!`)
+        return await response.json();
+      } catch (error) {
+        console.error("Error al modificar comercio:", error);
+        throw error;
+      }
+    };

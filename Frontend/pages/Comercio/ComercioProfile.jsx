@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
-import RegistroComercio from '../registro/RegistroComercio'; // Asegúrate de que la ruta sea correcta
+import RegistroComercio from '../Registro/RegistroComercio'; // Asegúrate de que la ruta sea correcta
 
 const ComercioProfile = ({ navigation }) => {
   const handleFormSubmit = (formData) => {
