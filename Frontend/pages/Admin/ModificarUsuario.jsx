@@ -473,6 +473,24 @@ const RegistroCliente = () => {
                     />
                   </View>
 
+                  <View style={styles.section}>
+                    <Text style={styles.label}>Estado de cuenta</Text>
+                    <View style={styles.options}>
+                      <TouchableOpacity
+                        style={[styles.option, activo === 1 && styles.selected]}
+                        onPress={() => setActivo(1)}
+                      >
+                        <Text style={[styles.text, activo === 1 && styles.textSelected]}>Activo</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.option, activo === 0 && styles.selected]}
+                        onPress={() => setActivo(0)}
+                      >
+                        <Text style={[styles.text, activo === 0 && styles.textSelected]}>No Activo</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
                 </>
               ) : null}
 
@@ -517,13 +535,6 @@ const styles = StyleSheet.create({
     width: '90%',
     marginTop: 20,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
-    marginBottom: 20,
-  },
   label: {
     fontSize: 16,
     color: '#333',
@@ -538,12 +549,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     color: '#333'
-  },
-  dateText: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-    lineHeight: 50,
   },
   categoriesContainer: {
     flexDirection: 'row',
@@ -566,90 +571,12 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 16,
   },
-  termsContainer: {
-    marginVertical: 15,
-    alignItems: 'center',
-  },
-  termsText: {
-    color: '#007bff',
-    fontSize: 16,
-    textDecorationLine: 'underline',
-    marginBottom: 5,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkedCheckbox: {
-    backgroundColor: '#4caf50', // Color cuando está seleccionado
-  },
-  checkboxText: {
-    marginLeft: 5,
-    fontSize: 16,
-  },
   submitButton: {
     backgroundColor: '#ff6347',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
-  },
-  disabledButton: {
-    backgroundColor: 'lightgray',
-  },
-  submitButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  cerrarSesionButtom: {
-    backgroundColor: '#aa0e0e',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  cerrarSesionButtonText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTexto: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
   },
   safeArea: {
     flex: 1,

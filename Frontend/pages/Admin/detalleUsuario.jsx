@@ -280,11 +280,6 @@ const styles = StyleSheet.create({
         borderTopColor: "#e0e0e0",
         gap: 8,
     },
-    loadingText: {
-        textAlign: 'center',
-        marginTop: 20,
-        fontSize: 18,
-    },
     modalContainer: {
         flex: 1,
         justifyContent: "center",
