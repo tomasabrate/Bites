@@ -6,105 +6,120 @@ import {
   Text,
   View,
   Image,
-  Dimensions,
+  useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import BotonGenerico from '../../../components/BotonGenerico';
-import { set } from '@react-native-firebase/database';
 
 export default function ImagePickerController({
   name,
   control,
   title,
-  label,
   errors,
-  setImagenes,
 }) {
   const [images, setImages] = useState([]);
+  const { width } = useWindowDimensions();
 
   const pickImages = async (onChange) => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
-        // allowsEditing: true,
-        //selectionLimit: 1,
+        selectionLimit: 2,
         aspect: [4, 3],
         quality: 0.5,
       });
 
-      console.log(JSON.stringify(result, null, 2));
-      if (result.assets && result.assets.length > 0) {
-        const selectedImages = result.assets.map((asset) => ({
-          uri: asset.uri,
-          type: 'image/jpeg',
-          name: asset.uri.split('/').pop() || 'image.jpg',
-        }));
-        setImages(selectedImages); // Actualizar el estado local
-        onChange(selectedImages); // Pasar las imágenes seleccionadas al formulario
-        setImagenes(selectedImages);
+      if (!result.canceled) {
+        const selectedImages = result.assets.map((asset) => asset.uri);
+        setImages(selectedImages);
+        onChange(selectedImages);
       }
     } catch (error) {
-      console.error('Error en pickImages:', error);
+      console.error('Error al seleccionar imágenes:', error.message);
     }
   };
 
+  const removeImage = (uri) => {
+    const updatedImages = images.filter((image) => image !== uri);
+    setImages(updatedImages);
+    //onChange(updatedImages); // Asegúrate de que onChange se pasa aquí
+    control.setValue(name, updatedImages); // Usar control para actualizar el formulario
+  };
+
   return (
-    <View style={styles.container}>
+    <>
       <Controller
         control={control}
         name={name}
         defaultValue={[]}
         render={({ field: { onChange, value } }) => (
-          <View style={styles.buttonContainer}>
+          <View>
             <BotonGenerico title={title} onPress={() => pickImages(onChange)} />
+
+            <FlatList
+              data={images}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: item }}
+                    style={styles.image}
+                    resizeMode="cover" // Cambia esto a "contain" si prefieres ver toda la imagen
+                  />
+                  {/* Botón de eliminación como una cruz */}
+                  <TouchableOpacity
+                    onPress={() => removeImage(item)}
+                    style={styles.removeButton}
+                  >
+                    <Text style={styles.removeImageText}>✖</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              ListHeaderComponent={null}
+            />
           </View>
         )}
       />
       {errors && errors[name] && (
         <Text style={styles.inputError}>{errors[name].message}</Text>
       )}
-      {images.length > 0 && (
-        <FlatList
-          data={images}
-          keyExtractor={(item) => item}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.imageListContainer}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item }} style={styles.image} />
-          )}
-        />
-      )}
-    </View>
+    </>
   );
 }
 
-const width = Dimensions.get('screen').width;
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 10,
-  },
-  buttonContainer: {
-    marginBottom: 15,
-    height: 70,
-  },
   inputError: {
+    justifyContent: 'space-between',
     color: 'red',
+    marginBottom: 20,
+    marginTop: 10,
+    padding: 10,
     fontSize: 12,
     fontWeight: 'bold',
-    marginTop: 5,
   },
-  imageListContainer: {
-    paddingVertical: 10,
-    height: width * 0.6,
+  imageContainer: {
+    position: 'relative',
+    width: '100%', // Asegura que el contenedor ocupe todo el ancho disponible
+    height: 250, // Mantén una altura fija para el contenedor de imágenes
   },
   image: {
-    width: width * 0.5,
-    height: width * 0.5,
-    borderRadius: 8,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    width: '100%', // Asegura que la imagen ocupe todo el ancho del contenedor
+    height: '100%', // Asegura que la imagen ocupe toda la altura del contenedor
+    borderRadius: 10, // Bordes redondeados (opcional)
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 15,
+    padding: 5,
+  },
+  removeImageText: {
+    color: 'red',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

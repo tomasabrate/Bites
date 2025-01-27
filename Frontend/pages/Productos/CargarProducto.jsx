@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Text,
+  Alert,
   SafeAreaView,
   Platform,
   StatusBar,
@@ -25,7 +26,10 @@ import { postProducto } from '../../services/productos';
 import { useAuth } from '../../context/AuthContext';
 
 //Imagenes
-import { uploadToCloudinary } from '../../utils/cloudinary';
+import { uploadImageToCloudinary } from '../../utils/cloudinary';
+
+import axios from 'axios';
+
 
 const categorias = [
   { value: 'Comida Rápida', key: 1 },
@@ -73,82 +77,94 @@ export default function CargarProducto({ route }) {
     setValue('activo', 1);
   }, [setValue, user]);
 
-  // Función para manejar la carga de las imágenes
-  const handleImageUpload = async (imagenes) => {
+  const showAlert = (message) => {
+    Alert.alert('Estado de publicación', message, [
+      { text: 'OK', onPress: () => console.log('Alerta cerrada') },
+    ]);
+  };
+
+  const onSubmit = async (data) => {
+    console.log('Data:', data);
+
+    if (Object.keys(errors).length > 0) {
+      console.log('El formulario tiene errores:', errors);
+      showAlert('Por favor, corrige los errores en el formulario.');
+      return;
+    }
+
     try {
-      const uploadedUrls = await Promise.all(
-        imagenes.map(async (image) => {
+      console.log('Contenido de data.imagenes:', data.imagenes);
+      console.log(
+        'Tipo de data.imagenes:',
+        Array.isArray(data.imagenes) ? 'Array' : typeof data.imagenes
+      );
+
+      const urlsImagenes = await Promise.all(
+        (data.imagenes || []).map(async (imagen) => {
           const formData = new FormData();
-          formData.append('file', {
-            uri: image.uri,
-            type: image.type || 'image/jpeg', // Asegúrate de pasar el tipo MIME correcto
-            name: image.fileName || 'image.jpg', // Nombre del archivo (opcional)
-          });
-          formData.append('upload_preset', 'BitesPreset'); // Reemplaza con tu `upload_preset`
+          formData.append('file', imagen); // Asegúrate de que es un base64 o URI completo
+          formData.append('upload_preset', 'BitesPreset');
 
-          const response = await fetch(
-            'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-            {
-              method: 'POST',
-              body: formData,
-            }
-          );
-
-          const result = await response.json();
-
-          if (result.secure_url) {
-            console.log('Imagen subida:', result.secure_url);
-            return result.secure_url;
-          } else {
-            console.error('Error en la subida:', result);
-            return null;
+          try {
+            const response = await axios.post(
+              'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+              formData
+            );
+            return response.data.secure_url;
+          } catch (error) {
+            console.error('Error subiendo imagen:', error);
+            return null; // Retorna null para excluirla si falla
           }
         })
       );
 
-      // Filtra las URLs válidas
-      return uploadedUrls.filter((url) => url !== null);
+      const validUrlsImagenes = urlsImagenes.filter((url) => url !== null);
+
+      // Verifica si se subieron imágenes
+      if (validUrlsImagenes.length === 0) {
+        showAlert('No se pudo cargar ninguna imagen. Intenta nuevamente.');
+        return;
+      }
+
+      // Si solo hay una imagen, enviar solo la URL
+      let imagenesFinales;
+      if (validUrlsImagenes.length === 1) {
+        imagenesFinales = validUrlsImagenes[0]; // Enviar solo la URL
+      } else {
+        // Si hay más de una, unirlas con ';'
+        imagenesFinales = validUrlsImagenes.join(';');
+      }
+
+      // Ahora, crea el objeto final de los datos
+      const formDataFinal = {
+        ...data,
+        tipo: selectedTipo,
+        categorias: selectedCategories,
+        fecha_produccion: formatDate(data.fecha_produccion),
+        fecha_vencimiento: formatDate(data.fecha_vencimiento),
+        imagenes: imagenesFinales, // Enviar solo una URL o las URLs separadas por ';'
+      };
+
+      console.log('Enviando formulario...');
+      console.log(JSON.stringify(formDataFinal));
+      console.log('Datos de las imagenes: ', formDataFinal.imagenes);
+
+      const response = await fetch('http://localhost:3000/productos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formDataFinal),
+      });
+
+      if (response.ok) {
+        showAlert('Producto publicado con éxito!');
+      } else {
+        const errorData = await response.json();
+        console.error('Error en la respuesta:', errorData);
+        showAlert('Hubo un error al cargar el producto.');
+      }
     } catch (error) {
-      console.error('Error al subir las imágenes:', error);
-      return [];
-    }
-  };
-
-  const onSubmit = async (data) => {
-    if (!imagenes || imagenes.length === 0) {
-      console.error('No hay imágenes seleccionadas.');
-      setModalMessage('Por favor selecciona al menos una imagen.');
-      setModalVisible(true);
-      return;
-    }
-
-    const uploadedImages = await handleImageUpload(imagenes);
-
-    if (uploadedImages.length === 0) {
-      setModalMessage('Error al subir las imágenes.');
-      setModalVisible(true);
-      return;
-    }
-
-    const formData = {
-      ...data,
-      tipo: selectedTipo,
-      id_categoria: selectedCategories,
-      fecha_produccion: formatDate(data.fecha_produccion),
-      fecha_vencimiento: formatDate(data.fecha_vencimiento),
-      imagenes: uploadedImages, // Usar las URLs de Cloudinary
-    };
-
-    console.log('Formulario enviado:', formData);
-
-    try {
-      await postProducto(formData);
-      setModalMessage('¡Producto cargado exitosamente!');
-      setModalVisible(true);
-    } catch (error) {
-      console.error('Error al enviar:', error);
-      setModalMessage('Error al cargar el producto.');
-      setModalVisible(true);
+      console.error('Error al subir imágenes o hacer la solicitud:', error);
+      showAlert('No se pudo conectar con el servidor.');
     }
   };
 

@@ -80,7 +80,9 @@ export const postProducto = async (req, res) => {
   } else {
     // Si no es ni un array ni una cadena, usa null
     imagenesFinales = null;
-  };
+  }
+  console.log('Imagenes recibidas:', imagenes);
+  console.log('Imagenes final procesadas:', imagenesFinales);
 
   try {
     // Subir imágenes a Cloudinary
