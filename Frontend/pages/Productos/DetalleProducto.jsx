@@ -45,7 +45,7 @@ export default function DetalleProducto({ navigation, route }) {
     }
   }
 
-  const imagen = imagenDefault(producto);
+  const imagen = (producto.imagenes != null) ? producto.imagenes : imagenDefault;
 
   return (
     <SafeAreaView style={styles.safeArea}>
