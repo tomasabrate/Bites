@@ -29,7 +29,7 @@ const InterfazCliente = () => {
         <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
           <Icon name="bars" size={24} color="#FF6347" />
         </TouchableOpacity>
-        <Text style={styles.title}>Productos</Text>
+        <Text style={styles.title}></Text>
       </View>
 
       {menuVisible && <MenuDesplegable />}

@@ -4,8 +4,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from "../pages/InicioApp/Inicio";
 import IntroScreen from "../pages/InicioApp/IntroScreen";
 import LoginSelectionScreen from "../pages/InicioApp/LoginSelectionScreen";
-import ClienteProfile from "../pages/Cliente/ClienteProfile";
-import ComercioProfile from "../pages/Comercio/ComercioProfile";
 import InterfazComerciante from "../pages/Comercio/InterfazComercio";
 import InterfazCliente from "../pages/Cliente/InterfazCliente";
 import MisPedidos from "../pages/Cliente/Mispedidos";
@@ -31,6 +29,7 @@ import DetalleUsuario from "../pages/Admin/DetalleUsuario";
 import MisCompras from "../pages/Cliente/MisCompras"
 import DetalleCompra from "../pages/Cliente/DetalleCompra";
 import ModificarUsuario from "../pages/Admin/ModificarUsuario";
+import PerfilCliente from "../pages/Cliente/PerfilCliente";
 
 const Stack = createStackNavigator();
 
@@ -47,8 +46,6 @@ export default function StackNavigator() {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="IntroScreen" component={IntroScreen} />
       <Stack.Screen name="LoginSelection" component={LoginSelectionScreen} />
-      <Stack.Screen name="ClienteProfile" component={ClienteProfile} />
-      <Stack.Screen name="ComercioProfile" component={ComercioProfile} />
       <Stack.Screen
         name="InterfazComerciante"
         component={InterfazComerciante}
@@ -76,6 +73,7 @@ export default function StackNavigator() {
       <Stack.Screen name="MisCompras" component={MisCompras} />
       <Stack.Screen name="DetalleCompra" component={DetalleCompra} />
       <Stack.Screen name="ModificarUsuario" component={ModificarUsuario} />
+      <Stack.Screen name="PerfilCliente" component={PerfilCliente} />
     </Stack.Navigator>
   );
 }

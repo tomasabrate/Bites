@@ -9,7 +9,7 @@ const MenuDesplegable = () => {
   const { user, logout } = useAuth();
   return (
     <View style={styles.menu}>
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('PerfilCliente')}>
         <Icon name="user" size={20} color="#000" />
         <Text style={styles.menuText}>Mi Perfil</Text>
       </TouchableOpacity>

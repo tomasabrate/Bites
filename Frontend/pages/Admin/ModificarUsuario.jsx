@@ -31,7 +31,7 @@ const theme = createTheme({
 const RegistroCliente = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { uid, rol } = route.params;
+  const { uid, rol, admin } = route.params;
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedZorrito, setSelectedZorrito] = useState(null);
@@ -195,321 +195,326 @@ const RegistroCliente = () => {
   };
 
   if (loading) {
-          return (
-              <SafeAreaView style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" color="#ff6347" />
-              </SafeAreaView>
-          );
-      }
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ff6347" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-              {/* Cliente */}
-              {rol === "Cliente" ? (
-                <>
-                  <ZorritoSelector onSelect={setSelectedZorrito} />
+          {/* Cliente */}
+          {rol === "Cliente" ? (
+            <>
+              <ZorritoSelector onSelect={setSelectedZorrito} />
 
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Nombre</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Nombre"
-                      placeholderTextColor="#888"
-                      name="nombre"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Apellido</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Apellido"
-                      placeholderTextColor="#888"
-                      name="apellido"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Fecha de Nacimiento</Text>
-                    <DatePickerController
-                      control={control}
-                      name="fecha_nacimiento"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Domicilio</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Domicilio"
-                      placeholderTextColor="#888"
-                      name="domicilio"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Número de Teléfono</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Nro de teléfono"
-                      placeholderTextColor="#888"
-                      keyboardType="phone-pad"
-                      name="telefono"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Estado de cuenta</Text>
-                    <View style={styles.options}>
-                      <TouchableOpacity
-                        style={[styles.option, activo === 1 && styles.selected]}
-                        onPress={() => setActivo(1)}
-                      >
-                        <Text style={[styles.text, activo === 1 && styles.textSelected]}>Activo</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.option, activo === 0 && styles.selected]}
-                        onPress={() => setActivo(0)}
-                      >
-                        <Text style={[styles.text, activo === 0 && styles.textSelected]}>No Activo</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Preferencias Alimentarias</Text>
-                    <View style={styles.categoriesContainer}>
-                      {categories.map((category) => (
-                        <TouchableOpacity
-                          key={category}
-                          style={[
-                            styles.categoryButton,
-                            selectedCategories.includes(category) && styles.selectedCategory,
-                          ]}
-                          onPress={() => handleCategorySelect(category)}
-                        >
-                          <Text style={styles.categoryText}>{category}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-                </>
-
-
-                // Comercio
-
-              ) : rol === "Comercio" ? (
-                <>
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Nombre del Comercio</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Nombre del comercio"
-                      placeholderTextColor="#888"
-                      name="nombre_comercio"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Categoria del Comercio</Text>
-                    <SelectList
-                      setSelected={(val) => {
-                        console.log("Categoría seleccionada:", val);
-                        setSelectedCategory(val);
-                      }}
-                      control={control}
-                      data={categoriasComercio}
-                      save="key"
-                      placeholder={categoriaActual?.value || " Sin categoria"}
-                      boxStyles={styles.selectBox}
-                      dropdownStyles={styles.dropdown}
-                      searchPlaceholder="Buscar categoría..."
-                      errors={errors}
-                      defaultOption={categoriaActual} // Usa el objeto con { key, value }
-                    />
-
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Descripción</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Descripción"
-                      placeholderTextColor="#888"
-                      name="descripcion"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Dirección</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Dirección"
-                      placeholderTextColor="#888"
-                      name="direccion"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Teléfono</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Teléfono"
-                      placeholderTextColor="#888"
-                      keyboardType="phone-pad"
-                      name="telefono"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Horario</Text>
-                    <View style={styles.row}>
-                      <Controller
-                        control={control}
-                        name="horario_apertura"
-                        rules={{ required: "El horario de apertura es obligatorio" }}
-                        render={({ field: { onChange, value }, fieldState: { error } }) => (
-                          <View style={styles.sectionHorario}>
-                            <TextField
-                              id="horario_apertura"
-                              type="time"
-                              defaultValue={horarioApertura}
-                              value={value}
-                              onChange={(e) => onChange(e.target.value)}
-                              style={styles.inputHorario}
-                              InputLabelProps={{
-                                style: { color: '#888' },
-                              }}
-                              inputProps={{
-                                style: { fontSize: 16 },
-                              }}
-                              error={!!error}
-                              helperText={error?.message}
-                            />
-                          </View>
-                        )}
-                      />
-                      <Controller
-                        control={control}
-                        name="horario_cierre"
-                        rules={{ required: "El horario de apertura es obligatorio" }}
-                        render={({ field: { onChange, value }, fieldState: { error } }) => (
-                          <View style={styles.sectionHorario}>
-                            <TextField
-                              id="horario_cierre"
-                              type="time"
-                              defaultValue={horarioCierre}
-                              value={value}
-                              onChange={(e) => onChange(e.target.value)}
-                              style={styles.inputHorario}
-                              InputLabelProps={{
-                                style: { color: '#888' },
-                              }}
-                              inputProps={{
-                                style: { fontSize: 16 },
-                              }}
-                              error={!!error}
-                              helperText={error?.message}
-                            />
-                          </View>
-                        )}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Zonas de Entrega</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Zonas de entrega"
-                      placeholderTextColor="#888"
-                      name="zonas_entrega"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Costo de Entrega</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Costo de entrega"
-                      placeholderTextColor="#888"
-                      keyboardType="numeric"
-                      name="costo_entrega"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Métodos de Pago</Text>
-                    <FormInputController
-                      control={control}
-                      style={styles.input}
-                      placeholder="Métodos de pago"
-                      placeholderTextColor="#888"
-                      name="metodos_pago"
-                      errors={errors}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>Estado de cuenta</Text>
-                    <View style={styles.options}>
-                      <TouchableOpacity
-                        style={[styles.option, activo === 1 && styles.selected]}
-                        onPress={() => setActivo(1)}
-                      >
-                        <Text style={[styles.text, activo === 1 && styles.textSelected]}>Activo</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.option, activo === 0 && styles.selected]}
-                        onPress={() => setActivo(0)}
-                      >
-                        <Text style={[styles.text, activo === 0 && styles.textSelected]}>No Activo</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                </>
-              ) : null}
-
-              <View style={styles.modalBotones}>
-                <BotonGenerico
-                  title="Cancelar"
-                  onPress={() => navigation.goBack()}
-                  colorInicial="#7a7878"
-                  colorPressed="#c4c4c4"
-                />
-
-                <BotonGenerico
-                  style={styles.submitButton}
-                  title="Guardar cambios"
-                  onPress={handleSubmit(rol === "Cliente" ? onSubmitCliente : onSubmitComercio)}
-                  colorInicial="#f44336"
-                  colorPressed="#d32f2f"
+              <View style={styles.section}>
+                <Text style={styles.label}>Nombre</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Nombre"
+                  placeholderTextColor="#888"
+                  name="nombre"
+                  errors={errors}
                 />
               </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Apellido</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Apellido"
+                  placeholderTextColor="#888"
+                  name="apellido"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Fecha de Nacimiento</Text>
+                <DatePickerController
+                  control={control}
+                  name="fecha_nacimiento"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Domicilio</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Domicilio"
+                  placeholderTextColor="#888"
+                  name="domicilio"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Número de Teléfono</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Nro de teléfono"
+                  placeholderTextColor="#888"
+                  keyboardType="phone-pad"
+                  name="telefono"
+                  errors={errors}
+                />
+              </View>
+
+              {admin && (
+                <View style={styles.section}>
+                  <Text style={styles.label}>Estado de cuenta</Text>
+                  <View style={styles.options}>
+                    <TouchableOpacity
+                      style={[styles.option, activo === 1 && styles.selected]}
+                      onPress={() => setActivo(1)}
+                    >
+                      <Text style={[styles.text, activo === 1 && styles.textSelected]}>Activo</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.option, activo === 0 && styles.selected]}
+                      onPress={() => setActivo(0)}
+                    >
+                      <Text style={[styles.text, activo === 0 && styles.textSelected]}>No Activo</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Preferencias Alimentarias</Text>
+                <View style={styles.categoriesContainer}>
+                  {categories.map((category) => (
+                    <TouchableOpacity
+                      key={category}
+                      style={[
+                        styles.categoryButton,
+                        selectedCategories.includes(category) && styles.selectedCategory,
+                      ]}
+                      onPress={() => handleCategorySelect(category)}
+                    >
+                      <Text style={styles.categoryText}>{category}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </>
+
+
+            // Comercio
+
+          ) : rol === "Comercio" ? (
+            <>
+              <View style={styles.section}>
+                <Text style={styles.label}>Nombre del Comercio</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Nombre del comercio"
+                  placeholderTextColor="#888"
+                  name="nombre_comercio"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Categoria del Comercio</Text>
+                <SelectList
+                  setSelected={(val) => {
+                    console.log("Categoría seleccionada:", val);
+                    setSelectedCategory(val);
+                  }}
+                  control={control}
+                  data={categoriasComercio}
+                  save="key"
+                  placeholder={categoriaActual?.value || " Sin categoria"}
+                  boxStyles={styles.selectBox}
+                  dropdownStyles={styles.dropdown}
+                  searchPlaceholder="Buscar categoría..."
+                  errors={errors}
+                  defaultOption={categoriaActual} // Usa el objeto con { key, value }
+                />
+
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Descripción</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Descripción"
+                  placeholderTextColor="#888"
+                  name="descripcion"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Dirección</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Dirección"
+                  placeholderTextColor="#888"
+                  name="direccion"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Teléfono</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Teléfono"
+                  placeholderTextColor="#888"
+                  keyboardType="phone-pad"
+                  name="telefono"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Horario</Text>
+                <View style={styles.row}>
+                  <Controller
+                    control={control}
+                    name="horario_apertura"
+                    rules={{ required: "El horario de apertura es obligatorio" }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <View style={styles.sectionHorario}>
+                        <TextField
+                          id="horario_apertura"
+                          type="time"
+                          defaultValue={horarioApertura}
+                          value={value}
+                          onChange={(e) => onChange(e.target.value)}
+                          style={styles.inputHorario}
+                          InputLabelProps={{
+                            style: { color: '#888' },
+                          }}
+                          inputProps={{
+                            style: { fontSize: 16 },
+                          }}
+                          error={!!error}
+                          helperText={error?.message}
+                        />
+                      </View>
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="horario_cierre"
+                    rules={{ required: "El horario de apertura es obligatorio" }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <View style={styles.sectionHorario}>
+                        <TextField
+                          id="horario_cierre"
+                          type="time"
+                          defaultValue={horarioCierre}
+                          value={value}
+                          onChange={(e) => onChange(e.target.value)}
+                          style={styles.inputHorario}
+                          InputLabelProps={{
+                            style: { color: '#888' },
+                          }}
+                          inputProps={{
+                            style: { fontSize: 16 },
+                          }}
+                          error={!!error}
+                          helperText={error?.message}
+                        />
+                      </View>
+                    )}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Zonas de Entrega</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Zonas de entrega"
+                  placeholderTextColor="#888"
+                  name="zonas_entrega"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Costo de Entrega</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Costo de entrega"
+                  placeholderTextColor="#888"
+                  keyboardType="numeric"
+                  name="costo_entrega"
+                  errors={errors}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>Métodos de Pago</Text>
+                <FormInputController
+                  control={control}
+                  style={styles.input}
+                  placeholder="Métodos de pago"
+                  placeholderTextColor="#888"
+                  name="metodos_pago"
+                  errors={errors}
+                />
+              </View>
+
+              {admin && (
+                <View style={styles.section}>
+                  <Text style={styles.label}>Estado de cuenta</Text>
+                  <View style={styles.options}>
+                    <TouchableOpacity
+                      style={[styles.option, activo === 1 && styles.selected]}
+                      onPress={() => setActivo(1)}
+                    >
+                      <Text style={[styles.text, activo === 1 && styles.textSelected]}>Activo</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.option, activo === 0 && styles.selected]}
+                      onPress={() => setActivo(0)}
+                    >
+                      <Text style={[styles.text, activo === 0 && styles.textSelected]}>No Activo</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+
+
+            </>
+          ) : null}
+
+          <View style={styles.modalBotones}>
+            <BotonGenerico
+              title="Cancelar"
+              onPress={() => navigation.goBack()}
+              colorInicial="#7a7878"
+              colorPressed="#c4c4c4"
+            />
+
+            <BotonGenerico
+              style={styles.submitButton}
+              title="Guardar cambios"
+              onPress={handleSubmit(rol === "Cliente" ? onSubmitCliente : onSubmitComercio)}
+              colorInicial="#f44336"
+              colorPressed="#d32f2f"
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -525,12 +530,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5,
     width: '90%',
     marginTop: 20,
