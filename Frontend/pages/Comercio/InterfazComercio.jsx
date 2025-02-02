@@ -11,6 +11,7 @@ import {
   Platform,
   StatusBar,
   Alert,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import MenuDesplegable from "./MenuDeslizanteC";
@@ -18,6 +19,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import BotonGenerico from "../../components/BotonGenerico";
 import calcularDescuento from "../Productos/utilities/calcularDescuento.utilities";
 import { deleteLogicoProducto, getProductos } from "../../services/productos";
+import imagenDefault from "../Productos/utilities/imagenDefault.utilities";
+import { inline } from "react-native-web/dist/cjs/exports/StyleSheet/compiler";
 
 export default function InterfazComerciante() {
   const [productos, setProductos] = useState([]);
@@ -47,7 +50,7 @@ export default function InterfazComerciante() {
 
   useEffect(() => {
     obtenerProductos();
-  }, [cambios]); // Escucha cambios en el nuevo estado
+  },[cambios]); // Escucha cambios en el nuevo estado
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -124,16 +127,19 @@ export default function InterfazComerciante() {
 
   const renderItem = ({ item }) => (
     <View style={styles.producto}>
-      <View style={styles.productoInfo}>
-        <Text style={styles.nombre}>{item.nombre}</Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.precioOriginal}>${item.precio}</Text>
-          <Text style={styles.precioDescuento}>
-            ${calcularDescuento(item.precio, item.descuento)}
-          </Text>
+      <View style={styles.infoContainer}>
+        <View style={styles.productoInfo}>
+          <Text style={styles.nombre}>{item.nombre}</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.precioOriginal}>${item.precio}</Text>
+            <Text style={styles.precioDescuento}>
+              ${calcularDescuento(item.precio, item.descuento)}
+            </Text>
+          </View>
+          <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
+          <Text style={styles.tipo}>Cantidad: {item.cantidad}</Text>
         </View>
-        <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
-        <Text style={styles.tipo}>Cantidad: {item.cantidad}</Text>
+        <Image source={item.imagenes || imagenDefault} style={styles.imagen} />
       </View>
       <View style={styles.botonesContainer}>
         <TouchableOpacity
@@ -264,6 +270,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 16,
   },
+  infoContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   botonMenu: {
     padding: 8,
     marginRight: 16,
@@ -349,6 +360,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     marginLeft: 8,
+  },
+  imagen: {
+    width: 150,
+    height: 100,
+    marginLeft: 8,
+    resizeMode: "cover",
   },
   modalContainer: {
     flex: 1,

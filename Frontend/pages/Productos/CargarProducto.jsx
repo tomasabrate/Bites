@@ -120,11 +120,11 @@ export default function CargarProducto({ route }) {
 
       const validUrlsImagenes = urlsImagenes.filter((url) => url !== null);
 
-      // Verifica si se subieron imágenes
-      if (validUrlsImagenes.length === 0) {
-        showAlert('No se pudo cargar ninguna imagen. Intenta nuevamente.');
-        return;
-      }
+      // // Verifica si se subieron imágenes
+      // if (validUrlsImagenes.length === 0) {
+      //   showAlert('No se pudo cargar ninguna imagen. Intenta nuevamente.');
+      //   return;
+      // }
 
       // Si solo hay una imagen, enviar solo la URL
       let imagenesFinales;
@@ -157,6 +157,7 @@ export default function CargarProducto({ route }) {
 
       if (response.ok) {
         showAlert('Producto publicado con éxito!');
+        navigation.goBack();
       } else {
         const errorData = await response.json();
         console.error('Error en la respuesta:', errorData);
