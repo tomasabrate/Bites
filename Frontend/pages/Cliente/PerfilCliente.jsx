@@ -5,7 +5,9 @@ import { getClienteById } from "../../services/clientes";
 import { useAuth } from "../../context/AuthContext";
 import ItemPerfil from './components/ItemPerfil';
 import { useFocusEffect } from '@react-navigation/native';
-import BotonVolverSimple from '../../components/BotonVolverSimple';
+import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/Feather";
+import ClientTermsModal from '../TerminosyCond/TermCliente';
 
 const PerfilCliente = () => {
     const navigation = useNavigation();
@@ -15,6 +17,7 @@ const PerfilCliente = () => {
     const [apellido, setApellido] = useState([]);
     const [imgPerfil, setImgPerfil] = useState([]);
     const [email, setEmail] = useState([]);
+    const [showTermsModal, setShowTermsModal] = useState(false);
 
 
     useFocusEffect(
@@ -45,60 +48,74 @@ const PerfilCliente = () => {
     );
 
     return (
-        <View style={styles.container}>
-            <BotonVolverSimple/>
-            <Image
-                source={{ uri: imgPerfil }}
-                style={styles.profileImage}
-            />
-            <Text style={styles.name}>{nombre} {apellido}</Text>
-            <Text style={styles.bio}>{email}</Text>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.header}>
+                    <TouchableOpacity
+                                onPress={() => navigation.navigate("InterfazCliente")}
+                                style={styles.backButton}
+                              >
+                                <Icon name="arrow-left" size={24} color="white" />
+                              </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Mi Perfil</Text>
+                </View>
+            <View style={styles.container}>
+                
+                <Image
+                    source={imgPerfil ? { uri: imgPerfil } : require('../../assets/user-default.png')}
+                    style={styles.profileImage}
+                />
+                <Text style={styles.name}>{nombre} {apellido}</Text>
+                <Text style={styles.bio}>{email}</Text>
 
-            <View style={styles.sectionView}>
-                <Text style={styles.sectionTitle}>Perfil</Text>
-            </View>
-            <ItemPerfil
-                title="Información personal"
-                icon="user"
-                onPress={() => navigation.navigate(null)}
-            />
-            <ItemPerfil
-                title="Editar perfil"
-                icon="edit"
-                onPress={() => navigation.navigate('ModificarUsuario', { uid: user.uid, rol: "Cliente", admin: false })}
-            />
+                <View style={styles.sectionView}>
+                    <Text style={styles.sectionTitle}>Perfil</Text>
+                </View>
+                <ItemPerfil
+                    title="Información personal"
+                    icon="user"
+                    onPress={() => navigation.navigate(null)}
+                />
+                <ItemPerfil
+                    title="Editar perfil"
+                    icon="edit"
+                    onPress={() => navigation.navigate('ModificarUsuario', { uid: user.uid, rol: "Cliente", admin: false })}
+                />
 
-            <View style={styles.sectionView}>
-                <Text style={styles.sectionTitle}>Actividad</Text>
+                <View style={styles.sectionView}>
+                    <Text style={styles.sectionTitle}>Actividad</Text>
+                </View>
+                <View style={styles.sectionView}>
+                    <Text style={styles.sectionTitle}>Soporte</Text>
+                </View>
+                <ItemPerfil
+                    title="Terminos y condiciones"
+                    icon="info"
+                    onPress={() => setShowTermsModal(true)}
+                />
+                <View style={styles.sectionView}>
+                    <Text style={styles.sectionTitle}> </Text>
+                </View>
+                <ItemPerfil
+                    title="Cerrar sesión"
+                    icon="log-out"
+                    color={"red"}
+                    direccion={false}
+                    onPress={async () => {
+                        try {
+                            navigation.navigate('Login');
+                            await logout();
+                            console.log('Sesion cerrada');
+                        } catch (error) {
+                            console.error('No se pudo cerrar sesión:', error);
+                        }
+                    }}
+                />
             </View>
-            <View style={styles.sectionView}>
-                <Text style={styles.sectionTitle}>Soporte</Text>
-            </View>
-            <ItemPerfil
-                title="Terminos y condiciones"
-                icon="info"
-                onPress={() => navigation.navigate(null)}
-            />
-            <View style={styles.sectionView}>
-                <Text style={styles.sectionTitle}> </Text>
-            </View>
-            <ItemPerfil
-                title="Cerrar sesión"
-                icon="log-out"
-                color={"red"}
-                direccion={false}
-                onPress={async () => {
-                    try {
-                        navigation.navigate('Login');
-                        await logout();
-                        console.log('Sesion cerrada');
-                    } catch (error) {
-                        console.error('No se pudo cerrar sesión:', error);
-                    }
-                }}
-            />
-        </View>
-
+            <ClientTermsModal
+          visible={showTermsModal}
+          onClose={() => setShowTermsModal(false)}
+        />
+        </SafeAreaView>
     );
 };
 
@@ -106,7 +123,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'top',
+        justifyContent: 'flex-start',
+        paddingTop: 30,
         backgroundColor: '#f5f5f5',
     },
     profileImage: {
@@ -140,6 +158,25 @@ const styles = StyleSheet.create({
         width: '90%',
         paddingTop: 20,
     },
+    header: {
+        backgroundColor: "#ff6347",
+        padding: 16,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "white",
+    },
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#ff6347",
+    },
+    backButton: {
+        marginRight: 16,
+      },
 });
 
 export default PerfilCliente;

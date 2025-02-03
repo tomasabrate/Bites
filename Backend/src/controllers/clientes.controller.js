@@ -126,11 +126,6 @@ export const putCliente = async (req, res) => {
       uid_cliente, mail, nombre, apellido, fecha_nacimiento, domicilio, telefono, preferencias_alimentarias, foto_perfil, activo
     ];
 
-    if (foto_perfil && foto_perfil.length > 0) {
-      query += `, foto_perfil = ?`;
-      values.push(foto_perfil.join(',')); 
-    }
-
     query += ` WHERE uid_cliente = ?`;
     values.push(uid_cliente); 
 

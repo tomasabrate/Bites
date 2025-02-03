@@ -15,7 +15,8 @@ import BotonGenerico from "../../components/BotonGenerico";
 import formatDate from "../Productos/utilities/formatDate.utilities";
 import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio, getCategoriaComercioById } from "../../services/categoriasComercio";
-
+import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
+import axios from 'axios';
 
 const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
 
@@ -34,7 +35,6 @@ const RegistroCliente = () => {
   const { uid, rol, admin } = route.params;
 
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedZorrito, setSelectedZorrito] = useState(null);
   const [user, setUser] = useState(null);
   const [activo, setActivo] = useState(null);
   const [categoriasComercio, setCategoriasComercio] = useState([]);
@@ -44,6 +44,8 @@ const RegistroCliente = () => {
   const [horarioApertura, setHorarioApertura] = useState(null);
   const [horarioCierre, setHorarioCierre] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imageUri, setImageUri] = useState(null);
+  const [imgPerfil, setImgPerfil] = useState(null);
 
   const handleCategorySelect = (category) => {
     if (selectedCategories.includes(category)) {
@@ -122,6 +124,7 @@ const RegistroCliente = () => {
           setValue("foto_perfil", data.foto_perfil);
           setValue("activo", data.activo);
 
+          setImgPerfil(data.foto_perfil);
           setActivo(data.activo);
         } else if (rol === "Comercio") {
           data = await getComercioById(uid);
@@ -160,16 +163,38 @@ const RegistroCliente = () => {
   }, [uid, setValue]);
 
   const onSubmitCliente = async (data) => {
+    let imageUrl = imgPerfil; // Usa la imagen actual por defecto
+
+    // Verifica si se ha seleccionado una nueva imagen
+    if (imageUri) {
+      console.log('Nueva imagen seleccionada:', imageUri);
+
+      const formDataImagen = new FormData();
+      formDataImagen.append('file', imageUri); // Asegúrate de que es un base64 o URI completo
+      formDataImagen.append('upload_preset', 'BitesPreset');
+
+      try {
+        const response = await axios.post(
+          'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+          formDataImagen
+        );
+        imageUrl = response.data.secure_url;
+      } catch (error) {
+        console.error('Error subiendo imagen:', error);
+      }
+
+      console.log('URL de nueva imagen:', imageUrl);
+    }
+
     const formData = {
       ...data,
-      activo: activo,
       fecha_nacimiento: formatDate(data.fecha_nacimiento),
+      foto_perfil: imageUrl, // Usa imageUrl (puede ser la actual o la nueva)
     };
 
     try {
       await putCliente(uid, formData);
       navigation.goBack();
-
     } catch (error) {
       console.log("Error al modificar el cliente:", error);
     }
@@ -209,7 +234,7 @@ const RegistroCliente = () => {
           {/* Cliente */}
           {rol === "Cliente" ? (
             <>
-              <ZorritoSelector onSelect={setSelectedZorrito} />
+              <SelectorImagenPerfil initialImage={imgPerfil} onImageSelected={setImageUri} />
 
               <View style={styles.section}>
                 <Text style={styles.label}>Nombre</Text>

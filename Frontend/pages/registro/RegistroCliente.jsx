@@ -8,7 +8,6 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import ZorritoSelector from './ZorritoSelector'; // Asegúrate de ajustar la ruta
 import ClientTermsModal from '../TerminosyCond/TermCliente';
 import { useAuth } from '../../context/AuthContext';
 import FormInputController from '../Productos/components/FormInputController';
@@ -20,6 +19,8 @@ import formatDate from '../Productos/utilities/formatDate.utilities';
 import BotonGenerico from '../../components/BotonGenerico';
 import { useNavigation } from '@react-navigation/native';
 import { postCliente } from '../../services/clientes';
+import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
+import axios from 'axios';
 
 import firebaseApp from '../../firebase_config';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
@@ -36,13 +37,13 @@ const RegistroCliente = () => {
   const navigation = useNavigation();
 
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedZorrito, setSelectedZorrito] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
   const [textModal, setTextModal] = useState('Continuar');
+  const [imageUri, setImageUri] = useState(null);
 
   const { user, logout } = useAuth();
 
@@ -74,9 +75,28 @@ const RegistroCliente = () => {
     const firestore = getFirestore(firebaseApp);
     const userDocRef = doc(firestore, 'usuarios', user.uid);
 
+    let imageUrl = null;
+    console.log('Imagen:', imageUri);
+
+    const formDataImagen = new FormData();
+    formDataImagen.append('file', imageUri); // Asegúrate de que es un base64 o URI completo
+    formDataImagen.append('upload_preset', 'BitesPreset');
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
+        formDataImagen
+      );
+      imageUrl = response.data.secure_url;
+    } catch (error) {
+      console.error('Error subiendo imagen:', error);
+    }
+
+    console.log('URL de imagen:', imageUrl);
     const formData = {
       ...data,
       fecha_nacimiento: formatDate(data.fecha_nacimiento),
+      foto_perfil: imageUrl || null,
     };
 
     console.log('Cliente:', formData);
@@ -115,7 +135,7 @@ const RegistroCliente = () => {
         <View style={styles.container}>
           <Text style={styles.title}>¡Completa tu Perfil!</Text>
 
-          <ZorritoSelector onSelect={setSelectedZorrito} />
+          <SelectorImagenPerfil onImageSelected={setImageUri} />
 
           <View style={styles.section}>
             <Text style={styles.label}>Nombre</Text>
@@ -182,7 +202,7 @@ const RegistroCliente = () => {
                   style={[
                     styles.categoryButton,
                     selectedCategories.includes(category) &&
-                      styles.selectedCategory,
+                    styles.selectedCategory,
                   ]}
                   onPress={() => handleCategorySelect(category)}
                 >
