@@ -24,11 +24,13 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { postProducto } from '../../services/productos';
 import { useAuth } from '../../context/AuthContext';
+import { CargaDeImagenes } from '../../utils/cargaDeImagenes';
 
 //Imagenes
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
 
 import axios from 'axios';
+
 
 
 const categorias = [
@@ -53,9 +55,10 @@ export default function CargarProducto({ route }) {
 
   const { user } = useAuth();
 
+  const { actualizarProductos } = route.params;
+
   //Testing imagenes
   const [imagenes, setImagenes] = useState([]);
-
   const mostrar = false;
 
   const {
@@ -93,47 +96,7 @@ export default function CargarProducto({ route }) {
     }
 
     try {
-      console.log('Contenido de data.imagenes:', data.imagenes);
-      console.log(
-        'Tipo de data.imagenes:',
-        Array.isArray(data.imagenes) ? 'Array' : typeof data.imagenes
-      );
-
-      const urlsImagenes = await Promise.all(
-        (data.imagenes || []).map(async (imagen) => {
-          const formData = new FormData();
-          formData.append('file', imagen); // Asegúrate de que es un base64 o URI completo
-          formData.append('upload_preset', 'BitesPreset');
-
-          try {
-            const response = await axios.post(
-              'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-              formData
-            );
-            return response.data.secure_url;
-          } catch (error) {
-            console.error('Error subiendo imagen:', error);
-            return null; // Retorna null para excluirla si falla
-          }
-        })
-      );
-
-      const validUrlsImagenes = urlsImagenes.filter((url) => url !== null);
-
-      // // Verifica si se subieron imágenes
-      // if (validUrlsImagenes.length === 0) {
-      //   showAlert('No se pudo cargar ninguna imagen. Intenta nuevamente.');
-      //   return;
-      // }
-
-      // Si solo hay una imagen, enviar solo la URL
-      let imagenesFinales;
-      if (validUrlsImagenes.length === 1) {
-        imagenesFinales = validUrlsImagenes[0]; // Enviar solo la URL
-      } else {
-        // Si hay más de una, unirlas con ';'
-        imagenesFinales = validUrlsImagenes.join(';');
-      }
+      const imagenesFinales = await CargaDeImagenes(data);
 
       // Ahora, crea el objeto final de los datos
       const formDataFinal = {
@@ -157,6 +120,7 @@ export default function CargarProducto({ route }) {
 
       if (response.ok) {
         showAlert('Producto publicado con éxito!');
+        actualizarProductos(); // Actualizar la lista de productos en la pantalla principal
         navigation.goBack();
       } else {
         const errorData = await response.json();

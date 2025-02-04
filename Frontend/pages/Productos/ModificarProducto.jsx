@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DatePickerController from "./components/DatePickerController";
 import FormInputController from "./components/FormInputController";
 import ImagePickerController from "./components/ImagePickerController";
@@ -18,6 +18,7 @@ import BotonGenerico from "../../components/BotonGenerico";
 import schema from "./utilities/schemaCargaProducto.utilities";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getProductoById, putProducto } from "../../services/productos";
+import { CargaDeImagenes } from "../../utils/cargaDeImagenes";
 
 const categorias = [
   { value: "Comida Rápida", key: 1 },
@@ -35,14 +36,13 @@ const tipos = [
 export default function ModificarProducto() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { productoId, actualizarProductos } = route.params; // ID del producto a modificar
-
-  console.log("Producto ID:", productoId); // Verificar productoId
+  const { productoId, actualizarProductos } = route.params;
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedTipo, setSelectedTipo] = useState("");
   const [cargando, setCargando] = useState(true);
-  const [producto, setProducto] = useState(null)
+  const [producto, setProducto] = useState(null);
+  const [cambioImg, setCambioImg] = useState(false);
 
   const {
     handleSubmit,
@@ -51,45 +51,45 @@ export default function ModificarProducto() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  useEffect(() => {
-    // Función para obtener los datos del producto
-    const obtenerProducto = async () => {
-      //Si no hay id, este "if" evita la llamada al backend
-      if (!productoId) {
-        console.log("Producto ID no válido"); // Verificación de productoId
-        setCargando(false);
-        return;
-      }
+  const obtenerProducto = useCallback(async () => {
+    if (!productoId) {
+      console.log("Producto ID no válido");
+      setCargando(false);
+      return;
+    }
 
-      try {
-        // Obtener producto por id
-        const data = await getProductoById(productoId);
-        setProducto(data);
-        console.log("Datos del producto obtenidos:", data);
-        console.log(data.nombre)
+    try {
+      const data = await getProductoById(productoId);
+      setProducto(data);
+      console.log("Datos del producto obtenidos:", data);
 
-        setValue("id_vendedor", data.id_vendedor);
-        setValue("nombre", data.nombre);
-        setValue("descripcion", data.descripcion);
-        setValue("precio", data.precio);
-        setValue("descuento", data.descuento);
-        setValue("cantidad", data.cantidad);
-        setValue("fecha_produccion", data.fecha_produccion);
-        setValue("fecha_vencimiento", data.fecha_vencimiento);
-        setValue("activo", 1);
-        setSelectedCategories(data.id_categoria);
-        setSelectedTipo(data.tipo);
-      } catch (error) {
-        Alert.alert("Error", "No se pudo cargar el producto.");
-      } finally {
-        setCargando(false);
-      }
-    };
-
-    obtenerProducto();
+      setValue("uid_comercio", data.uid_comercio);
+      setValue("nombre", data.nombre);
+      setValue("descripcion", data.descripcion);
+      setValue("precio", data.precio);
+      setValue("descuento", data.descuento);
+      setValue("cantidad", data.cantidad);
+      setValue("fecha_produccion", data.fecha_produccion);
+      setValue("fecha_vencimiento", data.fecha_vencimiento);
+      setValue("activo", 1);
+      setValue("imagenes", data.imagenes);
+      setSelectedCategories(data.id_categoria);
+      setSelectedTipo(data.tipo);
+      console.log(data);
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cargar el producto.");
+    } finally {
+      setCargando(false);
+    }
   }, [productoId, setValue]);
 
+  useEffect(() => {
+    obtenerProducto();
+  }, [obtenerProducto]);
+
   const onSubmit = async (data) => {
+    const imagenesFinales = await CargaDeImagenes(data);
+
     const formData = {
       ...data,
       tipo: selectedTipo,
@@ -97,25 +97,23 @@ export default function ModificarProducto() {
       id_categoria: selectedCategories,
       fecha_produccion: formatDate(data.fecha_produccion),
       fecha_vencimiento: formatDate(data.fecha_vencimiento),
+      imagenes: imagenesFinales,
     };
 
     try {
       await putProducto(productoId, formData);
-
       Alert.alert(
         "Producto modificado",
         "El producto se ha modificado exitosamente."
       );
-
-      // Llama a la función para actualizar la lista en InterfazComerciante
       actualizarProductos();
-      navigation.goBack(); // Regresa a la pantalla anterior
+      navigation.goBack();
     } catch (error) {
       Alert.alert("Error", "No se pudo conectar con el servidor.");
     }
   };
 
-  if (cargando  || !producto) {
+  if (cargando || !producto) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Cargando...</Text>
@@ -353,4 +351,3 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 });
-//MODIFICARPRODUCTO.JSX

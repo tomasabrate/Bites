@@ -8,5 +8,5 @@ export function generarCodigoDeRetiro(length = 6) {
 }
 
 // Test the function
-console.log("Generated pickup code:", generarCodigoDeRetiro());
-console.log("Generated pickup code (8 characters):", generarCodigoDeRetiro(8));
+// console.log("Generated pickup code:", generarCodigoDeRetiro());
+// console.log("Generated pickup code (8 characters):", generarCodigoDeRetiro(8));

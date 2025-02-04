@@ -192,6 +192,7 @@ export default function InterfazComerciante() {
             onPress={() =>
               navigation.navigate("CargarProducto", {
                 onProductAdded: () => setCambios((prev) => !prev),
+                actualizarProductos : obtenerProductos
               })
             }
             colorInicial="#4CAF50"
