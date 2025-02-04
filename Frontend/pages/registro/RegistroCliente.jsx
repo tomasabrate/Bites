@@ -20,6 +20,7 @@ import BotonGenerico from '../../components/BotonGenerico';
 import { useNavigation } from '@react-navigation/native';
 import { postCliente } from '../../services/clientes';
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
+import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
 import axios from 'axios';
 
 import firebaseApp from '../../firebase_config';
@@ -75,28 +76,12 @@ const RegistroCliente = () => {
     const firestore = getFirestore(firebaseApp);
     const userDocRef = doc(firestore, 'usuarios', user.uid);
 
-    let imageUrl = null;
-    console.log('Imagen:', imageUri);
+    const imagenFinal = await CargaDeImagenPerfil(imageUri);
 
-    const formDataImagen = new FormData();
-    formDataImagen.append('file', imageUri); // Asegúrate de que es un base64 o URI completo
-    formDataImagen.append('upload_preset', 'BitesPreset');
-
-    try {
-      const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-        formDataImagen
-      );
-      imageUrl = response.data.secure_url;
-    } catch (error) {
-      console.error('Error subiendo imagen:', error);
-    }
-
-    console.log('URL de imagen:', imageUrl);
     const formData = {
       ...data,
       fecha_nacimiento: formatDate(data.fecha_nacimiento),
-      foto_perfil: imageUrl || null,
+      foto_perfil: imagenFinal,
     };
 
     console.log('Cliente:', formData);

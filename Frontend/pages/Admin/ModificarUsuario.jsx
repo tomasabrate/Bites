@@ -16,6 +16,7 @@ import formatDate from "../Productos/utilities/formatDate.utilities";
 import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio, getCategoriaComercioById } from "../../services/categoriasComercio";
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
+import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
 import axios from 'axios';
 
 const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
@@ -144,7 +145,9 @@ const RegistroCliente = () => {
           setValue("metodos_pago", data.metodos_pago);
           setValue("imagenes", data.imagenes);
           setValue("activo", data.activo);
+          setValue("foto_perfil", data.foto_perfil);
 
+          setImgPerfil(data.foto_perfil);
           setActivo(data.activo);
           setIdCategoriaActual(data.id_categoria);
           setHorarioApertura(data.horario_apertura);
@@ -167,23 +170,7 @@ const RegistroCliente = () => {
 
     // Verifica si se ha seleccionado una nueva imagen
     if (imageUri) {
-      console.log('Nueva imagen seleccionada:', imageUri);
-
-      const formDataImagen = new FormData();
-      formDataImagen.append('file', imageUri); // Asegúrate de que es un base64 o URI completo
-      formDataImagen.append('upload_preset', 'BitesPreset');
-
-      try {
-        const response = await axios.post(
-          'https://api.cloudinary.com/v1_1/dturrtxzx/image/upload',
-          formDataImagen
-        );
-        imageUrl = response.data.secure_url;
-      } catch (error) {
-        console.error('Error subiendo imagen:', error);
-      }
-
-      console.log('URL de nueva imagen:', imageUrl);
+      imageUrl = await CargaDeImagenPerfil(imageUri);
     }
 
     const formData = {
@@ -201,11 +188,16 @@ const RegistroCliente = () => {
   };
 
   const onSubmitComercio = async (data) => {
-    console.log("Submit comercio")
+    let imageUrl = imgPerfil;
+
+    if (imageUri) {
+      imageUrl = await CargaDeImagenPerfil(imageUri);
+    }
     const formData = {
       ...data,
       activo: activo,
       id_categoria: selectedCategory,
+      foto_perfil: imageUrl,
     };
 
     console.log("Data Comercio:", formData);
@@ -339,6 +331,9 @@ const RegistroCliente = () => {
           ) : rol === "Comercio" ? (
             <>
               <View style={styles.section}>
+
+              <SelectorImagenPerfil initialImage={imgPerfil} onImageSelected={setImageUri} />
+
                 <Text style={styles.label}>Nombre del Comercio</Text>
                 <FormInputController
                   control={control}

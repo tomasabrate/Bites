@@ -47,12 +47,13 @@ export const postComercio = async (req, res) => {
     costo_entrega,
     metodos_pago,
     imagenes,
+    foto_perfil,
   } = req.body;
   console.log(req.body);
   try {
     const [rows] = await pool.query(
-      "INSERT INTO Comercios (uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega, metodos_pago, imagenes )" +
-        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO Comercios (uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega, metodos_pago, imagenes, foto_perfil )" +
+        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
       [
         uid_comercio,
         mail,
@@ -67,6 +68,7 @@ export const postComercio = async (req, res) => {
         costo_entrega,
         metodos_pago,
         imagenes,
+        foto_perfil,
       ]
     );
 
@@ -84,6 +86,7 @@ export const postComercio = async (req, res) => {
       costo_entrega,
       metodos_pago,
       imagenes,
+      foto_perfil
     });
     console.log("Perfil de comercio añadido con exito!", req.body);
   } catch (error) {
@@ -132,17 +135,17 @@ export const putComercio = async (req, res) => {
   console.log("Datos recibidos:", req.body);
   const { uid_comercio } = req.params; 
   const { mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega, 
-    metodos_pago, imagenes, activo } = req.body;
+    metodos_pago, imagenes, activo, foto_perfil } = req.body;
 
   try {
     let query = `
       UPDATE Comercios SET
       uid_comercio = ?, mail = ?, nombre_comercio = ?, id_categoria = ?, descripcion = ?, direccion = ?, telefono = ?, horario_apertura = ?, horario_cierre = ?, 
-      zonas_entrega = ?, costo_entrega = ?, metodos_pago = ?, imagenes = ?, activo = ?`;
+      zonas_entrega = ?, costo_entrega = ?, metodos_pago = ?, imagenes = ?, activo = ?, foto_perfil = ?`;
 
     const values = [
       uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, 
-      costo_entrega, metodos_pago, imagenes, activo
+      costo_entrega, metodos_pago, imagenes, activo, foto_perfil
     ];
 
     query += ` WHERE uid_comercio = ?`;

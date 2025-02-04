@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
-import ClientTermsModal from '../TerminosyCond/TermCliente';
+import ComercioTermsModal from '../TerminosyCond/TermComercio';
 import { useAuth } from '../../context/AuthContext';
 import FormInputController from "../Productos/components/FormInputController";
 import { useForm, Controller } from "react-hook-form";
@@ -12,6 +12,8 @@ import { postComercio } from "../../services/comercios";
 import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio } from "../../services/categoriasComercio";
 import { TextField } from '@mui/material';
+import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
+import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
 
 import firebaseApp from '../../firebase_config';
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
@@ -29,6 +31,7 @@ const RegistroComercio = () => {
   const [envio, setEnvio] = useState(false)
   const [categoriasComercio, setCategoriasComercio] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [imageUri, setImageUri] = useState(null);
 
 
   const { user, logout } = useAuth();
@@ -70,10 +73,12 @@ const RegistroComercio = () => {
     const firestore = getFirestore(firebaseApp);
     const userDocRef = doc(firestore, "usuarios", user.uid);
 
+    const imagenFinal = await CargaDeImagenPerfil(imageUri);
 
     const formData = {
       ...data,
       id_categoria: selectedCategory,
+      foto_perfil: imagenFinal,
     };
 
     console.log("Comercio:", formData);
@@ -119,6 +124,8 @@ const RegistroComercio = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Text style={styles.title}>Completa el perfil de tu Comercio</Text>
+
+          <SelectorImagenPerfil onImageSelected={setImageUri} />
 
           <View style={styles.section}>
             <Text style={styles.label}>Nombre del Comercio</Text>
@@ -317,7 +324,7 @@ const RegistroComercio = () => {
           </TouchableOpacity>
         </View>
 
-        <ClientTermsModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />
+        <ComercioTermsModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />
       </ScrollView>
 
       <Modal

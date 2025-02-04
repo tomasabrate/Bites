@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getClienteById } from "../../services/clientes";
+import { getComercioById } from "../../services/comercios";
 import { useAuth } from "../../context/AuthContext";
 import ItemPerfil from '../../components/ItemPerfil';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
-import ClientTermsModal from '../TerminosyCond/TermCliente';
+import ComercioTermsModal from '../TerminosyCond/TermComercio';
 
-const PerfilCliente = () => {
+const PerfilClomercio = () => {
     const navigation = useNavigation();
     const { user, logout } = useAuth();
 
-    const [nombre, setNombre] = useState([]);
-    const [apellido, setApellido] = useState([]);
+    const [nombreComercio, setNombreComercio] = useState([]);
     const [imgPerfil, setImgPerfil] = useState([]);
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
@@ -31,10 +30,9 @@ const PerfilCliente = () => {
 
                 try {
                     let data;
-                    data = await getClienteById(user.uid);
+                    data = await getComercioById(user.uid);
 
-                    setNombre(data.nombre);
-                    setApellido(data.apellido);
+                    setNombreComercio(data.nombre_comercio);
                     setImgPerfil(data.foto_perfil);
                     setEmail(data.mail);
 
@@ -64,21 +62,21 @@ const PerfilCliente = () => {
                     source={imgPerfil ? { uri: imgPerfil } : require('../../assets/user-default.png')}
                     style={styles.profileImage}
                 />
-                <Text style={styles.name}>{nombre} {apellido}</Text>
+                <Text style={styles.name}>{nombreComercio}</Text>
                 <Text style={styles.bio}>{email}</Text>
 
                 <View style={styles.sectionView}>
                     <Text style={styles.sectionTitle}>Perfil</Text>
                 </View>
                 <ItemPerfil
-                    title="Información personal"
-                    icon="user"
+                    title="Información del comercio"
+                    icon="shopping-bag"
                     onPress={() => navigation.navigate(null)}
                 />
                 <ItemPerfil
                     title="Editar información del perfil"
                     icon="edit"
-                    onPress={() => navigation.navigate('ModificarUsuario', { uid: user.uid, rol: "Cliente", admin: false })}
+                    onPress={() => navigation.navigate('ModificarUsuario', { uid: user.uid, rol: "Comercio", admin: false })}
                 />
 
                 <View style={styles.sectionView}>
@@ -111,7 +109,7 @@ const PerfilCliente = () => {
                     }}
                 />
             </View>
-            <ClientTermsModal
+            <ComercioTermsModal
           visible={showTermsModal}
           onClose={() => setShowTermsModal(false)}
         />
@@ -179,4 +177,4 @@ const styles = StyleSheet.create({
       },
 });
 
-export default PerfilCliente;
+export default PerfilClomercio;
