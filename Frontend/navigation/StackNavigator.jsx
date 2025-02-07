@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import SplashScreen from "../pages/InicioApp/Inicio";
+import Inicio from "../pages/InicioApp/Inicio";
 import IntroScreen from "../pages/InicioApp/IntroScreen";
 import LoginSelectionScreen from "../pages/InicioApp/LoginSelectionScreen";
 import InterfazComerciante from "../pages/Comercio/InterfazComercio";
@@ -37,14 +37,14 @@ const Stack = createStackNavigator();
 export default function StackNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="Splash"
+      initialRouteName="Inicio"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Registro" component={Registro} />
       <Stack.Screen name="RegistroCliente" component={RegistroCliente} />
       <Stack.Screen name="RegistroComercio" component={RegistroComercio} />
-      <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="Inicio" component={Inicio} />
       <Stack.Screen name="IntroScreen" component={IntroScreen} />
       <Stack.Screen name="LoginSelection" component={LoginSelectionScreen} />
       <Stack.Screen
