@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, Modal } from 'react-native';
 import firebaseApp from '../../firebase_config';
-import {
-  getAuth,
-  onAuthStateChanged,
-  //signInWithEmailAndPassword,
-} from 'firebase/auth';
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import BotonGenerico from '../../components/BotonGenerico';
 
@@ -13,7 +9,15 @@ const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 import { useAuth } from '../../context/AuthContext';
 
-export default function SplashScreen({ navigation }) {
+setPersistence(auth, browserLocalPersistence)
+.then(() => {
+  console.log("Persistencia activada");
+})
+.catch((error) => {
+  console.error("Error con la persistencia:", error);
+});
+
+export default function Inicio({ navigation }) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [textModal, setTextModal] = useState('');
