@@ -5,7 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  Button
 } from "react-native";
 import { validate as validateEmail } from 'email-validator';
 import { createTheme, TextField } from '@mui/material';
@@ -15,6 +16,8 @@ import * as Google from 'expo-auth-session/providers/google'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Path } from 'react-native-svg';
 import Divider from 'react-native-divider';
+import LoadingScreen from "../../components/LoadingScreen";
+import { useAuth } from '../../context/AuthContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -22,6 +25,9 @@ import firebaseApp from "../../firebase_config";
 import {
   getAuth,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential
 } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 const auth = getAuth(firebaseApp);
@@ -37,6 +43,8 @@ const theme = createTheme({
 });
 
 const Login = ({ navigation }) => {
+  const { user, logout } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,12 +52,71 @@ const Login = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
-    androidClientId: "450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com"
+    androidClientId: "450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com",
+    scopes: ["profile", "email"],
+    responseType: "id_token"
   })
 
+  // Con Firestore
+
+  useEffect(() => {
+    handleGoogleSignIn();
+  }, [response]);
+
+  const handleGoogleSignIn = async () => {
+    if (response?.type === "success") {
+      try {
+        const { id_token } = response.params;
+
+        if (!id_token) {
+          console.error("Error: No se recibió id_token");
+          return;
+        }
+
+        const credential = GoogleAuthProvider.credential(id_token);
+        const userCredential = await signInWithCredential(auth, credential);
+        console.log("Usuario autenticado con Google:", userCredential.user);
+
+      } catch (error) {
+        console.error("Error en la autenticación con Google:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getLocalUser();
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await AsyncStorage.setItem("@user", JSON.stringify(user));
+        console.log(JSON.stringify(user, null, 2));
+        setUserInfo(user);
+      } else {
+        console.log("Usuario no autenticado");
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const getLocalUser = async () => {
+    try {
+      setLoading(true);
+      const userJSON = await AsyncStorage.getItem("@user");
+      const userData = userJSON ? JSON.parse(userJSON) : null;
+      setUserInfo(userData);
+    } catch (e) {
+      console.log(e, "Error al obtener usuario local");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Sin Firestore
+  /*
   const getLocalUser = async () => {
     const data = await AsyncStorage.getItem("@user");
     if (!data) return null;
@@ -85,11 +152,13 @@ const Login = ({ navigation }) => {
       );
       const user = await response.json();
       await AsyncStorage.setItem("@user", JSON.stringify(user));
-      setUserInfo(user); 
-    }catch (e){
+      setUserInfo(user);
+    } catch (e) {
       console.log("Error al obtener info user:", e)
     }
-  }
+  } 
+  */
+  // ----
 
   const handleSingIn = () => {
     if (!validateEmail(email)) {
@@ -125,10 +194,16 @@ const Login = ({ navigation }) => {
     setIsModalVisible(false);
   };
 
+  if (loading) {
+    return (
+      <LoadingScreen/>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-      <Text style={styles.title}>Elige como quieres ingresar sesión</Text>
+        <Text style={styles.title}>Elige como quieres ingresar sesión</Text>
 
         <TextField
           id="email-field"
@@ -165,7 +240,7 @@ const Login = ({ navigation }) => {
         </Divider>
 
 
-        <TouchableOpacity style={styles.button} disabled={!request} onPress={() => {promptAsync();}}>
+        <TouchableOpacity style={styles.button} disabled={!request} onPress={() => { promptAsync(); }}>
           <View style={styles.iconContainer}>
             <Svg width={24} height={24} viewBox="0 0 48 48">
               <Path fill="#EA4335" d="M24 9.5c3.2 0 6 1.1 8.2 3.2l6.1-6.1C34.3 3 29.5 1 24 1 14.8 1 7 6.8 3.5 14.5l7.5 5.8C13.2 14 18.2 9.5 24 9.5z" />
@@ -186,6 +261,26 @@ const Login = ({ navigation }) => {
           Regístrate como Cliente o Comercio
         </Text>
         <CustomModal visible={isModalVisible} onClose={hideModal} errorMessage="El correo o la contraseña son incorrectos." />
+
+        <Button
+          title="remove local store"
+          onPress={async () => await AsyncStorage.removeItem("@user")}
+        />
+      <TouchableOpacity
+              style={styles.menuItem}
+              onPress={async () => {
+                try {
+                  await logout();
+                  navigation.navigate('Login');
+                  await AsyncStorage.removeItem("@user");
+                  console.log('Sesion cerrada');
+                } catch (error) {
+                  console.error('No se pudo cerrar sesión:', error);
+                }
+              }}
+            >
+              <Text style={styles.menuText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -288,6 +383,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     marginVertical: 10,
     paddingBottom: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
