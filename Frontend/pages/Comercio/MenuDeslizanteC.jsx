@@ -3,8 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // O la familia de íconos que prefieras
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from "@react-navigation/native";
+import useLogout from "../../utils/logout";
 
 const MenuDeslizanteC = ({ setPaginaActual }) => {
+  const handleLogout = useLogout();
   const navigation = useNavigation();
   const { user, logout } = useAuth();
   return (
@@ -27,15 +29,7 @@ const MenuDeslizanteC = ({ setPaginaActual }) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.menuItem}
-        onPress={async () => {
-          try {
-            await logout();
-            navigation.navigate('Login');
-            console.log('Sesion cerrada');
-          } catch (error) {
-            console.error('No se pudo cerrar sesión:', error);
-          }
-        }}
+        onPress={handleLogout}
       >
         <Icon name="sign-out" size={20} color="#000" />
         <Text style={styles.menuText}>Cerrar Sesión</Text>

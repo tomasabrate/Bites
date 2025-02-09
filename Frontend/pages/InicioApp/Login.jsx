@@ -18,6 +18,7 @@ import Svg, { Path } from 'react-native-svg';
 import Divider from 'react-native-divider';
 import LoadingScreen from "../../components/LoadingScreen";
 import { useAuth } from '../../context/AuthContext';
+import useLogout from "../../utils/logout";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -29,7 +30,7 @@ import {
   onAuthStateChanged,
   signInWithCredential
 } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
@@ -43,7 +44,6 @@ const theme = createTheme({
 });
 
 const Login = ({ navigation }) => {
-  const { user, logout } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,8 +51,9 @@ const Login = ({ navigation }) => {
   const [error, setError] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  const [token, setToken] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const handleLogout = useLogout();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
@@ -60,8 +61,6 @@ const Login = ({ navigation }) => {
     scopes: ["profile", "email"],
     responseType: "id_token"
   })
-
-  // Con Firestore
 
   useEffect(() => {
     handleGoogleSignIn();
@@ -79,7 +78,10 @@ const Login = ({ navigation }) => {
 
         const credential = GoogleAuthProvider.credential(id_token);
         const userCredential = await signInWithCredential(auth, credential);
-        console.log("Usuario autenticado con Google:", userCredential.user);
+        const user = userCredential.user;
+        console.log("Usuario autenticado con Google:", user);
+
+        await verificarCuentaFirestore(user);
 
       } catch (error) {
         console.error("Error en la autenticación con Google:", error);
@@ -94,6 +96,7 @@ const Login = ({ navigation }) => {
         await AsyncStorage.setItem("@user", JSON.stringify(user));
         console.log(JSON.stringify(user, null, 2));
         setUserInfo(user);
+        await verificarCuentaFirestore(user);
       } else {
         console.log("Usuario no autenticado");
       }
@@ -114,51 +117,29 @@ const Login = ({ navigation }) => {
     }
   };
 
+  const verificarCuentaFirestore = async (user) => {
+    if (!user) return;
 
-  // Sin Firestore
-  /*
-  const getLocalUser = async () => {
-    const data = await AsyncStorage.getItem("@user");
-    if (!data) return null;
-    return JSON.parse(data);
-  }
-
-  useEffect(() => {
-    handleEffect();
-  }, [response, token]);
-
-  async function handleEffect() {
-    const user = await getLocalUser();
-    console.log("user", user);
-    if (!user) {
-      if (response?.type === "success") {
-        // setToken(response.authentication.accessToken);
-        getUserInfo(response.authentication.accessToken);
-      }
-    } else {
-      setUserInfo(user);
-      console.log("loaded locally");
-    }
-  }
-
-  getUserInfo = async (token) => {
-    if (!token) return;
     try {
-      const response = await fetch(
-        "https://www.googleapis.com/userinfo/v2/me",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const user = await response.json();
-      await AsyncStorage.setItem("@user", JSON.stringify(user));
-      setUserInfo(user);
-    } catch (e) {
-      console.log("Error al obtener info user:", e)
+      setLoading(true);
+      const docuRef = doc(firestore, `usuarios/${user.uid}`);
+      const docSnap = await getDoc(docuRef);
+
+      if (!docSnap.exists()) {
+        navigation.navigate("RegistroGoogle", { userInfo: user });
+      } else {
+        console.log("Usuario ya existe en Firestore, no se crea otro documento");
+      }
+    } catch (error) {
+      console.error("Error al obtener cuenta de Firestore:", error);
+    }finally {
+      setLoading(false);
     }
-  } 
-  */
-  // ----
+  };
+
+
+
+  //---
 
   const handleSingIn = () => {
     if (!validateEmail(email)) {
@@ -196,7 +177,7 @@ const Login = ({ navigation }) => {
 
   if (loading) {
     return (
-      <LoadingScreen/>
+      <LoadingScreen />
     );
   }
 
@@ -261,30 +242,10 @@ const Login = ({ navigation }) => {
           Regístrate como Cliente o Comercio
         </Text>
         <CustomModal visible={isModalVisible} onClose={hideModal} errorMessage="El correo o la contraseña son incorrectos." />
-
-        <Button
-          title="remove local store"
-          onPress={async () => await AsyncStorage.removeItem("@user")}
-        />
-      <TouchableOpacity
-              style={styles.menuItem}
-              onPress={async () => {
-                try {
-                  await logout();
-                  navigation.navigate('Login');
-                  await AsyncStorage.removeItem("@user");
-                  console.log('Sesion cerrada');
-                } catch (error) {
-                  console.error('No se pudo cerrar sesión:', error);
-                }
-              }}
-            >
-              <Text style={styles.menuText}>Cerrar Sesión</Text>
-            </TouchableOpacity>
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -305,17 +266,6 @@ const styles = StyleSheet.create({
     width: "90%",
     marginTop: 20,
     maxWidth: 500,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#ffe8e3", // Fondo mientras carga
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 18,
-    color: "#333",
   },
   title: {
     fontSize: 18,
@@ -377,17 +327,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#555',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 10,
-    paddingBottom: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 

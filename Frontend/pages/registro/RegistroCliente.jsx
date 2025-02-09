@@ -17,14 +17,20 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import schemaClientes from './utilities/schemaRegistroCliente.utilities';
 import formatDate from '../Productos/utilities/formatDate.utilities';
 import BotonGenerico from '../../components/BotonGenerico';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { postCliente } from '../../services/clientes';
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
 import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
-import firebaseApp from '../../firebase_config';
+import firebaseApp from "../../firebase_config";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+const auth = getAuth(firebaseApp);
 
 const categories = [
   'Postres',
@@ -45,6 +51,9 @@ const RegistroCliente = () => {
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
   const [textModal, setTextModal] = useState('Continuar');
   const [imageUri, setImageUri] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [imagenGoogle, setImagenGoogle] = useState(null);
 
   const { user, logout } = useAuth();
 
@@ -76,7 +85,13 @@ const RegistroCliente = () => {
     const firestore = getFirestore(firebaseApp);
     const userDocRef = doc(firestore, 'usuarios', user.uid);
 
-    const imagenFinal = await CargaDeImagenPerfil(imageUri);
+    let imagenFinal = null;
+
+    if (imageUri) {
+        imagenFinal = await CargaDeImagenPerfil(imageUri);  
+    } else if (imagenGoogle) {  
+        imagenFinal = imagenGoogle;  
+    }
 
     const formData = {
       ...data,
@@ -84,6 +99,7 @@ const RegistroCliente = () => {
       foto_perfil: imagenFinal,
     };
 
+    console.log("userInfo: ", userInfo);
     console.log('Cliente:', formData);
 
     try {
@@ -114,13 +130,55 @@ const RegistroCliente = () => {
     }
   };
 
+  useEffect(() => {
+    getLocalUser();
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await AsyncStorage.setItem("@user", JSON.stringify(user));
+        console.log(JSON.stringify(user, null, 2));
+        setUserInfo(user);
+      } else {
+        console.log("Usuario no autenticado");
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const getLocalUser = async () => {
+    try {
+      setLoading(true);
+      const userJSON = await AsyncStorage.getItem("@user");
+      const userData = userJSON ? JSON.parse(userJSON) : null;
+      setUserInfo(userData);
+    } catch (e) {
+      console.log(e, "Error al obtener usuario local");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      const fullName = userInfo.displayName || "";
+      const nameParts = fullName.split(" ");
+
+      const firstName = nameParts.length > 0 ? nameParts[0] : "";
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+      setValue("nombre", firstName);
+      setValue("apellido", lastName);
+      setValue("telefono", userInfo.phoneNumber || "");
+      setImagenGoogle(userInfo.photoURL);
+    }
+  }, [userInfo, setValue]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Text style={styles.title}>¡Completa tu Perfil!</Text>
 
-          <SelectorImagenPerfil onImageSelected={setImageUri} />
+          <SelectorImagenPerfil initialImage={userInfo ? userInfo.photoURL : null} onImageSelected={setImageUri} />
 
           <View style={styles.section}>
             <Text style={styles.label}>Nombre</Text>

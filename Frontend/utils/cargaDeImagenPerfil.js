@@ -4,9 +4,13 @@ export const CargaDeImagenPerfil = async (imageUri) => {
   try {
     let imageUrl = null;
     console.log('Imagen:', imageUri);
-
-    const formDataImagen = new FormData();
-    formDataImagen.append('file', imageUri); // Asegúrate de que es un base64 o URI completo
+    
+    if (imageUri.startsWith('http')) {
+      imageUrl = imageUri;
+    } else {
+      const formDataImagen = new FormData();
+      formDataImagen.append('file', imageUri); // Asegúrate de que es un base64 o URI completo
+    }
     formDataImagen.append('upload_preset', 'BitesPreset');
 
     try {

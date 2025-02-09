@@ -7,12 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { SelectList } from "react-native-dropdown-select-list";
-import BotonVolver from "../../components/BotonVolver";
 
 import firebaseApp from "../../firebase_config";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import BotonVolverSimple from "../../components/BotonVolverSimple";
 
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
@@ -64,15 +63,19 @@ const Registro = ({ navigation }) => {
           onChangeText={setPassword}
         />
 
-        <Text style={styles.label}>Cuenta</Text>
-        <SelectList
-          placeholder="Selecciona el tipo de cuenta"
-          setSelected={setRol}
-          label="Tipo"
-          data={tipo}
-          styles={styles.picker}
-          save="value"
-        />
+        <Text style={styles.label1}>Elija uno de los siguientes roles: </Text>
+        <Text style={styles.label}></Text>
+        <Text style={styles.label}>Cliente: Si deseas comprar productos o servicios.</Text>
+        <Text style={styles.label}>Comercio: Si eres un vendedor y quieres ofrecer productos o servicios.</Text>
+        <View style={styles.options}>
+          <TouchableOpacity style={[styles.option, rol === "Comercio" && styles.selected]} onPress={() => setRol("Cliente")}>
+            <Text style={[styles.submitButtonText, rol === "Cliente" && styles.textSelected]}>Cliente</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.option, rol === "Cliente" && styles.selected]} onPress={() => setRol("Comercio")}>
+            <Text style={[styles.submitButtonText, rol === "Comercio" && styles.textSelected]}>Comercio</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={[styles.submitButton]}
@@ -81,7 +84,7 @@ const Registro = ({ navigation }) => {
           <Text style={styles.submitButtonText}>Registrarse</Text>
         </TouchableOpacity>
       </View>
-      <BotonVolver styles={{paddingTop: 15}} />
+      <BotonVolverSimple styles={{ paddingTop: 15 }} />
     </ScrollView>
   );
 };
@@ -117,6 +120,11 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 5,
   },
+  label1: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 10,
+  },
   input: {
     height: 50,
     borderColor: "gray",
@@ -125,16 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 15,
     fontSize: 16,
-  },
-  picker: {
-    height: 50,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 10,
-    marginBottom: 15,
-    marginTop: 20,
-    paddingHorizontal: 15,
-    fontSize: 30,
   },
   submitButton: {
     backgroundColor: "#ff6347",
@@ -146,6 +144,29 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: "white",
     fontSize: 18,
+    fontWeight: "bold",
+  },
+  options:
+  {
+    flexDirection: 'row',
+    justifyContent: "center",
+    padding: 16,
+    gap: 10,
+  },
+  option: {
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+    marginHorizontal: 5,
+    marginTop: 5,
+    backgroundColor: '#ff6347',
+    borderColor: '#ff6347',
+    paddingVertical: 15
+  },
+  selected: { backgroundColor: '#ccc', borderColor: '#ccc' },
+  textSelected: {
+    fontSize: 18,
+    color: 'white',
     fontWeight: "bold",
   },
 });

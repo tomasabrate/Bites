@@ -139,7 +139,7 @@ export default function Inicio({ navigation }) {
   useEffect(() => {
     if (user === null && !isAuthenticated) {
       const timer = setTimeout(() => {
-        navigation.navigate('IntroScreen');
+        navigation.navigate('Login');
       }, 1000);
 
       return () => clearTimeout(timer);
