@@ -8,8 +8,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import ClientTermsModal from '../TerminosyCond/TermCliente';
+import useLogout from "../../utils/logout";
 
 const PerfilCliente = () => {
+    const handleLogout = useLogout();
     const navigation = useNavigation();
     const { user, logout } = useAuth();
 
@@ -100,15 +102,7 @@ const PerfilCliente = () => {
                     icon="log-out"
                     color={"red"}
                     direccion={false}
-                    onPress={async () => {
-                        try {
-                            navigation.navigate('Login');
-                            await logout();
-                            console.log('Sesion cerrada');
-                        } catch (error) {
-                            console.error('No se pudo cerrar sesión:', error);
-                        }
-                    }}
+                    onPress={handleLogout}
                 />
             </View>
             <ClientTermsModal

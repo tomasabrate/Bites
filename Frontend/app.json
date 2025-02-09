@@ -18,10 +18,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.tomas_abrate.pjbites"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f9a32653-5fe7-4ae7-849e-f53c40fac9e5"
+      }
+    },
+    "scheme": "pjbites"
   }
 }

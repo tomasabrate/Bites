@@ -8,6 +8,7 @@ import { getFirestore, collection, query, where, getDocs } from 'firebase/firest
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { getAuth } from "firebase/auth";
+import useLogout from "../../utils/logout";
 
 const firestore = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
@@ -23,6 +24,8 @@ const navItems = [
 ];
 
 export default function InterfazAdministrador() {
+const handleLogout = useLogout()
+
   const [activeNav, setActiveNav] = useState('Dashboard');
   const [usuarios, setUsuarios] = useState([]);
   const [filteredUsuarios, setFilteredUsuarios] = useState([]);
@@ -103,17 +106,6 @@ export default function InterfazAdministrador() {
 
   const handleNavigation = (screenName) => {
     setActiveNav(screenName);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigation.navigate("Login");
-      console.log("Sesión de administrador cerrada");
-    } catch (error) {
-      console.error('No se pudo cerrar sesión:', error);
-      Alert.alert('Error', 'No se pudo cerrar la sesión. Por favor, intente de nuevo.');
-    }
   };
 
   return (
