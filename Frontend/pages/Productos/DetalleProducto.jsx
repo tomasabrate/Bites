@@ -9,6 +9,7 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  TouchableOpacity
 } from "react-native";
 import { useCart } from "../../context/CartContext";
 import formatDate from "./utilities/formatDate.utilities";
@@ -37,10 +38,10 @@ export default function DetalleProducto({ navigation, route }) {
     );
   };
 
-  const tipoProducto = (tipo) =>{
-    if(tipo === 1){
+  const tipoProducto = (tipo) => {
+    if (tipo === 1) {
       return "Unidad"
-    }else{
+    } else {
       return "Bolson"
     }
   }
@@ -51,7 +52,17 @@ export default function DetalleProducto({ navigation, route }) {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <Text style={styles.nombre}>{producto.nombre_comercio}</Text>
+
+          <TouchableOpacity onPress={() => navigation.navigate("InfoPerfilComercio", { uid_comercio: producto.uid_comercio })}>
+            <View style={styles.conteinerNombre}>
+              <Image
+                source={producto.foto_perfil ? { uri: producto.foto_perfil } : require('../../assets/user-default.png')}
+                style={styles.profileImage}
+              />
+              <Text style={styles.nombre}>{producto.nombre_comercio}</Text>
+            </View>
+          </TouchableOpacity>
+
 
           <View style={styles.imageContainer}>
             <Image source={imagen} style={styles.imagen} resizeMode="cover" />
@@ -225,5 +236,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
     gap: 8,
+  },
+  profileImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    backgroundColor: "white",
+    textAlign: "center",
+  },
+  conteinerNombre: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
   },
 });

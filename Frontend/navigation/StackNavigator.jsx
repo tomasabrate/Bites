@@ -32,6 +32,7 @@ import ModificarUsuario from "../pages/Admin/ModificarUsuario";
 import PerfilCliente from "../pages/Cliente/PerfilCliente";
 import PerfilComercio from "../pages/Comercio/PerfilComercio";
 import RegistroGoogle from "../pages/Registro/RegistroGoogle";
+import InfoPerfilComercio from "../pages/Comercio/InfoPerfilComercio";
 
 const Stack = createStackNavigator();
 
@@ -78,6 +79,7 @@ export default function StackNavigator() {
       <Stack.Screen name="PerfilCliente" component={PerfilCliente} />
       <Stack.Screen name="PerfilComercio" component={PerfilComercio} />
       <Stack.Screen name="RegistroGoogle" component={RegistroGoogle} />
+      <Stack.Screen name="InfoPerfilComercio" component={InfoPerfilComercio} />
     </Stack.Navigator>
   );
 }

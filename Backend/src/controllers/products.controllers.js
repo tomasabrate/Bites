@@ -14,7 +14,7 @@ export const getProductos = async (req, res) => {
   try {
     // const [result] = await pool.query("SELECT * FROM Productos p JOIN where p.cantidad > 0");//para que solo se devuelvan productos con cantidad > 0
     const [result] = await pool.query(
-      'SELECT p.id_producto, p.uid_comercio, c.nombre_comercio, p.id_categoria, p.nombre, p.descripcion, p.precio, p.descuento, p.fecha_produccion, p.fecha_vencimiento, p.tipo, p.cantidad, p.imagenes, p.activo FROM Productos p JOIN Comercios c ON p.uid_comercio = c.uid_comercio WHERE p.cantidad > 0  AND p.activo = 1'
+      'SELECT p.id_producto, p.uid_comercio, c.uid_comercio, c.nombre_comercio, c.foto_perfil, p.id_categoria, p.nombre, p.descripcion, p.precio, p.descuento, p.fecha_produccion, p.fecha_vencimiento, p.tipo, p.cantidad, p.imagenes, p.activo FROM Productos p JOIN Comercios c ON p.uid_comercio = c.uid_comercio WHERE p.cantidad > 0  AND p.activo = 1'
     );
     //esta consulta devuelve todos los datos de productos mas el nombre del comercio al que pertenece.
     console.log('Lista de Productos:', result); //muestra en consola

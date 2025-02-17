@@ -190,6 +190,8 @@ export default function Productos() {
               precio={item.precio}
               descuento={item.descuento}
               nombre_comercio={item.nombre_comercio}
+              foto_perfil={item.foto_perfil}
+              uid_comercio={item.uid_comercio}
               onPress={() =>
                 navigation.navigate("DetalleProducto", { producto: item })
               }

@@ -4,12 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import React from "react";
 import { Feather } from '@expo/vector-icons';
 
-export default function BotonVolver() {
+export default function BotonVolver({color}) {
     const navigation = useNavigation();
 
     return (
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Feather name='chevron-left' size={40} color='black' />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Feather name='chevron-left' size={40} color={color ? color : 'black'} />
         </TouchableOpacity>
     );
 }
