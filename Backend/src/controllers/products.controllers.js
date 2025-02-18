@@ -47,6 +47,27 @@ export const getProductosById = async (req, res) => {
   }
 };
 
+export const getProductosByUidComercio = async (req, res) => {
+  const { uid_comercio } = req.params;
+  try {
+    const [result] = await pool.query(
+      'SELECT * FROM Productos WHERE uid_comercio = ?',
+      [uid_comercio] 
+    );
+
+    console.log('Productos', result); 
+
+    if (result.length > 0) {
+      res.status(200).json(result); 
+    } else {
+      res.status(404).json({ message: 'No hay productos de' , uid_comercio }); 
+    }
+  } catch (error) {
+    console.log('ERROR en GET productos.', error);
+    return res.status(500).send('500 - Error en la base de datos.');
+  }
+};
+
 export const postProducto = async (req, res) => {
   const {
     uid_comercio,

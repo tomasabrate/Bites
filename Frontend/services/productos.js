@@ -17,6 +17,23 @@ export const getProductos = async () => {
   }
 };
 
+//OBTENER PRODUCTOS POR COMERCIO
+export const getProductosByUidComercio = async (uid_comercio) => {
+  try {
+    const response = await fetch(`${API_URL}/comercio/${uid_comercio}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    throw error;
+  }
+};
+
 //MODIFICAR UN PRODUCTO
 export const putProducto = async (productoId, data) => {
   try {
