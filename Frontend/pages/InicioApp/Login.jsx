@@ -61,14 +61,14 @@ const Login = ({ navigation }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [textModal, setTextModal] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  
+  const [showInicio, setShowInicio] = useState(true);
+
   const handleLogout = useLogout();
   const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
   // widht min: 820
@@ -102,7 +102,7 @@ const Login = ({ navigation }) => {
         console.log("Usuario autenticado con Google:", user);
 
         await verificarCuentaFirestore(user);
-
+        await redirigirSegunRol(user);
       } catch (error) {
         console.error("Error en la autenticación con Google:", error);
       }
@@ -110,90 +110,93 @@ const Login = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          // Guardar usuario en AsyncStorage
-          await AsyncStorage.setItem("@user", JSON.stringify(user));
-          console.log(JSON.stringify(user, null, 2));
+    const iniciarSesion = async () => {
+      try {
+        // timepo de Inicio
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          // Obtener datos del usuario desde Firestore
-          const rol = await getRol(user.uid);
-          const perfilCompleto = await getPerfilCompleto(user.uid);
-          const activo = await getActivo(user.uid);
-          console.log('Perfil completo:', perfilCompleto);
+        // Obtiene usuario local de AsyncStorage
+        const userJSON = await AsyncStorage.getItem("@user");
+        const localUser = userJSON ? JSON.parse(userJSON) : null;
 
-          const userData = {
-            uid: user.uid,
-            email: user.email,
-            rol,
-            perfilCompleto,
-          };
+        if (localUser) {
+          console.log("Usuario recuperado desde AsyncStorage:", localUser);
+          setUser(localUser);
+          await verificarCuentaFirestore(localUser);
+          await redirigirSegunRol(localUser);
+          return;
+        }
 
-          setUser(userData);
-
-          // Verificar si la cuenta está activa
-          if (activo === false) {
-            setTextModal(
-              'Lo sentimos, la cuenta ha sido desactivada. Contacte con soporte para más información. Correo: bitesgrupo1@gmail.com'
-            );
-            setModalVisible(true);
-            return;
-          }
-
-          // Verificar si el dispositivo es compatible con el rol de administrador
-          if (screenWidth < 820 && rol === 'Admin') {
-            setTextModal(
-              'Lo sentimos, el dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución.'
-            );
-            setModalVisible(true);
-            return;
-          }
-
-          // Redireccionar según el rol y si el perfil está completo
-          if (perfilCompleto) {
-            if (rol === 'Admin') {
-              navigation.navigate('InterfazAdministrador');
-            } else if (rol === 'Cliente') {
-              navigation.navigate('InterfazCliente');
-            } else if (rol === 'Comercio') {
-              navigation.navigate('InterfazComerciante');
-            }
+        // Verifica autenticación con Firebase, si no hay usuario local
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+          if (firebaseUser) {
+            console.log("Usuario autenticado en Firebase:", firebaseUser);
+            await AsyncStorage.setItem("@user", JSON.stringify(firebaseUser));
+            setUser(firebaseUser);
+            await verificarCuentaFirestore(firebaseUser);
+            await redirigirSegunRol(firebaseUser);
           } else {
-            if (rol === 'Cliente') {
-              navigation.navigate('RegistroCliente');
-            } else if (rol === 'Comercio') {
-              navigation.navigate('RegistroComercio');
-            }
+            console.log("No hay sesión iniciada");
+            setShowInicio(false);
           }
+        });
 
-          // Verificar si el usuario tiene una cuenta en Firestore
-          await verificarCuentaFirestore(user);
-        } catch (error) {
-          console.error('Error en la autenticación:', error);
+        // Si no se redirige en 5 seg mostrar Login
+        setTimeout(() => {
+          setShowInicio(false);
+          unsubscribe();
+        }, 5000);
+      } catch (error) {
+        console.error("Error en la autenticación automática:", error);
+        setShowInicio(false);
+      }
+    };
+
+    iniciarSesion();
+  }, []);
+
+
+  const redirigirSegunRol = async (user) => {
+    try {
+      const rol = await getRol(user.uid);
+      const perfilCompleto = await getPerfilCompleto(user.uid);
+      const activo = await getActivo(user.uid);
+
+      if (!activo) {
+        setTextModal(
+          "Lo sentimos, la cuenta ha sido desactivada. Contacte con soporte para más información. Correo: bitesgrupo1@gmail.com"
+        );
+        setModalVisible(true);
+        return setShowInicio(false);
+      }
+
+      if (screenWidth < 820 && rol === "Admin") {
+        setTextModal(
+          "Lo sentimos, el dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución."
+        );
+        setModalVisible(true);
+        return setShowInicio(false);
+      }
+
+      if (perfilCompleto) {
+        if (rol === "Admin") {
+          navigation.navigate("InterfazAdministrador");
+        } else if (rol === "Cliente") {
+          navigation.navigate("InterfazCliente");
+        } else if (rol === "Comercio") {
+          navigation.navigate("InterfazComerciante");
         }
       } else {
-        console.log("Usuario no autenticado");
-        setUser(null);
+        if (rol === "Cliente") {
+          navigation.navigate("RegistroCliente");
+        } else if (rol === "Comercio") {
+          navigation.navigate("RegistroComercio");
+        }
       }
-    });
-
-    // Obtener usuario local al inicio
-    getLocalUser();
-
-    return () => unsubscribe();
-  }, [screenWidth]);
-
-  const getLocalUser = async () => {
-    try {
-      setLoading(true);
-      const userJSON = await AsyncStorage.getItem("@user");
-      const userData = userJSON ? JSON.parse(userJSON) : null;
-      setUser(userData);
-    } catch (e) {
-      console.log(e, "Error al obtener usuario local");
+    } catch (error) {
+      console.error("Error al redirigir según el rol:", error);
     } finally {
-      setLoading(false);
+      setTimeout(() => setShowInicio(false), 1000);
     }
   };
 
@@ -252,7 +255,6 @@ const Login = ({ navigation }) => {
     if (!user) return;
 
     try {
-      setLoading(true);
       const docuRef = doc(firestore, `usuarios/${user.uid}`);
       const docSnap = await getDoc(docuRef);
 
@@ -263,40 +265,32 @@ const Login = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error al obtener cuenta de Firestore:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
 
-  /*
-  useEffect(() => {
-      if (user === null && !isAuthenticated) {
-        const timer = setTimeout(() => {
-          navigation.navigate('Login');
-        }, 1000);
-  
-        return () => clearTimeout(timer);
-      }
-    }, [isAuthenticated]);
-  */
-
   //Sign in con email
 
-  const handleSingIn = () => {
+  const handleSignIn = async () => {
     if (!validateEmail(email)) {
       setError(true);
       return;
     }
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log("Sesion iniciada");
-        setIsAuthenticated(true); // cambia el estado para indicar que el usuario se autentico
-      })
-      .catch((error) => {
-        console.error("Error al iniciar sesión:", error);
-        showModal();
-      });
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Sesión iniciada");
+
+      const user = userCredential.user;
+      setUser(user);
+
+      await AsyncStorage.setItem("@user", JSON.stringify(user));
+      await verificarCuentaFirestore(user);
+      await redirigirSegunRol(user);
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      showModal();
+    }
   };
 
   const handleChangeMail = (event) => {
@@ -316,6 +310,12 @@ const Login = ({ navigation }) => {
   const hideModal = () => {
     setIsModalVisible(false);
   };
+
+  if (showInicio) {
+    return (
+      <Inicio />
+    );
+  }
 
   if (loading) {
     return (
@@ -358,7 +358,7 @@ const Login = ({ navigation }) => {
           fullWidth
         />
 
-        <TouchableOpacity style={[styles.submitButton]} onPress={handleSingIn}>
+        <TouchableOpacity style={[styles.submitButton]} onPress={handleSignIn}>
           <Text style={styles.submitButtonText}>Iniciar Sesion</Text>
         </TouchableOpacity>
 
@@ -389,30 +389,30 @@ const Login = ({ navigation }) => {
         </Text>
         <CustomModal visible={isModalVisible} onClose={hideModal} errorMessage="El correo o la contraseña son incorrectos." />
         <Modal
-                transparent={true}
-                animationType="slide"
-                visible={modalVisible}
-                onRequestClose={cerrarModal}
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalContent}>
-                    <Text style={styles.modalTexto}>{textModal}</Text>
-                    <View style={styles.modalBotones}>
-                      <BotonGenerico
-                        title="Salir"
-                        onPress={async () => {
-                          try {
-                            cerrarModal();
-                            handleLogout();
-                          } catch (error) {
-                            console.error('No se pudo cerrar sesión:', error);
-                          }
-                        }}
-                      />
-                    </View>
-                  </View>
-                </View>
-              </Modal>
+          transparent={true}
+          animationType="slide"
+          visible={modalVisible}
+          onRequestClose={cerrarModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTexto}>{textModal}</Text>
+              <View style={styles.modalBotones}>
+                <BotonGenerico
+                  title="Salir"
+                  onPress={async () => {
+                    try {
+                      cerrarModal();
+                      handleLogout();
+                    } catch (error) {
+                      console.error('No se pudo cerrar sesión:', error);
+                    }
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
