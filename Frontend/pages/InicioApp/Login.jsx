@@ -22,6 +22,7 @@ import LoadingScreen from "../../components/LoadingScreen";
 import { useAuth } from '../../context/AuthContext';
 import useLogout from "../../utils/logout";
 import BotonGenerico from '../../components/BotonGenerico';
+import Inicio from "../InicioApp/Inicio";
 
 WebBrowser.maybeCompleteAuthSession();
 
