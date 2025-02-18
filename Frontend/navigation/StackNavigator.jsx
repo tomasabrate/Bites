@@ -39,7 +39,7 @@ const Stack = createStackNavigator();
 export default function StackNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="Inicio"
+      initialRouteName="Login"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Login" component={Login} />

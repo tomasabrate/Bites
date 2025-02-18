@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Button
+  Button,
+  Dimensions,
+  Modal
 } from "react-native";
 import { validate as validateEmail } from 'email-validator';
 import { createTheme, TextField } from '@mui/material';
@@ -19,6 +21,7 @@ import Divider from 'react-native-divider';
 import LoadingScreen from "../../components/LoadingScreen";
 import { useAuth } from '../../context/AuthContext';
 import useLogout from "../../utils/logout";
+import BotonGenerico from '../../components/BotonGenerico';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -28,11 +31,21 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
-  signInWithCredential
+  signInWithCredential,
+  browserLocalPersistence,
+  setPersistence
 } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
+
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Persistencia activada");
+  })
+  .catch((error) => {
+    console.error("Error con la persistencia:", error);
+  });
 
 const theme = createTheme({
   palette: {
@@ -50,10 +63,14 @@ const Login = ({ navigation }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [textModal, setTextModal] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  
   const handleLogout = useLogout();
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
+  // widht min: 820
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
@@ -63,7 +80,9 @@ const Login = ({ navigation }) => {
   })
 
   useEffect(() => {
-    handleGoogleSignIn();
+    if (response?.type === "success") {
+      handleGoogleSignIn();
+    }
   }, [response]);
 
   const handleGoogleSignIn = async () => {
@@ -90,30 +109,141 @@ const Login = ({ navigation }) => {
   };
 
   useEffect(() => {
-    getLocalUser();
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        await AsyncStorage.setItem("@user", JSON.stringify(user));
-        console.log(JSON.stringify(user, null, 2));
-        setUserInfo(user);
-        await verificarCuentaFirestore(user);
+        try {
+          // Guardar usuario en AsyncStorage
+          await AsyncStorage.setItem("@user", JSON.stringify(user));
+          console.log(JSON.stringify(user, null, 2));
+
+          // Obtener datos del usuario desde Firestore
+          const rol = await getRol(user.uid);
+          const perfilCompleto = await getPerfilCompleto(user.uid);
+          const activo = await getActivo(user.uid);
+          console.log('Perfil completo:', perfilCompleto);
+
+          const userData = {
+            uid: user.uid,
+            email: user.email,
+            rol,
+            perfilCompleto,
+          };
+
+          setUser(userData);
+
+          // Verificar si la cuenta está activa
+          if (activo === false) {
+            setTextModal(
+              'Lo sentimos, la cuenta ha sido desactivada. Contacte con soporte para más información. Correo: bitesgrupo1@gmail.com'
+            );
+            setModalVisible(true);
+            return;
+          }
+
+          // Verificar si el dispositivo es compatible con el rol de administrador
+          if (screenWidth < 820 && rol === 'Admin') {
+            setTextModal(
+              'Lo sentimos, el dispositivo no es compatible para el rol de administrador. Pruebe con otro dispositivo con mayor resolución.'
+            );
+            setModalVisible(true);
+            return;
+          }
+
+          // Redireccionar según el rol y si el perfil está completo
+          if (perfilCompleto) {
+            if (rol === 'Admin') {
+              navigation.navigate('InterfazAdministrador');
+            } else if (rol === 'Cliente') {
+              navigation.navigate('InterfazCliente');
+            } else if (rol === 'Comercio') {
+              navigation.navigate('InterfazComerciante');
+            }
+          } else {
+            if (rol === 'Cliente') {
+              navigation.navigate('RegistroCliente');
+            } else if (rol === 'Comercio') {
+              navigation.navigate('RegistroComercio');
+            }
+          }
+
+          // Verificar si el usuario tiene una cuenta en Firestore
+          await verificarCuentaFirestore(user);
+        } catch (error) {
+          console.error('Error en la autenticación:', error);
+        }
       } else {
         console.log("Usuario no autenticado");
+        setUser(null);
       }
     });
-    return () => unsub();
-  }, []);
+
+    // Obtener usuario local al inicio
+    getLocalUser();
+
+    return () => unsubscribe();
+  }, [screenWidth]);
 
   const getLocalUser = async () => {
     try {
       setLoading(true);
       const userJSON = await AsyncStorage.getItem("@user");
       const userData = userJSON ? JSON.parse(userJSON) : null;
-      setUserInfo(userData);
+      setUser(userData);
     } catch (e) {
       console.log(e, "Error al obtener usuario local");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getRol = async (uid) => {
+    try {
+      const docuRef = doc(firestore, `usuarios/${uid}`);
+      const docuCifrada = await getDoc(docuRef);
+
+      if (docuCifrada.exists()) {
+        return docuCifrada.data().rol;
+      } else {
+        console.warn('Documento no encontrado');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener rol:', error.message);
+      return null;
+    }
+  };
+
+  const getPerfilCompleto = async (uid) => {
+    try {
+      const docuRef = doc(firestore, `usuarios/${uid}`);
+      const docuCifrada = await getDoc(docuRef);
+
+      if (docuCifrada.exists()) {
+        return docuCifrada.data().perfilCompleto;
+      } else {
+        console.warn('Documento no encontrado para el usuario', uid);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener si el perfil esta completo', error);
+      return null;
+    }
+  };
+
+  const getActivo = async (uid) => {
+    try {
+      const docuRef = doc(firestore, `usuarios/${uid}`);
+      const docuCifrada = await getDoc(docuRef);
+
+      if (docuCifrada.exists()) {
+        return docuCifrada.data().activo;
+      } else {
+        console.warn('Documento no encontrado');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener estado activo:', error.message);
+      return null;
     }
   };
 
@@ -132,14 +262,25 @@ const Login = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error al obtener cuenta de Firestore:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
 
+  /*
+  useEffect(() => {
+      if (user === null && !isAuthenticated) {
+        const timer = setTimeout(() => {
+          navigation.navigate('Login');
+        }, 1000);
+  
+        return () => clearTimeout(timer);
+      }
+    }, [isAuthenticated]);
+  */
 
-  //---
+  //Sign in con email
 
   const handleSingIn = () => {
     if (!validateEmail(email)) {
@@ -180,6 +321,10 @@ const Login = ({ navigation }) => {
       <LoadingScreen />
     );
   }
+
+  const cerrarModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -242,6 +387,31 @@ const Login = ({ navigation }) => {
           Regístrate como Cliente o Comercio
         </Text>
         <CustomModal visible={isModalVisible} onClose={hideModal} errorMessage="El correo o la contraseña son incorrectos." />
+        <Modal
+                transparent={true}
+                animationType="slide"
+                visible={modalVisible}
+                onRequestClose={cerrarModal}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTexto}>{textModal}</Text>
+                    <View style={styles.modalBotones}>
+                      <BotonGenerico
+                        title="Salir"
+                        onPress={async () => {
+                          try {
+                            cerrarModal();
+                            handleLogout();
+                          } catch (error) {
+                            console.error('No se pudo cerrar sesión:', error);
+                          }
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </Modal>
       </View>
     </ScrollView>
   );
@@ -285,13 +455,18 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: "#ff6347",
-    paddingVertical: 15,
-    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
     alignItems: "center",
     marginTop: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   submitButtonText: {
-    color: "white",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -327,6 +502,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#555',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTexto: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
   },
 });
 
