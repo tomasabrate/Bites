@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import SplashScreen from "../pages/InicioApp/Inicio";
+import SplashScreen from "../pages/InicioApp/inicio";
 import IntroScreen from "../pages/InicioApp/IntroScreen";
 import LoginSelectionScreen from "../pages/InicioApp/LoginSelectionScreen";
 import InterfazComerciante from "../pages/Comercio/InterfazComercio";
@@ -15,22 +15,23 @@ import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
 import ResumenCompra from "../pages/Cliente/ResumenCompra";
 import Login from "../pages/InicioApp/Login";
-import InterfazAdministrador from "../pages/Admin/InterfazAdministrador";
-import Registro from "../pages/Registro/Registro";
-import RegistroCliente from "../pages/Registro/RegistroCliente";
-import RegistroComercio from "../pages/Registro/RegistroComercio";
+import InterfazAdministrador from "../pages/Admin/interfazAdministrador";
+import Registro from "../pages/registro/Registro";
+import RegistroCliente from "../pages/registro/RegistroCliente";
+import RegistroComercio from "../pages/registro/RegistroComercio";
 import Productos from "../pages/Productos/Productos";
 import DetalleProducto from "../pages/Productos/DetalleProducto";
 import CargarProducto from "../pages/Productos/CargarProducto";
 import ModificarProducto from "../pages/Productos/ModificarProducto";
 import MisVentas from "../pages/Comercio/Ventas/MisVentas"
 import DetalleVenta from "../pages/Comercio/Ventas/DetalleVenta";
-import DetalleUsuario from "../pages/Admin/DetalleUsuario";
+import DetalleUsuario from "../pages/Admin/detalleUsuario";
 import MisCompras from "../pages/Cliente/MisCompras"
 import DetalleCompra from "../pages/Cliente/DetalleCompra";
 import ModificarUsuario from "../pages/Admin/ModificarUsuario";
 import PerfilCliente from "../pages/Cliente/PerfilCliente";
 import PerfilComercio from "../pages/Comercio/PerfilComercio";
+import ReseñaForm from '../pages/Cliente/resena';
 
 const Stack = createStackNavigator();
 
@@ -52,6 +53,7 @@ export default function StackNavigator() {
         component={InterfazComerciante}
       />
       <Stack.Screen name="InterfazCliente" component={InterfazCliente} />
+      <Stack.Screen name="reseñas" component={ReseñaForm} />
       <Stack.Screen name="MisPedidos" component={MisPedidos} />
       <Stack.Screen name="Mapa" component={Mapa} />
       <Stack.Screen name="Productos" component={Productos} />

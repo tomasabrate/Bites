@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
-import ZorritoSelector from '../Registro/ZorritoSelector';
+//import ZorritoSelector from '../Registro/zorritoSelector';
 import FormInputController from "../Productos/components/FormInputController";
 import DatePickerController from "../Productos/components/DatePickerController";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import schemaClientes from "../Registro/utilities/schemaRegistroCliente.utilities";
-import schemaComercios from "../Registro/utilities/schemaRegistroComercio.utilities";
+//import schemaClientes from "../Registro/utilities/schemaRegistroCliente.utilities";
+//import schemaComercios from "../Registro/utilities/schemaRegistroComercio.utilities";
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getClienteById, putCliente } from "../../services/clientes";
 import { getComercioById, putComercio } from "../../services/comercios";

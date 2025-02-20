@@ -1,5 +1,25 @@
 import { pool } from "../database/connection.js";
 
+
+
+export const getComerciosNombre = async (req, res) => {
+  const { nombre_comercio } = req.query;
+  try {
+      const [comercio] = await pool.query('SELECT uid_comercio FROM Comercios WHERE nombre_comercio = ?', [nombre_comercio]);
+
+      if (comercio.length > 0) {
+          res.json({ uid_comercio: comercio[0].uid_comercio });
+      } else {
+          res.status(404).json({ error: 'Comercio no encontrado' });
+      }
+  } catch (error) {
+      console.log("Error al buscar el comercio:", error);  // Añadir log para detalles de error
+      res.status(500).json({ error: 'Error al buscar el comercio' });
+  }
+};
+
+
+
 export const getComercios = async (req, res) => {
   try {
     const [result] = await pool.query("SELECT * FROM Comercios");

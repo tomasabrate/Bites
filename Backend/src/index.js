@@ -8,13 +8,21 @@ import routerVentas from "./routes/ventas.routes.js";
 import routerCompras from "./routes/compras.routes.js";
 import routerDetalleVenta from "./routes/detalleVentas.routes.js";
 import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
+import routerResenas from "./routes/resenas.routes.js";
+
 // import cron from "node-cron.js";
+
 // import { deleteExpiredOrEmptyProducts } from "./controllers/products.controllers.js";
 
 //Home
 app.get("/", (req, res) => {
   res.send("Home page");
 });
+
+
+//reseñas
+app.use(routerResenas);
+
 
 //Productos
 app.use(routerProductos);
@@ -47,6 +55,7 @@ app.use(routerCategoriasComercio);
 //     console.error("Error en el cron job:", error);
 //   }
 // });
+
 
 
 //Middleware - Ruta no encontrada

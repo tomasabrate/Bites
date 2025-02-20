@@ -55,6 +55,13 @@ const InterfazCliente = () => {
           <Text style={styles.footerButtonText}>Pedidos</Text>
         </TouchableOpacity>
         <TouchableOpacity
+           style={styles.footerButton}
+           onPress={() => navigation.navigate("reseñas")}
+          >
+        <Icon name="chatbubble-ellipses-outline" size={24} color="#FF6347" />
+        <Text style={styles.footerButtonText}>Reseña</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.footerButton}
           onPress={() => navigation.navigate("Carrito")}
         >
