@@ -6,7 +6,7 @@ export const obtenerResenas = async (req, res) => {
     const { uid_comercio } = req.params;
 
     try {
-        const query = "SELECT * FROM reseñas WHERE uid_comercio = ?";
+        const query = "SELECT * FROM Resenas WHERE uid_comercio = ?";
         const [resenas] = await pool.query(query, [uid_comercio]);
 
         res.status(200).json(resenas);
@@ -37,7 +37,7 @@ export const crearResena = async (req, res) => {
         }
 
         const query = `
-            INSERT INTO reseñas (uid_cliente, uid_comercio, puntuacion, comentario)
+            INSERT INTO Resenas (uid_cliente, uid_comercio, puntuacion, comentario)
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE puntuacion = VALUES(puntuacion), comentario = VALUES(comentario)
         `;
@@ -56,7 +56,7 @@ export const eliminarResena = async (req, res) => {
     const { uid_cliente, uid_comercio } = req.body;
 
     try {
-        const query = "DELETE FROM reseñas WHERE uid_cliente = ? AND uid_comercio = ?";
+        const query = "DELETE FROM Resenas WHERE uid_cliente = ? AND uid_comercio = ?";
         await pool.query(query, [uid_cliente, uid_comercio]);
 
         res.status(200).json({ message: "Reseña eliminada correctamente" });
