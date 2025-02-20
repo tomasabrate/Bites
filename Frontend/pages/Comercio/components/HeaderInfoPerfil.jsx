@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import BotonVolverSimple from '../../../components/BotonVolverSimple';
-import ImageColors from 'react-native-image-colors';
+//import { getColors } from 'react-native-image-colors';
 import EstrellaRating from './EstrellaRating';
 
 const HeaderInfoPerfil = ({ comercio, onPressRating }) => {
     const [colorComercio, setColorComercio] = useState('#fff');
 
-    useEffect(() => {
+    /*useEffect(() => {
         const fetchImageColor = async () => {
             if (!comercio?.foto_perfil) return;
 
-            const colors = await ImageColors.getColors(comercio.foto_perfil, {
+            const colors = await getColors(comercio.foto_perfil, {
                 fallback: '#ffffff',
                 cache: true,
             });
@@ -27,6 +27,8 @@ const HeaderInfoPerfil = ({ comercio, onPressRating }) => {
 
         fetchImageColor();
     }, [comercio?.foto_perfil]);
+
+    */
 
     return (
         <View style={styles.header}>
