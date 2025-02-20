@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import BotonVolverSimple from '../../../components/BotonVolverSimple';
 import ImageColors from 'react-native-image-colors';
+import EstrellaRating from './EstrellaRating';
 
-const HeaderInfoPerfil = ({ comercio }) => {
+const HeaderInfoPerfil = ({ comercio, onPressRating }) => {
     const [colorComercio, setColorComercio] = useState('#fff');
 
     useEffect(() => {
@@ -30,10 +31,15 @@ const HeaderInfoPerfil = ({ comercio }) => {
     return (
         <View style={styles.header}>
             <View style={styles.leftContainer}>
-                <BotonVolverSimple />
+                <View style={{ position: 'absolute', top: 0, left: 0 }}>
+                    <BotonVolverSimple />
+                </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.title}>{comercio?.nombre_comercio || 'Nombre no disponible'}</Text>
                     <Text style={styles.subtitle}>{comercio?.direccion || 'Dirección no disponible'}</Text>
+                    <TouchableOpacity onPress={onPressRating}>
+                        <EstrellaRating rating={4} totalReviews={120} />
+                    </TouchableOpacity>
                 </View>
             </View>
             <Image source={comercio?.foto_perfil ? { uri: comercio?.foto_perfil } : require('../../../assets/user-default.png')} style={styles.imagePerfil} />
@@ -65,7 +71,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     textContainer: {
-        marginLeft: 10,
+        marginLeft: 50,
     },
     title: {
         fontSize: 18,
