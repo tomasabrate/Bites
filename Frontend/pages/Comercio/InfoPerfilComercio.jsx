@@ -4,13 +4,20 @@ import { getComercioById } from '../../services/comercios';
 import LoadingScreen from '../../components/LoadingScreen';
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderInfoPerfil from './components/HeaderInfoPerfil';
+import { getProductosByUidComercio } from '../../services/productos';
+import Producto from '../Productos/components/Producto';
+import { useNavigation } from "@react-navigation/native";
 
 const InfoPerfilComercio = ({ route }) => {
+    const navigation = useNavigation();
     const uid_comercio = route.params.uid_comercio;
 
     const [comercio, setComercio] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadingProductos, setLoadingProductos] = useState(true);
     const [modalResenaVisible, setModalResenaVisible] = useState(false);
+    const [error, setError] = useState(false);
+    const [productos, setProductos] = useState(false);
 
     const obtenerComercio = async () => {
         try {
@@ -19,18 +26,35 @@ const InfoPerfilComercio = ({ route }) => {
             console.log(data);
             setComercio(data);
         } catch (error) {
-            console.log("Error al obtener comercio");
+            setError("Error al obtener comercio. Inténtalo de nuevo más tarde.");
         } finally {
             setLoading(false);
         }
     };
 
+    const obtenerProductos = async () => {
+        try {
+            const data = await getProductosByUidComercio(uid_comercio);
+            setProductos(data);
+        } catch (error) {
+            setError("Error al obtener productos. Inténtalo de nuevo más tarde.");
+        } finally {
+            setLoadingProductos(false);
+        }
+    };
+
     useEffect(() => {
         obtenerComercio();
+        obtenerProductos();
     }, []);
+
 
     if (loading) {
         return <LoadingScreen />;
+    }
+
+    if (error) {
+        return (<Text>{error}</Text>);
     }
 
     const openCloseModal = () => {
@@ -44,6 +68,33 @@ const InfoPerfilComercio = ({ route }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <HeaderInfoPerfil comercio={comercio} onPressRating={openCloseModal} />
+            {loadingProductos ? (
+                    <LoadingScreen />
+                  ) : error ? (
+                    <Text style={styles.errorText}>{error}</Text>
+                  ) : (
+                    <FlatList
+                      style={styles.flatList}
+                      data={productos}
+                      keyExtractor={(item) => item.id_producto.toString()}
+                      renderItem={({ item }) => (
+                        <Producto
+                          imagenes={item.imagenes}
+                          id_producto={item.id_producto}
+                          nombre={item.nombre}
+                          precio={item.precio}
+                          descuento={item.descuento}
+                          nombre_comercio={item.nombre_comercio}
+                          foto_perfil={item.foto_perfil}
+                          uid_comercio={item.uid_comercio}
+                          onPress={() =>
+                            navigation.navigate("DetalleProducto", { producto: item })
+                          }
+                        />
+                      )}
+                      showsVerticalScrollIndicator={false}
+                    />
+                  )}
             <Modal
                 style={styles.modalContainer}
                 transparent={true}
@@ -90,6 +141,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 10,
     },
+    flatList: {
+        width: "100%",
+        marginTop: 100
+      },
 });
 
 
