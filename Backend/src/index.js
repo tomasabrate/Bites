@@ -1,19 +1,21 @@
 //Dependencias
-import { PUERTO } from "./config.js";
-import app from "./app.js";
-import routerProductos from "./routes/products.routes.js";
-import routerClientes from "./routes/clientes.routes.js";
-import routerComercios from "./routes/comercio.routes.js";
-import routerVentas from "./routes/ventas.routes.js";
-import routerCompras from "./routes/compras.routes.js";
-import routerDetalleVenta from "./routes/detalleVentas.routes.js";
-import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
+import { PUERTO } from './config.js';
+import app from './app.js';
+import routerProductos from './routes/products.routes.js';
+import routerClientes from './routes/clientes.routes.js';
+import routerComercios from './routes/comercio.routes.js';
+import routerVentas from './routes/ventas.routes.js';
+import routerCompras from './routes/compras.routes.js';
+import routerDetalleVenta from './routes/detalleVentas.routes.js';
+import routerCategoriasComercio from './routes/categoriasComercio.routes.js';
 // import cron from "node-cron.js";
 // import { deleteExpiredOrEmptyProducts } from "./controllers/products.controllers.js";
 
+import reportesRoutes from './routes/reporte.routes.js';
+
 //Home
-app.get("/", (req, res) => {
-  res.send("Home page");
+app.get('/', (req, res) => {
+  res.send('Home page');
 });
 
 //Productos
@@ -37,6 +39,8 @@ app.use(routerCompras);
 //Categorias Comercio
 app.use(routerCategoriasComercio);
 
+app.use('/reportes', reportesRoutes);
+
 //Eliminar productos vencidos o agotados
 // cron.schedule("0 0 * * *", async () => {
 //   try {
@@ -48,10 +52,9 @@ app.use(routerCategoriasComercio);
 //   }
 // });
 
-
 //Middleware - Ruta no encontrada
 app.use((req, res, next) => {
-  res.status(404).send("404 - Ruta no existente.");
+  res.status(404).send('404 - Ruta no existente.');
 });
 
 app.listen(PUERTO, () => {
