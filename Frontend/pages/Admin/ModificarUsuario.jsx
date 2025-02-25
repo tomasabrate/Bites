@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
-import ZorritoSelector from '../Registro/ZorritoSelector';
 import FormInputController from "../Productos/components/FormInputController";
 import DatePickerController from "../Productos/components/DatePickerController";
 import { useForm, Controller } from "react-hook-form";
@@ -10,25 +9,14 @@ import schemaComercios from "../Registro/utilities/schemaRegistroComercio.utilit
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getClienteById, putCliente } from "../../services/clientes";
 import { getComercioById, putComercio } from "../../services/comercios";
-import { createTheme, TextField } from '@mui/material';
 import BotonGenerico from "../../components/BotonGenerico";
 import formatDate from "../Productos/utilities/formatDate.utilities";
 import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio, getCategoriaComercioById } from "../../services/categoriasComercio";
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
 import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
-import axios from 'axios';
 
 const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
-
-const theme = createTheme({
-  palette: {
-    customGris: {
-      main: '#ded8cd',
-      contrastText: '#fff',
-    },
-  },
-});
 
 const RegistroCliente = () => {
   const navigation = useNavigation();
@@ -411,22 +399,7 @@ const RegistroCliente = () => {
                     rules={{ required: "El horario de apertura es obligatorio" }}
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                       <View style={styles.sectionHorario}>
-                        <TextField
-                          id="horario_apertura"
-                          type="time"
-                          defaultValue={horarioApertura}
-                          value={value}
-                          onChange={(e) => onChange(e.target.value)}
-                          style={styles.inputHorario}
-                          InputLabelProps={{
-                            style: { color: '#888' },
-                          }}
-                          inputProps={{
-                            style: { fontSize: 16 },
-                          }}
-                          error={!!error}
-                          helperText={error?.message}
-                        />
+                        <Text>Seccion horario apertura</Text>
                       </View>
                     )}
                   />
@@ -436,22 +409,7 @@ const RegistroCliente = () => {
                     rules={{ required: "El horario de apertura es obligatorio" }}
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                       <View style={styles.sectionHorario}>
-                        <TextField
-                          id="horario_cierre"
-                          type="time"
-                          defaultValue={horarioCierre}
-                          value={value}
-                          onChange={(e) => onChange(e.target.value)}
-                          style={styles.inputHorario}
-                          InputLabelProps={{
-                            style: { color: '#888' },
-                          }}
-                          inputProps={{
-                            style: { fontSize: 16 },
-                          }}
-                          error={!!error}
-                          helperText={error?.message}
-                        />
+                        <Text>Seccion horario cierre</Text>
                       </View>
                     )}
                   />

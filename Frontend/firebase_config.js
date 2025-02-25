@@ -1,5 +1,6 @@
 //ClienteID web: 450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com
-//ClienteID android: 450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com
+//ClienteID android 1: 450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com
+//ClienteID android 2: 450223259168-iec5tvfuilstub7o2kqt4ta5mrqer1gl.apps.googleusercontent.com
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";

@@ -11,7 +11,6 @@ import { useNavigation } from '@react-navigation/native';
 import { postComercio } from "../../services/comercios";
 import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio } from "../../services/categoriasComercio";
-import { TextField } from '@mui/material';
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
 import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
 
@@ -202,23 +201,7 @@ const RegistroComercio = () => {
                 rules={{ required: "El horario de apertura es obligatorio" }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <View style={styles.sectionHorario}>
-                    <TextField
-                      id="horario_apertura"
-                      label="Horario apertura"
-                      type="time"
-                      defaultValue="08:00"
-                      value={value}
-                      onChange={(e) => onChange(e.target.value)}
-                      style={styles.inputHorario}
-                      InputLabelProps={{
-                        style: { color: '#888' },
-                      }}
-                      inputProps={{
-                        style: { fontSize: 16 },
-                      }}
-                      error={!!error} // Indica si hay un error
-                      helperText={error?.message} // Muestra el mensaje de error
-                    />
+                    <Text>Seccion horario apertura</Text>
                   </View>
                 )}
               />
@@ -228,23 +211,7 @@ const RegistroComercio = () => {
                 rules={{ required: "El horario de apertura es obligatorio" }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <View style={styles.sectionHorario}>
-                    <TextField
-                      id="horario_cierre"
-                      label="Horario cierre"
-                      type="time"
-                      defaultValue="20:00"
-                      value={value}
-                      onChange={(e) => onChange(e.target.value)}
-                      style={styles.inputHorario}
-                      InputLabelProps={{
-                        style: { color: '#888' },
-                      }}
-                      inputProps={{
-                        style: { fontSize: 16 },
-                      }}
-                      error={!!error} 
-                      helperText={error?.message} 
-                    />
+                    <Text>Seccion horario cierre</Text>
                   </View>
                 )}
               />

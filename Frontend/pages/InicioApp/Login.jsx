@@ -5,13 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
-  Button,
+  TextInput,
   Dimensions,
-  Modal
+  Modal,
+  Platform
 } from "react-native";
 import { validate as validateEmail } from 'email-validator';
-import { createTheme, TextField } from '@mui/material';
 import CustomModal from "../../components/CustomModal";
 import * as WebBrowser from 'expo-web-browser'
 import * as Google from 'expo-auth-session/providers/google'
@@ -19,10 +18,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Path } from 'react-native-svg';
 import Divider from 'react-native-divider';
 import LoadingScreen from "../../components/LoadingScreen";
-import { useAuth } from '../../context/AuthContext';
 import useLogout from "../../utils/logout";
 import BotonGenerico from '../../components/BotonGenerico';
 import Inicio from "../InicioApp/Inicio";
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -34,28 +33,29 @@ import {
   onAuthStateChanged,
   signInWithCredential,
   browserLocalPersistence,
-  setPersistence
+  setPersistence,
+  initializeAuth,
+  getReactNativePersistence
 } from "firebase/auth";
+
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("Persistencia activada");
-  })
-  .catch((error) => {
-    console.error("Error con la persistencia:", error);
+let auth;
+if (Platform.OS !== 'web') {
+  auth = initializeAuth(firebaseApp, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage),
   });
-
-const theme = createTheme({
-  palette: {
-    customGris: {
-      main: '#ded8cd',
-      contrastText: '#fff',
-    },
-  },
-});
+} else {
+  auth = getAuth(firebaseApp);
+  setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+      console.log("Persistencia activada en web");
+    })
+    .catch((error) => {
+      console.error("Error con la persistencia en web:", error);
+    });
+}
 
 const Login = ({ navigation }) => {
 
@@ -75,7 +75,7 @@ const Login = ({ navigation }) => {
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
-    androidClientId: "450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com",
+    androidClientId: "450223259168-iec5tvfuilstub7o2kqt4ta5mrqer1gl.apps.googleusercontent.com",
     scopes: ["profile", "email"],
     responseType: "id_token"
   })
@@ -293,16 +293,6 @@ const Login = ({ navigation }) => {
     }
   };
 
-  const handleChangeMail = (event) => {
-    setEmail(event.target.value);
-    setError(false); // Reset error on change
-  };
-
-  const handleChangePass = (event) => {
-    setPassword(event.target.value);
-    setError(false); // Reset error on change
-  };
-
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -332,31 +322,28 @@ const Login = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>Elige como quieres ingresar sesión</Text>
 
-        <TextField
-          id="email-field"
-          label="Correo electrónico"
-          variant="outlined"
-          color="customGris"
+        <TextInput
+          style={styles.input}
+          placeholder="Correo electrónico"
+          keyboardType="email-address"
           value={email}
-          onChange={handleChangeMail}
-          error={error} // Cambia el estado visual a error si es true
-          helperText={error ? "Por favor ingresa un correo válido" : ""}
-          fullWidth
-          sx={{
-            marginBottom: 2,
+          onChangeText={(text) => {
+            setEmail(text);
+            setError(false); // Reinicia el error si se modifica el texto
           }}
         />
 
-        <TextField
-          id="password-field"
-          label="Contraseña"
-          type="password"
-          variant="outlined"
-          color="customGris"
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          secureTextEntry={true}
           value={password}
-          onChange={handleChangePass}
-          fullWidth
+          onChangeText={(text) => {
+            setPassword(text);
+            setError(false);
+          }}
         />
+
 
         <TouchableOpacity style={[styles.submitButton]} onPress={handleSignIn}>
           <Text style={styles.submitButtonText}>Iniciar Sesion</Text>
@@ -460,7 +447,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
@@ -530,6 +516,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
+  },
+  input: {
+    height: 50,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
 });
 

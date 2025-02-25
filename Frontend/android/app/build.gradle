@@ -1,8 +1,16 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: 'com.google.gms.google-services'
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
+
+plugins {
+    id 'com.google.gms.google-services' version '4.4.2' apply false
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
+
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -173,4 +181,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation platform('com.google.firebase:firebase-bom:33.9.0')
+    classpath("com.google.gms:google-services:4.3.10") 
+
 }
