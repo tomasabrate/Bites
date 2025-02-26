@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,13 @@ import {
   Alert,
   Button,
   TouchableOpacity,
-} from "react-native";
-import { BarChart } from "react-native-chart-kit";
-import Icon from "react-native-vector-icons/MaterialIcons"; // Asegúrate de tener esta dependencia
+} from 'react-native';
+import { BarChart } from 'react-native-chart-kit';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Asegúrate de tener esta dependencia
 
 const Reportes = ({ navigation }) => {
   const [data] = useState({
-    labels: ["Enero", "Febrero", "Marzo"],
+    labels: ['Enero', 'Febrero', 'Marzo'],
     datasets: [
       {
         data: [50, 45, 60],
@@ -65,12 +65,12 @@ const Reportes = ({ navigation }) => {
         height={220}
         yAxisLabel="$"
         chartConfig={{
-          backgroundColor: "#fff",
-          backgroundGradientFrom: "#fffbfb",
-          backgroundGradientTo: "#fff",
+          backgroundColor: '#fff',
+          backgroundGradientFrom: '#fffbfb',
+          backgroundGradientTo: '#fff',
           decimalPlaces: 2,
           color: (opacity = 1) => `rgba(255, 99, 72, ${opacity})`,
-          labelColor: () => "#333",
+          labelColor: () => '#333',
         }}
         style={styles.chart}
         onDataPointClick={({ value, getColor, index }) =>
@@ -91,47 +91,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FF6347",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF6347',
     padding: 10,
     borderRadius: 10,
     marginBottom: 20,
     width: 120,
   },
   backButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 16,
     marginLeft: 5,
   },
   titulo: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#FF6347",
+    fontWeight: 'bold',
+    color: '#FF6347',
     marginBottom: 10,
   },
   descripcion: {
     fontSize: 16,
-    color: "#555",
+    color: '#555',
     marginBottom: 20,
   },
   resumen: {
     marginBottom: 20,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#f9f9f9",
-    shadowColor: "#000",
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
   },
   resumenText: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
     marginBottom: 5,
   },
   chart: {
