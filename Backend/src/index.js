@@ -1,5 +1,5 @@
 //Dependencias
-import { PUERTO } from "./config.js";
+import { PORT } from "./config.js";
 import app from "./app.js";
 import routerProductos from "./routes/products.routes.js";
 import routerClientes from "./routes/clientes.routes.js";
@@ -54,6 +54,6 @@ app.use((req, res, next) => {
   res.status(404).send("404 - Ruta no existente.");
 });
 
-app.listen(PUERTO, () => {
-  console.log(`Server esuchando en el puerto http://localhost:${PUERTO}`);
+app.listen(PORT, () => {
+  console.log(`Server esuchando en el puerto http://localhost:${PORT}`);
 });
