@@ -16,6 +16,7 @@ import reportesRoutes from './routes/reporte.routes.js';
 //Home
 app.get('/', (req, res) => {
   res.send('Home page');
+  res.send(`Server esuchando en el puerto ${PORT}`);
 });
 
 //Productos
