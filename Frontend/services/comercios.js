@@ -1,5 +1,5 @@
 import { API_URL_BACK } from "./api_back";
-const API_URL = API_URL_BACK; 
+const API_URL = API_URL_BACK + '/comercios'; 
 
 //CREAR UN PERFIL DE COMERCIO
 export const postComercio = async (data) => {

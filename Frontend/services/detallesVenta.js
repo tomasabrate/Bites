@@ -1,5 +1,5 @@
 import { API_URL_BACK } from "./api_back";
-const API_URL = API_URL_BACK; 
+const API_URL = API_URL_BACK + '/ventas/:id_venta/detalles'; 
 
 export const getDetallesByIdVenta = async (id_venta) => {
   try {

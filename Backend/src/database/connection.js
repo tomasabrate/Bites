@@ -7,11 +7,4 @@ console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
 console.log("DB_DATABASE:", process.env.DB_DATABASE);
 console.log("DB_PORT:", process.env.DB_PORT);
 
-export const pool = mysql.createPool({
-  host: DB_HOST, 
-  user: DB_USER,
-  password: DB_PASSWORD,
-  database: DB_DATABASE,
-  port: DB_PORT,
-  idleTimeout: 10000,
-});
+export const pool = mysql.createPool(process.env.DATABASE_URL);
