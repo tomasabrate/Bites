@@ -20,8 +20,8 @@ export const getProductos = async (req, res) => {
     console.log('Lista de Productos:', result); //muestra en consola
     return res.status(200).json(result); //respuesta en el cliente
   } catch (error) {
-    console.log('ERROR en GET productos.', error);
-    return res.status(500).send('500 - Error en la base de datos.');
+    console.error('ERROR en GET productos.', error);
+    return res.status(500).json({ error: error.message });
   }
 };
 
