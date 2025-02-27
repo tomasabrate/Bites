@@ -18,7 +18,7 @@ export const getProductos = async (req, res) => {
     );
     //esta consulta devuelve todos los datos de productos mas el nombre del comercio al que pertenece.
     console.log('Lista de Productos:', result); //muestra en consola
-    res.status(200).json(result); //respuesta en el cliente
+    return res.status(200).json(result); //respuesta en el cliente
   } catch (error) {
     console.log('ERROR en GET productos.', error);
     return res.status(500).send('500 - Error en la base de datos.');

@@ -2,7 +2,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, Alert } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import RNBlobUtil from 'react-native-blob-util';
+//import RNBlobUtil from 'react-native-blob-util';
 
 const ExportarExcelButton = () => {
   const auth = getAuth();

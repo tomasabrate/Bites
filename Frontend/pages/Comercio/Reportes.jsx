@@ -8,7 +8,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import { Group, Bar, Pie } from '@visx/shape';
+/*import { Group, Bar, Pie } from '@visx/shape';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { GradientOrangeRed } from '@visx/gradient';
@@ -16,7 +16,7 @@ import { Legend } from '@visx/legend';
 import Svg, { G, Text as SvgText } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
-import { getAuth } from 'firebase/auth';
+import { getAuth } from 'firebase/auth'; */
 
 import ExportarExcelButton from '../../components/ExportarExcelButton';
 
