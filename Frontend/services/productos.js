@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000/productos"; //DIRECCION DEL BACKEND
+import { API_URL_BACK } from "./api_back";
+const API_URL = API_URL_BACK; 
 
 //OBTENER PRODUCTOS
 export const getProductos = async () => {

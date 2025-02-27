@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000/comercios";
+import { API_URL_BACK } from "./api_back";
+const API_URL = API_URL_BACK; 
 
 //CREAR UN PERFIL DE COMERCIO
 export const postComercio = async (data) => {

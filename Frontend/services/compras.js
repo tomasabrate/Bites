@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000/compras"; //DIRECCION DEL BACKEND
+import { API_URL_BACK } from "./api_back";
+const API_URL = API_URL_BACK; 
 
 
 //OBTENER COMPRAS POR CLIENTE -- usamos la misma tabla ventas de la bd pero filtramos por uid_cliente

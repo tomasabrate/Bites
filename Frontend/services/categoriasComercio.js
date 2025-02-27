@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000/categoriasComercio";
+import { API_URL_BACK } from "./api_back";
+const API_URL = API_URL_BACK; 
 
 export const getCategoriasComercio = async () => {
   try {

@@ -1,6 +1,5 @@
-// En el archivo services/ventas.js
-
-const API_URL = "http://localhost:3000"; // Asegúrate de que esta es tu URL correcta
+import { API_URL_BACK } from "./api_back";
+const API_URL = API_URL_BACK; 
 
 export const getDetallesByIdVenta = async (id_venta) => {
   try {
