@@ -56,8 +56,8 @@ const InterfazCliente = () => {
         data={data}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
-        ListFooterComponent={
-          <View style={styles.footer}>
+      />
+      <View style={styles.footer}>
             <TouchableOpacity
               style={styles.footerButton}
               onPress={() => navigation.navigate("Mapa")}
@@ -80,8 +80,6 @@ const InterfazCliente = () => {
               <Text style={styles.footerButtonText}>Carrito</Text>
             </TouchableOpacity>
           </View>
-        }
-      />
     </SafeAreaView>
   );
 };

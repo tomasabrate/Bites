@@ -5,6 +5,7 @@ import {
   deleteCliente,
   deleteLogicoCliente,
   putCliente,
+  getNombreClienteByUid
 } from "../controllers/clientes.controller.js";
 import { Router } from "express";
 const routerClientes = Router();
@@ -21,5 +22,8 @@ routerClientes.delete("/clientes/:uid_cliente", deleteCliente);
 routerClientes.delete("/clientes/baja/:uid_cliente", deleteLogicoCliente);
 
 routerClientes.put("/clientes/:uid_cliente", putCliente);
+
+routerClientes.get("/clientes/:uid_cliente/nombre", getNombreClienteByUid);
+
 
 export default routerClientes;

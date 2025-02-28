@@ -145,3 +145,24 @@ export const putCliente = async (req, res) => {
     });
   }
 };
+
+export const getNombreClienteByUid = async (req, res) => {
+  const { uid_cliente } = req.params;
+  try {
+    const [result] = await pool.query(
+      "SELECT nombre, apellido FROM Clientes WHERE uid_cliente = ?",
+      [uid_cliente]
+    );
+
+    console.log("Cliente: ", result);
+
+    if (result.length > 0) {
+      res.status(200).json(result[0]);
+    } else {
+      res.status(404).json({ message: "Cliente no encontrado" });
+    }
+  } catch (error) {
+    console.log("ERROR en GET Clientes.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};

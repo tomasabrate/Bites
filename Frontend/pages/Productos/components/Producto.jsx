@@ -17,7 +17,6 @@ export default function Producto(props) {
   const imagen = (props.imagenes != null) ? props.imagenes : imagenDefault;
 
   const precioFinal = CalcularDescuento(props.precio, props.descuento);
-  console.log(props.imagenes);
   return (
     <Pressable onPress={props.onPress} style={styles.card}>
       <Image source={imagen} style={styles.imagen} />

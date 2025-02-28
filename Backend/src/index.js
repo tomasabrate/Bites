@@ -8,6 +8,7 @@ import routerVentas from "./routes/ventas.routes.js";
 import routerCompras from "./routes/compras.routes.js";
 import routerDetalleVenta from "./routes/detalleVentas.routes.js";
 import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
+import routerResenas from "./routes/resenas.routes.js";
 // import cron from "node-cron.js";
 // import { deleteExpiredOrEmptyProducts } from "./controllers/products.controllers.js";
 
@@ -40,6 +41,8 @@ app.use(routerCompras);
 app.use(routerCategoriasComercio);
 
 app.use('/reportes', reportesRoutes);
+
+app.use(routerResenas);
 
 //Eliminar productos vencidos o agotados
 // cron.schedule("0 0 * * *", async () => {

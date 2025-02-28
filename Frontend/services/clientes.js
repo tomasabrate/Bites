@@ -107,3 +107,19 @@ export const postCliente = async (data) => {
       throw error;
     }
   };
+
+  export const getNombreClienteByUid = async (uid_cliente) => {
+    try {
+      const response = await fetch(`${API_URL}/${uid_cliente}/nombre`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Error ${response.status}: ${response.statusText}`
+        );
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error al obtener Cliente:", error);
+      throw error;
+    }
+  };

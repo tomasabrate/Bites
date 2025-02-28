@@ -7,6 +7,8 @@ import HeaderInfoPerfil from './components/HeaderInfoPerfil';
 import { getProductosByUidComercio } from '../../services/productos';
 import Producto from '../Productos/components/Producto';
 import { useNavigation } from "@react-navigation/native";
+import ListaResenas from '../Resena/ListaResenas';
+import { FontAwesome } from "@expo/vector-icons";
 
 const InfoPerfilComercio = ({ route }) => {
     const navigation = useNavigation();
@@ -69,32 +71,32 @@ const InfoPerfilComercio = ({ route }) => {
         <SafeAreaView style={styles.safeArea}>
             <HeaderInfoPerfil comercio={comercio} onPressRating={openCloseModal} />
             {loadingProductos ? (
-                    <LoadingScreen />
-                  ) : error ? (
-                    <Text style={styles.errorText}>{error}</Text>
-                  ) : (
-                    <FlatList
-                      style={styles.flatList}
-                      data={productos}
-                      keyExtractor={(item) => item.id_producto.toString()}
-                      renderItem={({ item }) => (
+                <LoadingScreen />
+            ) : error ? (
+                <Text style={styles.errorText}>{error}</Text>
+            ) : (
+                <FlatList
+                    style={styles.flatList}
+                    data={productos}
+                    keyExtractor={(item) => item.id_producto.toString()}
+                    renderItem={({ item }) => (
                         <Producto
-                          imagenes={item.imagenes}
-                          id_producto={item.id_producto}
-                          nombre={item.nombre}
-                          precio={item.precio}
-                          descuento={item.descuento}
-                          nombre_comercio={item.nombre_comercio}
-                          foto_perfil={item.foto_perfil}
-                          uid_comercio={item.uid_comercio}
-                          onPress={() =>
-                            navigation.navigate("DetalleProducto", { producto: item })
-                          }
+                            imagenes={item.imagenes}
+                            id_producto={item.id_producto}
+                            nombre={item.nombre}
+                            precio={item.precio}
+                            descuento={item.descuento}
+                            nombre_comercio={item.nombre_comercio}
+                            foto_perfil={item.foto_perfil}
+                            uid_comercio={item.uid_comercio}
+                            onPress={() =>
+                                navigation.navigate("DetalleProducto", { producto: item })
+                            }
                         />
-                      )}
-                      showsVerticalScrollIndicator={false}
-                    />
-                  )}
+                    )}
+                    showsVerticalScrollIndicator={false}
+                />
+            )}
             <Modal
                 style={styles.modalContainer}
                 transparent={true}
@@ -103,10 +105,12 @@ const InfoPerfilComercio = ({ route }) => {
                 onRequestClose={openCloseModal}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text>Modal de reseñas</Text>
-                        <TouchableOpacity onPress={openCloseModal}>
-                            <Text>Cerrar</Text>
-                        </TouchableOpacity>
+                        <View style={styles.cerrarModal}>
+                            <TouchableOpacity onPress={openCloseModal}>
+                                <FontAwesome name="close" size={20} color={'black'} />
+                            </TouchableOpacity>
+                        </View>
+                        <ListaResenas onCrearResena={() => console.log("Abrir modal para crear reseña")} uid_comercio={uid_comercio} />
                     </View>
                 </View>
             </Modal>
@@ -144,7 +148,11 @@ const styles = StyleSheet.create({
     flatList: {
         width: "100%",
         marginTop: 100
-      },
+    },
+    cerrarModal: {
+        alignSelf: "flex-end",
+        padding: 10,
+    }
 });
 
 
