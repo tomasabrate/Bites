@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   ScrollView,
+  FlatList
 } from "react-native";
 import Carrusel from "../../pages/Cliente/Carrusel";
 import MenuDesplegable from "../../pages/Cliente/MenuDesplegable";
@@ -22,6 +23,22 @@ const InterfazCliente = () => {
     setMenuVisible(!menuVisible);
   };
 
+  // Función para renderizar los componentes dentro del FlatList
+  const renderItem = ({ item }) => {
+    if (item.type === 'carrusel') {
+      return <Carrusel />;
+    } else if (item.type === 'productos') {
+      return <Productos />;
+    }
+    return null;
+  };
+
+  // Datos para renderizar el FlatList
+  const data = [
+    { type: 'carrusel' },
+    { type: 'productos' }
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -34,34 +51,37 @@ const InterfazCliente = () => {
 
       {menuVisible && <MenuDesplegable />}
 
-      <ScrollView>
-        <Carrusel />
-        <Productos />
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate("Mapa")}
-        >
-          <Icon name="map-marker" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Mapa</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate("MisCompras")}
-        >
-          <Icon name="list" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Pedidos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate("Carrito")}
-        >
-          <Icon name="shopping-cart" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Carrito</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Utilizamos FlatList para manejar el scroll y ambos componentes */}
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        ListFooterComponent={
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => navigation.navigate("Mapa")}
+            >
+              <Icon name="map-marker" size={24} color="#FF6347" />
+              <Text style={styles.footerButtonText}>Mapa</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => navigation.navigate("MisCompras")}
+            >
+              <Icon name="list" size={24} color="#FF6347" />
+              <Text style={styles.footerButtonText}>Pedidos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => navigation.navigate("Carrito")}
+            >
+              <Icon name="shopping-cart" size={24} color="#FF6347" />
+              <Text style={styles.footerButtonText}>Carrito</Text>
+            </TouchableOpacity>
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 };
