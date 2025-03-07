@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,25 +7,34 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
-/*import { Group, Bar, Pie } from '@visx/shape';
-import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { AxisBottom, AxisLeft } from '@visx/axis';
-import { GradientOrangeRed } from '@visx/gradient';
-import { Legend } from '@visx/legend';
-import Svg, { G, Text as SvgText } from 'react-native-svg';
+import Svg, {
+  Rect,
+  Path,
+  G,
+  Text as SvgText,
+  Line,
+  Defs,
+  LinearGradient,
+  Stop,
+} from 'react-native-svg';
+import * as d3Shape from 'd3-shape';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
-import { getAuth } from 'firebase/auth'; */
-
+import { getAuth } from 'firebase/auth';
 import ExportarExcelButton from '../../components/ExportarExcelButton';
 
 const { width: screenWidth } = Dimensions.get('window');
-const margin = { top: 40, right: 40, bottom: 80, left: 70 };
 const chartHeight = 350;
 const pieChartHeight = 280;
+const colores = ['#FF6B6B', '#FFA07A', '#FFD700', '#45B7D1', '#96CEB4'];
+const darkBackground = '#1A1A1A';
+const metallicBlack = '#2D2D2D';
 
 const Reportes = ({ navigation }) => {
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const [containerWidth, setContainerWidth] = useState(screenWidth);
   const [ventasMensuales, setVentasMensuales] = useState([]);
   const [productosMasVendidos, setProductosMasVendidos] = useState([]);
   const [productosHistoricos, setProductosHistoricos] = useState([]);
@@ -95,59 +104,240 @@ const Reportes = ({ navigation }) => {
       'Nov',
       'Dic',
     ];
-    return `${meses[parseInt(month) - 1]} ${year}`;
+    return windowWidth > 600
+      ? `${meses[parseInt(month) - 1]} '${year.slice(2)}`
+      : meses[parseInt(month) - 1];
   };
 
-  // Funciones para gráficos
-  const calcularPorcentajes = (datos) => {
-    const total = datos.reduce((acc, curr) => acc + curr.value, 0);
-    return datos.map((d) => ({
-      ...d,
-      porcentaje: total > 0 ? ((d.value / total) * 100).toFixed(1) + '%' : '0%',
-    }));
+  const onLayoutContainer = useCallback((event) => {
+    const { width } = event.nativeEvent.layout;
+    setContainerWidth(Math.min(width - 40, screenWidth - 40));
+  }, []);
+
+  const formatNumber = (num) => {
+    if (num >= 1e6) return `${(num / 1e6).toFixed(1)}M`;
+    if (num >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
+    return num.toLocaleString();
   };
 
-  const xScale = scaleBand({
-    domain: ventasMensuales.map((d) => d.mes),
-    padding: 0.6,
-    range: [margin.left, screenWidth - margin.right],
-  });
+  const GraficoBarras = () => {
+    const margin = {
+      top: 30,
+      right: 20,
+      bottom: windowWidth > 600 ? 80 : 60,
+      left: 50,
+    };
 
-  const yScale = scaleLinear({
-    domain: [0, Math.max(...ventasMensuales.map((d) => d.total_ventas), 1)],
-    nice: true,
-    range: [chartHeight - margin.bottom, margin.top],
-  });
+    const chartWidth = Math.max(
+      containerWidth - margin.left - margin.right,
+      300
+    );
+    const barSpacing = chartWidth / ventasMensuales.length;
 
-  const colores = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
+    const xScale = (index) => margin.left + index * barSpacing;
+    const maxValue = Math.max(...ventasMensuales.map((d) => d.total_ventas), 1);
 
-  const crearDatosPastel = (productos) =>
-    productos.map((p, i) => ({
-      label: p.nombre,
-      value: p.cantidad_vendida,
-      color: colores[i % colores.length],
-    }));
+    const yScale = (value) => {
+      return (
+        chartHeight -
+        margin.bottom -
+        (value / maxValue) * (chartHeight - margin.top - margin.bottom)
+      );
+    };
 
-  const escalaPastel = (datos) =>
-    scaleOrdinal({
-      domain: datos.map((d) => d.label),
-      range: datos.map((d) => d.color),
-    });
+    return (
+      <View onLayout={onLayoutContainer} style={styles.chartContainer}>
+        <Svg width={containerWidth} height={chartHeight}>
+          <Defs>
+            <LinearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#FF6B6B" />
+              <Stop offset="100%" stopColor="#FF4500" />
+            </LinearGradient>
+          </Defs>
 
-  const LeyendaPersonalizada = ({ scale, data }) => (
-    <View style={styles.leyendaContainer}>
-      {data.map((d, i) => (
-        <View key={i} style={styles.leyendaItem}>
-          <View
-            style={[styles.leyendaColor, { backgroundColor: scale(d.label) }]}
+          {ventasMensuales.map((d, i) => {
+            const barWidth = barSpacing * 0.6;
+            const x = xScale(i) + barSpacing * 0.2;
+            const y = yScale(d.total_ventas);
+            const height = chartHeight - margin.bottom - y;
+
+            return (
+              <G key={`bar-${i}`}>
+                <Rect
+                  x={x}
+                  y={y}
+                  width={barWidth}
+                  height={height}
+                  fill="url(#barGradient)"
+                  rx={4}
+                />
+                {d.total_ventas > 0 && (
+                  <SvgText
+                    x={x + barWidth / 2}
+                    y={y - 8}
+                    fontSize={windowWidth > 600 ? 12 : 10}
+                    fill="#FFFFFF"
+                    textAnchor="middle"
+                  >
+                    ${formatNumber(d.total_ventas)}
+                  </SvgText>
+                )}
+                {d.total_ventas === 0 && (
+                  <SvgText
+                    x={x + barWidth / 2}
+                    y={chartHeight - margin.bottom - 10}
+                    fontSize={10}
+                    fill="#FF6B6B"
+                    textAnchor="middle"
+                  >
+                    $0
+                  </SvgText>
+                )}
+              </G>
+            );
+          })}
+
+          <G transform={`translate(0, ${chartHeight - margin.bottom + 10})`}>
+            {ventasMensuales.map((d, i) => (
+              <SvgText
+                key={`xlabel-${i}`}
+                x={xScale(i) + barSpacing * 0.5}
+                y={windowWidth > 600 ? 20 : 15}
+                fontSize={windowWidth > 600 ? 12 : 10}
+                fill="#FFFFFF"
+                textAnchor="middle"
+              >
+                {d.mes}
+              </SvgText>
+            ))}
+          </G>
+
+          <Line
+            x1={margin.left}
+            y1={margin.top}
+            x2={margin.left}
+            y2={chartHeight - margin.bottom}
+            stroke="#666666"
+            strokeWidth={1}
           />
+
+          {[0, 0.2, 0.4, 0.6, 0.8, 1].map((tick, i) => {
+            const value = maxValue * tick;
+            return (
+              <G key={`ylabel-${i}`}>
+                <SvgText
+                  x={margin.left - 10}
+                  y={yScale(value) + 4}
+                  fontSize={windowWidth > 600 ? 12 : 10}
+                  fill="#FFFFFF"
+                  textAnchor="end"
+                >
+                  ${formatNumber(value)}
+                </SvgText>
+                <Line
+                  x1={margin.left - 5}
+                  y1={yScale(value)}
+                  x2={margin.left}
+                  y2={yScale(value)}
+                  stroke="#666666"
+                  strokeWidth={0.5}
+                  strokeDasharray="4 4"
+                />
+              </G>
+            );
+          })}
+        </Svg>
+      </View>
+    );
+  };
+
+  const GraficoPastel = ({ datos, size }) => {
+    const pieGenerator = d3Shape
+      .pie()
+      .value((d) => d.value)
+      .sort(null);
+
+    const arcs = pieGenerator(datos);
+    const outerRadius = size / 2.5;
+    const innerRadius = outerRadius * 0.6;
+
+    const arcGenerator = d3Shape
+      .arc()
+      .innerRadius(innerRadius)
+      .outerRadius(outerRadius)
+      .padRadius(outerRadius)
+      .padAngle(0.03)
+      .cornerRadius(4);
+
+    return (
+      <View
+        style={{
+          width: size,
+          height: size,
+          alignSelf: 'center',
+          marginVertical: 20,
+        }}
+      >
+        <Svg width="100%" height="100%">
+          <G transform={`translate(${size / 2}, ${size / 2})`}>
+            {arcs.map((arc, i) => {
+              const path = arcGenerator(arc);
+              return (
+                <G key={`pie-${i}`}>
+                  <Path
+                    d={path}
+                    fill={datos[i].color}
+                    stroke={metallicBlack}
+                    strokeWidth={2}
+                  />
+                  <SvgText
+                    x={arcGenerator.centroid(arc)[0]}
+                    y={arcGenerator.centroid(arc)[1]}
+                    fontSize={12}
+                    fontWeight="500"
+                    fill="#FFFFFF"
+                    textAnchor="middle"
+                    alignmentBaseline="middle"
+                  >
+                    {datos[i].percentage}
+                  </SvgText>
+                </G>
+              );
+            })}
+          </G>
+        </Svg>
+      </View>
+    );
+  };
+
+  const Leyenda = ({ datos }) => (
+    <View style={styles.leyendaContainer}>
+      {datos.map((d, i) => (
+        <View key={i} style={styles.leyendaItem}>
+          <View style={[styles.leyendaColor, { backgroundColor: d.color }]} />
           <Text style={styles.leyendaTexto}>
-            {d.label}: {d.value} unid. ({d.porcentaje})
+            {d.label}: {d.value} unid. ({d.percentage})
           </Text>
         </View>
       ))}
     </View>
   );
+
+  const generarDatosPastel = (productos) => {
+    const total = productos.reduce(
+      (acc, curr) => acc + curr.cantidad_vendida,
+      0
+    );
+    return productos.map((p, i) => ({
+      label: p.nombre,
+      value: p.cantidad_vendida,
+      percentage:
+        total > 0
+          ? ((p.cantidad_vendida / total) * 100).toFixed(1) + '%'
+          : '0%',
+      color: colores[i % colores.length],
+    }));
+  };
 
   if (loading) {
     return (
@@ -158,182 +348,102 @@ const Reportes = ({ navigation }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={[styles.container, { minHeight: windowHeight }]}
+      showsVerticalScrollIndicator={false}
+    >
       <TouchableOpacity
-        style={styles.backButton}
+        style={[styles.backButton, { width: windowWidth > 600 ? 140 : 120 }]}
         onPress={() => navigation.goBack()}
       >
         <Icon name="arrow-back" size={24} color="#fff" />
         <Text style={styles.backButtonText}>Volver</Text>
       </TouchableOpacity>
 
-      <Text style={styles.titulo}>Reportes de Ventas</Text>
+      <Text style={[styles.titulo, { fontSize: windowWidth > 600 ? 28 : 24 }]}>
+        Reportes de Ventas
+      </Text>
 
-      {/* Gráfico de Barras Mejorado */}
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Ventas Mensuales</Text>
+      <View
+        style={[
+          styles.chartCard,
+          {
+            width: windowWidth > 600 ? windowWidth * 0.9 : windowWidth * 0.95,
+            marginHorizontal: windowWidth > 600 ? 20 : 10,
+          },
+        ]}
+      >
+        <Text
+          style={[styles.chartTitle, { fontSize: windowWidth > 600 ? 22 : 18 }]}
+        >
+          Ventas Mensuales
+        </Text>
         <Text style={styles.chartSubtitle}>
           Total últimos 6 meses: $
           {ventasMensuales
             .reduce((a, b) => a + b.total_ventas, 0)
             .toLocaleString()}
         </Text>
-        <Svg width={screenWidth} height={chartHeight}>
-          <GradientOrangeRed id="barGradient" />
-
-          {ventasMensuales.map((d, i) => (
-            <G key={`bar-${i}`}>
-              <Bar
-                x={xScale(d.mes)}
-                y={yScale(d.total_ventas)}
-                width={xScale.bandwidth()}
-                height={chartHeight - margin.bottom - yScale(d.total_ventas)}
-                fill="url(#barGradient)"
-                rx={6}
-              />
-              <SvgText
-                x={xScale(d.mes) + xScale.bandwidth() / 2}
-                y={yScale(d.total_ventas) - 8}
-                fontSize={12}
-                fontWeight="500"
-                fill="#2D3748"
-                textAnchor="middle"
-              >
-                ${d.total_ventas.toLocaleString()}
-              </SvgText>
-            </G>
-          ))}
-
-          <AxisBottom
-            scale={xScale}
-            top={chartHeight - margin.bottom}
-            stroke="#CBD5E0"
-            strokeWidth={1}
-            tickStroke="#CBD5E0"
-            tickLabelProps={() => ({
-              fill: '#4A5568',
-              fontSize: 12,
-              fontWeight: '500',
-              textAnchor: 'middle',
-            })}
-            numTicks={ventasMensuales.length}
-          />
-
-          <AxisLeft
-            scale={yScale}
-            left={margin.left}
-            stroke="#CBD5E0"
-            strokeWidth={1}
-            tickStroke="#CBD5E0"
-            tickLabelProps={() => ({
-              fill: '#4A5568',
-              fontSize: 12,
-              dx: '-10',
-              fontWeight: '500',
-            })}
-            numTicks={6}
-            label="Ventas Totales ($)"
-            labelProps={{
-              fill: '#2D3748',
-              fontSize: 14,
-              fontWeight: '600',
-              dy: -40,
-              dx: -20,
-            }}
-          />
-        </Svg>
+        <GraficoBarras />
       </View>
 
-      {/* Gráficos de Pastel Mejorados */}
       {productosMasVendidos.length > 0 && (
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>
+        <View
+          style={[
+            styles.chartCard,
+            {
+              width: windowWidth > 600 ? windowWidth * 0.9 : windowWidth * 0.95,
+              marginHorizontal: windowWidth > 600 ? 20 : 10,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.chartTitle,
+              { fontSize: windowWidth > 600 ? 22 : 18 },
+            ]}
+          >
             Productos Más Vendidos (Últimos 6 Meses)
           </Text>
           <Text style={styles.chartSubtitle}>
             Total unidades vendidas:{' '}
             {productosMasVendidos.reduce((a, b) => a + b.cantidad_vendida, 0)}
           </Text>
-          <Svg width={screenWidth} height={pieChartHeight}>
-            <G
-              transform={`translate(${screenWidth / 2},${pieChartHeight / 2})`}
-            >
-              <Pie
-                data={calcularPorcentajes(
-                  crearDatosPastel(productosMasVendidos)
-                )}
-                pieValue={(d) => d.value}
-                outerRadius={110}
-                innerRadius={70}
-                padAngle={0.03}
-                cornerRadius={4}
-              >
-                {(pie) =>
-                  pie.arcs.map((arc, i) => (
-                    <G key={`arc-${i}`}>
-                      <path
-                        d={pie.path(arc)}
-                        fill={escalaPastel(
-                          crearDatosPastel(productosMasVendidos)
-                        )(arc.data.label)}
-                        stroke="#FFF"
-                        strokeWidth={2}
-                      />
-                    </G>
-                  ))
-                }
-              </Pie>
-            </G>
-          </Svg>
-          <LeyendaPersonalizada
-            scale={escalaPastel(crearDatosPastel(productosMasVendidos))}
-            data={calcularPorcentajes(crearDatosPastel(productosMasVendidos))}
+          <GraficoPastel
+            datos={generarDatosPastel(productosMasVendidos)}
+            size={windowWidth > 600 ? 400 : Math.min(windowWidth * 0.8, 300)}
           />
+          <Leyenda datos={generarDatosPastel(productosMasVendidos)} />
         </View>
       )}
 
       {productosHistoricos.length > 0 && (
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Histórico Completo de Ventas</Text>
+        <View
+          style={[
+            styles.chartCard,
+            {
+              width: windowWidth > 600 ? windowWidth * 0.9 : windowWidth * 0.95,
+              marginHorizontal: windowWidth > 600 ? 20 : 10,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.chartTitle,
+              { fontSize: windowWidth > 600 ? 22 : 18 },
+            ]}
+          >
+            Histórico Completo de Ventas
+          </Text>
           <Text style={styles.chartSubtitle}>
             Total histórico de unidades vendidas:{' '}
             {productosHistoricos.reduce((a, b) => a + b.cantidad_vendida, 0)}
           </Text>
-          <Svg width={screenWidth} height={pieChartHeight}>
-            <G
-              transform={`translate(${screenWidth / 2},${pieChartHeight / 2})`}
-            >
-              <Pie
-                data={calcularPorcentajes(
-                  crearDatosPastel(productosHistoricos)
-                )}
-                pieValue={(d) => d.value}
-                outerRadius={110}
-                innerRadius={70}
-                padAngle={0.03}
-                cornerRadius={4}
-              >
-                {(pie) =>
-                  pie.arcs.map((arc, i) => (
-                    <G key={`historic-arc-${i}`}>
-                      <path
-                        d={pie.path(arc)}
-                        fill={escalaPastel(
-                          crearDatosPastel(productosHistoricos)
-                        )(arc.data.label)}
-                        stroke="#FFF"
-                        strokeWidth={2}
-                      />
-                    </G>
-                  ))
-                }
-              </Pie>
-            </G>
-          </Svg>
-          <LeyendaPersonalizada
-            scale={escalaPastel(crearDatosPastel(productosHistoricos))}
-            data={calcularPorcentajes(crearDatosPastel(productosHistoricos))}
+          <GraficoPastel
+            datos={generarDatosPastel(productosHistoricos)}
+            size={windowWidth > 600 ? 400 : Math.min(windowWidth * 0.8, 300)}
           />
+          <Leyenda datos={generarDatosPastel(productosHistoricos)} />
         </View>
       )}
 
@@ -352,18 +462,22 @@ const Reportes = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#F7FAFC',
-    minHeight: '100%',
+    backgroundColor: darkBackground,
+    alignItems: 'center',
+  },
+  chartContainer: {
+    width: '100%',
+    overflow: 'hidden',
+    marginVertical: 10,
   },
   chartCard: {
-    backgroundColor: 'white',
+    backgroundColor: metallicBlack,
     borderRadius: 16,
-    padding: 24,
+    padding: 20,
     marginBottom: 24,
-    marginHorizontal: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
   },
@@ -374,7 +488,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 24,
-    width: 120,
+    alignSelf: 'flex-start',
   },
   backButtonText: {
     color: 'white',
@@ -383,22 +497,20 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   titulo: {
-    fontSize: 26,
+    color: '#FFFFFF',
     fontWeight: '700',
-    color: '#2D3748',
     marginBottom: 24,
     textAlign: 'center',
   },
   chartTitle: {
-    fontSize: 20,
+    color: '#FFFFFF',
     fontWeight: '700',
-    color: '#2D3748',
     marginBottom: 8,
     textAlign: 'center',
   },
   chartSubtitle: {
     fontSize: 14,
-    color: '#718096',
+    color: '#CCCCCC',
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -406,7 +518,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F7FAFC',
+    backgroundColor: darkBackground,
   },
   leyendaContainer: {
     marginTop: 20,
@@ -425,12 +537,12 @@ const styles = StyleSheet.create({
   },
   leyendaTexto: {
     fontSize: 14,
-    color: '#4A5568',
+    color: '#FFFFFF',
     flexShrink: 1,
   },
   sinDatos: {
     textAlign: 'center',
-    color: '#718096',
+    color: '#CCCCCC',
     fontSize: 16,
     marginTop: 20,
   },
