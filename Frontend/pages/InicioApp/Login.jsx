@@ -22,6 +22,8 @@ import useLogout from "../../utils/logout";
 import BotonGenerico from '../../components/BotonGenerico';
 import Inicio from "../InicioApp/Inicio";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import * as AuthSession from "expo-auth-session";
+import Constants from "expo-constants";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -72,12 +74,22 @@ const Login = ({ navigation }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
   // widht min: 820
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: "450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com",
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
-    androidClientId: "450223259168-iec5tvfuilstub7o2kqt4ta5mrqer1gl.apps.googleusercontent.com",
+    expoClientId: "450223259168-kf5cts2q84r85tqfiqu3nuda1p778sma.apps.googleusercontent.com",
     scopes: ["profile", "email"],
-    responseType: "id_token"
-  })
+    redirectUri: AuthSession.makeRedirectUri({
+      native: "com.tomas_abrate.pjbites:/oauthredirect", // Usa el esquema nativo
+      useProxy: Constants.executionEnvironment === "expo", // Solo usa proxy si estás en Expo Go
+    }),
+  });
+
+  useEffect(() => {
+    console.log("Execution Environment:", Constants.executionEnvironment);
+  }, []);
+
+
 
   useEffect(() => {
     if (response?.type === 'success') {
