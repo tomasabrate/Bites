@@ -74,16 +74,14 @@ const Login = ({ navigation }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
   // widht min: 820
 
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+  const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: "450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com",
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
     expoClientId: "450223259168-kf5cts2q84r85tqfiqu3nuda1p778sma.apps.googleusercontent.com",
     scopes: ["profile", "email"],
-    redirectUri: AuthSession.makeRedirectUri({
-      native: "com.tomas_abrate.pjbites:/oauthredirect", // Usa el esquema nativo
-      useProxy: Constants.executionEnvironment === "expo", // Solo usa proxy si estás en Expo Go
-    }),
-  });
+    responseType: "id_token"
+  })
+
 
   useEffect(() => {
     console.log("Execution Environment:", Constants.executionEnvironment);
