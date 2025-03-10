@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -48,9 +49,11 @@ const MisCompras = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    fetchCompras();
-  }, [fetchCompras]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCompras();
+    }, [fetchCompras])
+  );
 
   const getComprasFiltradas = () => {
     switch (filtroActual) {
@@ -82,7 +85,14 @@ const MisCompras = () => {
             <Text
               style={[
                 styles.estadoCompra,
-                { color: item.estado === "CANCELADO" ? "#dc2626" : item.estado === "EN CURSO" ? "#FFA500" : "#4CAF50" },
+                {
+                  color:
+                    item.estado === "CANCELADO"
+                      ? "#dc2626"
+                      : item.estado === "EN CURSO"
+                      ? "#FFA500"
+                      : "#4CAF50",
+                },
               ]}
             >
               {item.estado} • {new Date(item.fecha_venta).toLocaleDateString()}{" "}

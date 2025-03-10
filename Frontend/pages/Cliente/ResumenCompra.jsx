@@ -17,7 +17,7 @@ import { useAuth } from "../../context/AuthContext";
 import { generarCodigoDeRetiro } from "../../utils/generarCodigoDeRetiro";
 
 export default function ResumenCompra({ navigation }) {
-  const { carrito } = useCart();
+  const { carrito, vaciarCarrito } = useCart();
   const { user } = useAuth();
   const uid_cliente = user.uid;
 
@@ -65,7 +65,8 @@ export default function ResumenCompra({ navigation }) {
         uid_cliente,
         codigo_retiro,
       });
-      navigation.navigate("MisCompras")
+      vaciarCarrito();
+      navigation.navigate("MisCompras");
     } catch (err) {
       console.error(err);
       alert("Error: " + err);

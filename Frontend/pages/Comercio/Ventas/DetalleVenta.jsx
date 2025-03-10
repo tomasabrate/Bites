@@ -65,11 +65,13 @@ const DetalleVenta = () => {
         return;
       }
     }else{
-      console.log("codigo de retiro no valido")
+      console.log("codigo de retiro no valido");
+      return;
     }
     Alert.alert("Éxito", `Venta confirmada con el código: ${codigoRetiro}`);
     setModalVisible(false);
     setCodigoRetiro("");
+    navigation.navigate("MisVentas");
   };
 
   if (loading) {

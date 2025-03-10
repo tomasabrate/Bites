@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -48,9 +49,11 @@ const MisVentas = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    fetchVentas();
-  }, [fetchVentas]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchVentas();
+    }, [fetchVentas])
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

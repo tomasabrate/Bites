@@ -30,9 +30,11 @@ const DetalleCompra = () => {
       try {
         const dataComercio = await getComercioById(compra.uid_comercio);
         setComercio(dataComercio);
+        console.log("Datos del Comercio:", dataComercio);
 
         const data = await getDetallesByIdVenta(compra.id_venta);
         setDetalleCompra(data);
+        console.log("Detalles de la venta: ", data);
       } catch (error) {
         console.error("Error al obtener detalles de la compra:", error);
         Alert.alert("Error", "No se pudieron cargar los detalles de la compra");
@@ -258,7 +260,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   codigoRetiroLabel: {
-    paddingTop:15,
+    paddingTop: 15,
     fontSize: 17,
     underline: true,
     color: "#666",
