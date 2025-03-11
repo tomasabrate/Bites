@@ -31,5 +31,11 @@
       }
     },
     "scheme": "pjbites"
-  }
+  },
+  "plugins":[
+    "expo-file-system",
+    {
+      "photosPermission": "Necesitamos acceso para guardar reportes"
+    }
+  ]
 }

@@ -4,6 +4,9 @@ import { CartProvider } from './context/CartContext'; // Ruta correcta al CartCo
 import { AuthProvider } from './context/AuthContext';
 import TabNavigator from './navigation/TabNavigator';
 
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
+
 export default function App() {
   return (
     <AuthProvider>

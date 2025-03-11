@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import ExportarExcelButton from '../../components/ExportarExcelButton';
+import ViewShot from 'react-native-view-shot';
 
 const { width: screenWidth } = Dimensions.get('window');
 const chartHeight = 350;
@@ -40,6 +41,11 @@ const Reportes = ({ navigation }) => {
   const [productosHistoricos, setProductosHistoricos] = useState([]);
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
+
+  // Referencias para capturar los gráficos
+  const graficoBarrasRef = useRef(null);
+  const graficoPastel1Ref = useRef(null);
+  const graficoPastel2Ref = useRef(null);
 
   useEffect(() => {
     const fetchReportes = async () => {
@@ -146,7 +152,12 @@ const Reportes = ({ navigation }) => {
     };
 
     return (
-      <View onLayout={onLayoutContainer} style={styles.chartContainer}>
+      <ViewShot
+        ref={graficoBarrasRef}
+        options={{ format: 'png', quality: 0.9 }}
+        onLayout={onLayoutContainer}
+        style={styles.chartContainer}
+      >
         <Svg width={containerWidth} height={chartHeight}>
           <Defs>
             <LinearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -247,7 +258,7 @@ const Reportes = ({ navigation }) => {
             );
           })}
         </Svg>
-      </View>
+      </ViewShot>
     );
   };
 
@@ -309,6 +320,21 @@ const Reportes = ({ navigation }) => {
       </View>
     );
   };
+
+  const GraficoPastelConCaptura = ({ datos, size, referencia }) => (
+    <ViewShot
+      ref={referencia}
+      options={{ format: 'png', quality: 0.9 }}
+      style={{
+        width: size,
+        height: size,
+        alignSelf: 'center',
+        marginVertical: 20,
+      }}
+    >
+      <GraficoPastel datos={datos} size={size} />
+    </ViewShot>
+  );
 
   const Leyenda = ({ datos }) => (
     <View style={styles.leyendaContainer}>
@@ -409,9 +435,10 @@ const Reportes = ({ navigation }) => {
             Total unidades vendidas:{' '}
             {productosMasVendidos.reduce((a, b) => a + b.cantidad_vendida, 0)}
           </Text>
-          <GraficoPastel
+          <GraficoPastelConCaptura
             datos={generarDatosPastel(productosMasVendidos)}
             size={windowWidth > 600 ? 400 : Math.min(windowWidth * 0.8, 300)}
+            referencia={graficoPastel1Ref}
           />
           <Leyenda datos={generarDatosPastel(productosMasVendidos)} />
         </View>
@@ -439,9 +466,10 @@ const Reportes = ({ navigation }) => {
             Total histórico de unidades vendidas:{' '}
             {productosHistoricos.reduce((a, b) => a + b.cantidad_vendida, 0)}
           </Text>
-          <GraficoPastel
+          <GraficoPastelConCaptura
             datos={generarDatosPastel(productosHistoricos)}
             size={windowWidth > 600 ? 400 : Math.min(windowWidth * 0.8, 300)}
+            referencia={graficoPastel2Ref}
           />
           <Leyenda datos={generarDatosPastel(productosHistoricos)} />
         </View>
@@ -449,16 +477,17 @@ const Reportes = ({ navigation }) => {
 
       <ExportarExcelButton
         ventas={ventasMensuales}
-        productos={[...productosMasVendidos, ...productosHistoricos]}
+        productosMasVendidos={generarDatosPastel(productosMasVendidos)}
+        productosHistoricos={generarDatosPastel(productosHistoricos)}
+        graficoBarrasRef={graficoBarrasRef}
+        graficoPastel1Ref={graficoPastel1Ref}
+        graficoPastel2Ref={graficoPastel2Ref}
       />
-
-      {ventasMensuales.length === 0 && (
-        <Text style={styles.sinDatos}>No hay datos disponibles</Text>
-      )}
     </ScrollView>
   );
 };
 
+// Los estilos se mantienen iguales que en tu código original
 const styles = StyleSheet.create({
   container: {
     padding: 16,
