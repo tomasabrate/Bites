@@ -167,3 +167,14 @@ export const putComercio = async (req, res) => {
     });
   }
 };
+
+export const getComerciosForMaps = async (req, res) => {
+  try {
+    const [result] = await pool.query("SELECT uid_comercio, nombre_comercio, lat, lon, foto_perfil FROM Comercios");
+    console.log("Lista de Comercios:", result);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log("ERROR en GET Comercios.", error);
+    return res.status(500).send("500 - Error en la base de datos.");
+  }
+};
