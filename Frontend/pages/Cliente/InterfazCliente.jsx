@@ -6,38 +6,31 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  ScrollView,
-  FlatList
 } from "react-native";
-import Carrusel from "../../pages/Cliente/Carrusel";
 import MenuDesplegable from "../../pages/Cliente/MenuDesplegable";
-import Productos from "../Productos/Productos";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import InicioCliente from "./InicioCliente";
+import Mapa from "./Mapa";
+import MisCompras from "./MisCompras";
+import Carrito from "./Cart";
+
+
+const screens = {
+  Inicio: <InicioCliente />,
+  Maps: < Mapa/>,
+  MisCompras: <MisCompras />,
+  Carrito: <Carrito />,
+};
 
 const InterfazCliente = () => {
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState('Inicio');
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
-
-  // Función para renderizar los componentes dentro del FlatList
-  const renderItem = ({ item }) => {
-    if (item.type === 'carrusel') {
-      return <Carrusel />;
-    } else if (item.type === 'productos') {
-      return <Productos />;
-    }
-    return null;
-  };
-
-  // Datos para renderizar el FlatList
-  const data = [
-    { type: 'carrusel' },
-    { type: 'productos' }
-  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,31 +43,33 @@ const InterfazCliente = () => {
       </View>
 
       {menuVisible && <MenuDesplegable />}
+      {screens[currentScreen] || <NotFoundScreen />}
 
-      {/* Utilizamos FlatList para manejar el scroll y ambos componentes */}
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-      />
       <View style={styles.footer}>
+      <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => setCurrentScreen("Inicio")}
+            >
+              <Icon name="home" size={24} color="#FF6347" />
+              <Text style={styles.footerButtonText}>Inicio</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => navigation.navigate("Mapa")}
+              onPress={() => setCurrentScreen("Maps")}
             >
               <Icon name="map-marker" size={24} color="#FF6347" />
               <Text style={styles.footerButtonText}>Mapa</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => navigation.navigate("MisCompras")}
+              onPress={() => setCurrentScreen("MisCompras")}
             >
               <Icon name="list" size={24} color="#FF6347" />
               <Text style={styles.footerButtonText}>Pedidos</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => navigation.navigate("Carrito")}
+              onPress={() => setCurrentScreen("Carrito")}
             >
               <Icon name="shopping-cart" size={24} color="#FF6347" />
               <Text style={styles.footerButtonText}>Carrito</Text>

@@ -133,16 +133,6 @@ const MisCompras = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("InterfazCliente")}
-            style={styles.backButton}
-          >
-            <Icon name="arrow-left" size={24} color="white" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Mis Pedidos</Text>
-        </View>
-
         <View style={styles.filtros}>
           <TouchableOpacity style={styles.filtroButton}>
             <Icon name="sliders" size={20} color="#333" />
@@ -223,18 +213,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-  },
-  header: {
-    backgroundColor: "#ff6347",
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
   },
   filtros: {
     flexDirection: "row",
@@ -344,9 +322,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     color: "#888",
-  },
-  backButton: {
-    marginRight: 16,
   },
 });
 

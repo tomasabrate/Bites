@@ -77,15 +77,6 @@ const Cart = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Icon name="arrow-left" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Carrito de Compras</Text>
-      </View>
       {productosAgrupados.length === 0 ? (
         <View style={styles.emptyCart}>
           <Icon name="shopping-cart" size={50} color="#ccc" />
@@ -136,20 +127,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#f5f5f5",
-  },
-  header: {
-    padding: 16,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "black",
   },
   listContent: {
     flexGrow: 1,
