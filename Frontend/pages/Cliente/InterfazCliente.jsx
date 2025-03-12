@@ -16,13 +16,6 @@ import MisCompras from "./MisCompras";
 import Carrito from "./Cart";
 
 
-const screens = {
-  Inicio: <InicioCliente />,
-  Maps: < Mapa/>,
-  MisCompras: <MisCompras />,
-  Carrito: <Carrito />,
-};
-
 const InterfazCliente = () => {
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
@@ -43,7 +36,16 @@ const InterfazCliente = () => {
       </View>
 
       {menuVisible && <MenuDesplegable />}
-      {screens[currentScreen] || <NotFoundScreen />}
+
+      {currentScreen === 'Inicio' ? (
+        <InicioCliente />
+      ) : currentScreen === 'Maps' ? (
+        <Mapa />
+      ) : currentScreen === 'MisCompras' ? (
+        <MisCompras />
+      ) : currentScreen === 'Carrito' ? (
+        <Carrito />
+      ) : null}
 
       <View style={styles.footer}>
       <TouchableOpacity

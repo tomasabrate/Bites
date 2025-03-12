@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, ScrollView } from 'react-native';
 import MapView, { Marker } from "react-native-maps";
-import getComerciosForMaps from '../../services/comercios';
+import { getComerciosForMaps } from '../../services/comercios';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const Mapa = () => {
     const [origin] = useState({
@@ -33,23 +34,21 @@ const Mapa = () => {
 
     return (
         <View style={styles.container}>
-            {/* Muestra un indicador de carga si aún está cargando */}
             {loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
+                <LoadingScreen />
             ) : (
                 <>
-                    {/* Mapa con marcadores */}
                     <MapView
                         style={styles.mapNative}
                         initialRegion={{
                             latitude: origin.latitude,
                             longitude: origin.longitude,
-                            latitudeDelta: 0.09,
-                            longitudeDelta: 0.04,
+                            latitudeDelta: 0.02,
+                            longitudeDelta: 0.01,
                         }}
                     >
                         {comercios
-                            .filter(comercio => comercio.lat && comercio.lon) // Filtrar comercios sin coordenadas
+                            .filter(comercio => comercio.lat && comercio.lon)
                             .map((comercio) => (
                                 <Marker
                                     key={comercio.uid_comercio}
@@ -58,30 +57,20 @@ const Mapa = () => {
                                         longitude: Number(comercio.lon),
                                     }}
                                     title={comercio.nombre_comercio}
+                                    description={comercio.direccion}
                                 />
                             ))}
                     </MapView>
-
-                    {/* Lista de comercios */}
-                    <ScrollView style={styles.listContainer}>
-                        {comercios.map((comercio) => (
-                            <Text key={comercio.uid_comercio} style={styles.comercioText}>
-                                {comercio.nombre_comercio}
-                            </Text>
-                        ))}
-                    </ScrollView>
                 </>
             )}
-
-            {/* Mostrar error si hay un problema al cargar */}
             {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 10 },
-    mapNative: { width: '100%', height: '70%' },
+    container: { flex: 1 },
+    mapNative: { width: '100%', height: '100%' },
     listContainer: { marginTop: 10 },
     comercioText: { fontSize: 16, padding: 5 },
     errorText: { color: 'red', textAlign: 'center', marginTop: 10 },

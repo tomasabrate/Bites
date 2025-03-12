@@ -32,10 +32,9 @@ const MisCompras = () => {
       setRefreshing(false);
       return;
     }
-
+  
     try {
       const comprasData = await getComprasByCliente(user.uid);
-      // Ordenar por fecha más reciente
       const comprasOrdenadas = comprasData.sort(
         (a, b) => new Date(b.fecha_venta) - new Date(a.fecha_venta)
       );
@@ -47,12 +46,12 @@ const MisCompras = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [user]);
+  }, [user?.uid]); 
 
   useFocusEffect(
     useCallback(() => {
       fetchCompras();
-    }, [fetchCompras])
+    }, [fetchCompras]) 
   );
 
   const getComprasFiltradas = () => {
