@@ -109,7 +109,7 @@ export const deleteComercio = async (uid_comercio) => {
 
     export const getComerciosForMaps = async () => {
       try {
-        const response = await fetch(`${API_URL}/maps`);
+        const response = await fetch(`${API_URL}/maps/info`);
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(

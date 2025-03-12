@@ -15,7 +15,7 @@ routerComercios.delete("/comercios/baja/:uid_comercio", deleteLogicoCormecio);
 
 routerComercios.put("/comercios/:uid_comercio", putComercio);
 
-routerComercios.get("/comercios/maps", getComerciosForMaps);
+routerComercios.get("/comercios/maps/info", getComerciosForMaps);
 
 
 export default routerComercios;
