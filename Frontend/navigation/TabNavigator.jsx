@@ -1,8 +1,7 @@
 import * as React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import StackNavigator from "./StackNavigator";
-import { StatusBar, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar, Platform, SafeAreaView } from "react-native";
 
 const Tab = createBottomTabNavigator();
 
@@ -25,11 +24,7 @@ export default function TabNavigator() {
           style={{
             backgroundColor: "black",
             flex: 1,
-            paddingTop: Platform.OS === 'android'
-              ? StatusBar.currentHeight
-              : Platform.OS === 'ios'
-              ? 0 // iOS ya maneja automáticamente SafeAreaView
-              : 1, // Para web, agrega un espacio fijo (con 1 no se nota, pero agrega una franja arriba)
+            paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
           }}
         >
           <StackNavigator />

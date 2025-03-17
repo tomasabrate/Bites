@@ -189,18 +189,18 @@ const Login = ({ navigation }) => {
 
       if (perfilCompleto) {
         if (rol === 'Admin') {
-          navigation.navigate('InterfazAdministrador');
+          navigation.replace('InterfazAdministrador');
         } else if (rol === 'Cliente') {
-          navigation.navigate('InterfazCliente');
+          navigation.replace('InterfazCliente');
         } else if (rol === 'Comercio') {
           await AsyncStorage.setItem('@comercioId', user.uid); // Guarda el UID del comercio
-          navigation.navigate('InterfazComerciante');
+          navigation.replace('InterfazComerciante');
         }
       } else {
         if (rol === 'Cliente') {
-          navigation.navigate('RegistroCliente');
+          navigation.replace('RegistroCliente');
         } else if (rol === 'Comercio') {
-          navigation.navigate('RegistroComercio');
+          navigation.replace('RegistroComercio');
         }
       }
     } catch (error) {
@@ -269,7 +269,7 @@ const Login = ({ navigation }) => {
       const docSnap = await getDoc(docuRef);
 
       if (!docSnap.exists()) {
-        navigation.navigate('RegistroGoogle', { userInfo: user });
+        navigation.replace('RegistroGoogle', { userInfo: user });
       } else {
         console.log(
           'Usuario ya existe en Firestore, no se crea otro documento'

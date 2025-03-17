@@ -17,7 +17,7 @@ const PerfilCliente = () => {
 
     const [nombre, setNombre] = useState([]);
     const [apellido, setApellido] = useState([]);
-    const [imgPerfil, setImgPerfil] = useState([]);
+    const [imgPerfil, setImgPerfil] = useState("");
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
 
@@ -37,7 +37,7 @@ const PerfilCliente = () => {
 
                     setNombre(data.nombre);
                     setApellido(data.apellido);
-                    setImgPerfil(data.foto_perfil);
+                    setImgPerfil(Array.isArray(data.foto_perfil) ? data.foto_perfil[0] : data.foto_perfil);
                     setEmail(data.mail);
 
                 } catch (error) {
@@ -52,16 +52,16 @@ const PerfilCliente = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.header}>
-                    <TouchableOpacity
-                                onPress={() => navigation.goBack()}
-                                style={styles.backButton}
-                              >
-                                <Icon name="arrow-left" size={24} color="white" />
-                              </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Mi Perfil</Text>
-                </View>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={styles.backButton}
+                >
+                    <Icon name="arrow-left" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Mi Perfil</Text>
+            </View>
             <View style={styles.container}>
-                
+
                 <Image
                     source={imgPerfil ? { uri: imgPerfil } : require('../../assets/user-default.png')}
                     style={styles.profileImage}
@@ -75,7 +75,6 @@ const PerfilCliente = () => {
                 <ItemPerfil
                     title="Información personal"
                     icon="user"
-                    onPress={() => navigation.navigate(null)}
                 />
                 <ItemPerfil
                     title="Editar información del perfil"
@@ -106,9 +105,9 @@ const PerfilCliente = () => {
                 />
             </View>
             <ClientTermsModal
-          visible={showTermsModal}
-          onClose={() => setShowTermsModal(false)}
-        />
+                visible={showTermsModal}
+                onClose={() => setShowTermsModal(false)}
+            />
         </SafeAreaView>
     );
 };
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         marginRight: 16,
-      },
+    },
 });
 
 export default PerfilCliente;

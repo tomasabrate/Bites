@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { CartProvider } from './context/CartContext'; // Ruta correcta al CartContext
+import { CartProvider } from './context/CartContext'; 
 import { AuthProvider } from './context/AuthContext';
 import TabNavigator from './navigation/TabNavigator';
+import { StatusBar } from 'react-native';
 
 import { Buffer } from 'buffer';
 global.Buffer = Buffer;
@@ -12,6 +13,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <NavigationContainer>
+          <StatusBar translucent backgroundColor="transparent" barStyle="light-content"/>
           <TabNavigator />
         </NavigationContainer>
       </CartProvider>

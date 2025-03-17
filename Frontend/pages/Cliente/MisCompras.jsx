@@ -131,7 +131,6 @@ const MisCompras = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
         <View style={styles.filtros}>
           <TouchableOpacity style={styles.filtroButton}>
             <Icon name="sliders" size={20} color="#333" />
@@ -199,7 +198,6 @@ const MisCompras = () => {
             contentContainerStyle={styles.listContainer}
           />
         )}
-      </View>
     </SafeAreaView>
   );
 };
@@ -207,15 +205,10 @@ const MisCompras = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#ff6347",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   filtros: {
     flexDirection: "row",
-    padding: 16,
+    padding: 10,
     alignItems: "center",
     backgroundColor: "white",
     borderBottomWidth: 1,

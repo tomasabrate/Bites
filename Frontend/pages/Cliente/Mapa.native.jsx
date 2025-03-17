@@ -58,6 +58,7 @@ const Mapa = () => {
                                     }}
                                     title={comercio.nombre_comercio}
                                     description={comercio.direccion}
+                                    tracksViewChanges={false}
                                 />
                             ))}
                     </MapView>
