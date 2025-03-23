@@ -1,4 +1,7 @@
 import { pool } from "../database/connection.js";
+import { updatePagoVenta } from "./pagos.controller.js";
+import { generarCodigoDeRetiro } from "./utils/generarCodigoRetiro.js";
+
 
 // Obtener todas las ventas
 export const getVentas = async (req, res) => {
@@ -171,6 +174,176 @@ export const postVenta = async (req, res) => {
   }
 };
 
+//Crear una venta mediante una reserva
+//Se registra desde el webhook de MercadoPago
+export const registrarVentaMP = async (id_reserva) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // Obtener la reserva y los detalles de la reserva
+    const [reserva] = await connection.query('SELECT * FROM Reservas WHERE id_reserva = ?', [id_reserva]);
+    if (reserva.length === 0) {
+      throw new Error(`Reserva con ID ${id_reserva} no encontrada.`);
+    }
+
+    const { uid_cliente, uid_comercio } = reserva[0];
+
+    const [detalles] = await connection.query('SELECT * FROM DetalleReservas WHERE id_reserva = ?', [id_reserva]);
+    if (detalles.length === 0) {
+      throw new Error(`No se encontraron detalles para la reserva con ID ${id_reserva}.`);
+    }
+
+    // Calcular el total de la venta
+    const total = detalles.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+    //generamos el codigo de retiro
+    const codigo_retiro = generarCodigoDeRetiro();
+    // Crear la venta
+    const [ventaResult] = await connection.query(
+      'INSERT INTO Ventas (uid_comercio, uid_cliente, total, metodo_pago, fecha_venta, estado, codigo_retiro) VALUES (?, ?, ?, ?, NOW(), "FINALIZADA")',
+      [uid_comercio, uid_cliente, total, "MercadoPago", codigo_retiro]
+    );
+    const id_venta = ventaResult.insertId;
+
+    // Insertar los detalles de la venta y actualizar la cantidad de cada producto
+    for (const item of detalles) {
+      const { id_producto, cantidad, precio } = item;
+
+      // Obtener cantidad disponible del producto
+      const [productoResult] = await connection.query(
+        'SELECT cantidad FROM Productos WHERE id_producto = ?',
+        [id_producto]
+      );
+
+      if (productoResult.length === 0) {
+        throw new Error(`Producto con ID ${id_producto} no encontrado.`);
+      }
+
+      const { cantidad: cantidadDisponible } = productoResult[0];
+
+      // Validar cantidad disponible
+      if (cantidadDisponible < cantidad) {
+        throw new Error(
+          `Cantidad insuficiente para el producto con ID ${id_producto}. Cantidad disponible: ${cantidadDisponible}.`
+        );
+      }
+
+      // Insertar el detalle de la venta
+      const subtotal = cantidad * precio;
+      await connection.query(
+        'INSERT INTO DetallesVenta (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)',
+        [id_venta, id_producto, cantidad, precio, subtotal]
+      );
+
+      // Actualizar la cantidad del producto
+      await connection.query(
+        'UPDATE Productos SET cantidad = cantidad - ? WHERE id_producto = ?',
+        [cantidad, id_producto]
+      );
+    }
+
+    // Actualizar el id_venta en el pago
+    await updatePagoVenta(id_venta, reserva[0].payment_id);
+
+    // Confirmar transacción
+    await connection.commit();
+
+    console.log("Venta registrada con éxito:", {
+      id_venta,
+      id_reserva,
+      total,
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error("Error al registrar la venta:", error);
+  } finally {
+    connection.release();
+  }
+};
+
+
+
+// export const registrarVentaMP = async (id_reserva) => {
+//   const connection = await pool.getConnection();
+//   try {
+//     await connection.beginTransaction();
+
+//     // Obtener la reserva y los detalles de la reserva
+//     const [reserva] = await connection.query('SELECT * FROM Reservas WHERE id_reserva = ?', [id_reserva]);
+//     if (reserva.length === 0) {
+//       throw new Error(`Reserva con ID ${id_reserva} no encontrada.`);
+//     }
+
+//     const { uid_cliente, uid_comercio } = reserva[0];
+
+//     const [detalles] = await connection.query('SELECT * FROM DetalleReservas WHERE id_reserva = ?', [id_reserva]);
+//     if (detalles.length === 0) {
+//       throw new Error(`No se encontraron detalles para la reserva con ID ${id_reserva}.`);
+//     }
+
+//     // Calcular el total de la venta
+//     const total = detalles.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+
+//     // Crear la venta
+//     const [ventaResult] = await connection.query(
+//       'INSERT INTO Ventas (uid_comercio, uid_cliente, total, metodo_pago, fecha_venta, estado) VALUES (?, ?, ?, ?, NOW(), "FINALIZADA")',
+//       [uid_comercio, uid_cliente, total, "mercado-pago"]
+//     );
+//     const id_venta = ventaResult.insertId;
+
+//     // Insertar los detalles de la venta y actualizar la cantidad de cada producto
+//     for (const item of detalles) {
+//       const { id_producto, cantidad, precio } = item;
+
+//       // Obtener cantidad disponible del producto
+//       const [productoResult] = await connection.query(
+//         'SELECT cantidad FROM Productos WHERE id_producto = ?',
+//         [id_producto]
+//       );
+
+//       if (productoResult.length === 0) {
+//         throw new Error(`Producto con ID ${id_producto} no encontrado.`);
+//       }
+
+//       const { cantidad: cantidadDisponible } = productoResult[0];
+
+//       // Validar cantidad disponible
+//       if (cantidadDisponible < cantidad) {
+//         throw new Error(
+//           `Cantidad insuficiente para el producto con ID ${id_producto}. Cantidad disponible: ${cantidadDisponible}.`
+//         );
+//       }
+
+//       // Insertar el detalle de la venta
+//       const subtotal = cantidad * precio;
+//       await connection.query(
+//         'INSERT INTO DetallesVenta (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)',
+//         [id_venta, id_producto, cantidad, precio, subtotal]
+//       );
+
+//       // Actualizar la cantidad del producto
+//       await connection.query(
+//         'UPDATE Productos SET cantidad = cantidad - ? WHERE id_producto = ?',
+//         [cantidad, id_producto]
+//       );
+//     }
+
+//     // Confirmar transacción
+//     await connection.commit();
+
+//     console.log("Venta registrada con éxito:", {
+//       id_venta,
+//       id_reserva,
+//       total,
+//     });
+//   } catch (error) {
+//     await connection.rollback();
+//     console.error("Error al registrar la venta:", error);
+//   } finally {
+//     connection.release();
+//   }
+// };
+
 // Actualizar una venta
 // export const putVenta = async (req, res) => {
 //   const { id_venta } = req.params;
@@ -220,6 +393,8 @@ export const postVenta = async (req, res) => {
 // };
 
 //Actualizar el estado de una venta al ser entregado el producto.
+
+// Actualizar el estado de una venta
 export const putEstadoVenta = async (req, res) => {
   console.log("Datos recibidos:", req.body);
   const { id_venta } = req.params; // ID de la venta desde los parámetros de la solicitud

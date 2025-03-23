@@ -9,11 +9,23 @@ import routerCompras from "./routes/compras.routes.js";
 import routerDetalleVenta from "./routes/detalleVentas.routes.js";
 import routerCategoriasComercio from "./routes/categoriasComercio.routes.js";
 import routerResenas from "./routes/resenas.routes.js";
+import routerMP from "./routes/mercadoPago.routes.js";
+import routerReservas from "./routes/reservas.routes.js";
+import routerPagos from "./routes/pagos.routes.js";
 // import cron from "node-cron.js";
 // import { deleteExpiredOrEmptyProducts } from "./controllers/products.controllers.js";
+//Eliminar productos vencidos o agotados
+// cron.schedule("0 0 * * *", async () => {
+//   try {
+//     console.log("Iniciando limpieza de productos...");
+//     await deleteExpiredOrEmptyProducts();
+//     console.log("Limpieza completada.");
+//   } catch (error) {
+//     console.error("Error en el cron job:", error);
+//   }
+// });
 
 import reportesRoutes from './routes/reporte.routes.js';
-
 //Home
 app.get('/', (req, res) => {
   res.send('Home Page');
@@ -40,20 +52,21 @@ app.use(routerCompras);
 //Categorias Comercio
 app.use(routerCategoriasComercio);
 
+//Reportes
 app.use('/reportes', reportesRoutes);
 
+//Reseñas
 app.use(routerResenas);
 
-//Eliminar productos vencidos o agotados
-// cron.schedule("0 0 * * *", async () => {
-//   try {
-//     console.log("Iniciando limpieza de productos...");
-//     await deleteExpiredOrEmptyProducts();
-//     console.log("Limpieza completada.");
-//   } catch (error) {
-//     console.error("Error en el cron job:", error);
-//   }
-// });
+//MercadoPago
+app.use(routerMP);
+
+//Reservas
+app.use(routerReservas);
+
+//Pagos
+app.use(routerPagos);
+
 
 //Middleware - Ruta no encontrada
 app.use((req, res, next) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getComercioById } from "../../services/comercios";
+import { getComercioAuth, getComercioById } from "../../services/comercios";
 import { useAuth } from "../../context/AuthContext";
 import ItemPerfil from '../../components/ItemPerfil';
 import { useFocusEffect } from '@react-navigation/native';
@@ -9,6 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import ComercioTermsModal from '../TerminosyCond/TermComercio';
 import useLogout from "../../utils/logout";
+import { openBrowserAsync } from 'expo-web-browser';
+import { getAuthURL } from '../../services/mercadoPago';
 
 const PerfilClomercio = () => {
     const handleLogout = useLogout()
@@ -20,6 +22,35 @@ const PerfilClomercio = () => {
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
 
+    //funcion que autoriza a un comercio a recibir pagos por MP
+    const autorizarMP = async () => {
+        try {
+            // Obtenemos la credencial del comercio
+            const comercioAuth = await getComercioAuth(user.uid);
+            console.log(comercioAuth);
+            // Si es igual a null, el comercio no autorizó pagos por MP
+            if (comercioAuth === null) {
+                console.log("No se encuentra comercio");
+                // Obtenemos la URL de autorización
+                const authURL = await getAuthURL();
+                // Redirigimos al comercio a la URL de autorización
+                await openBrowserAsync(authURL);
+
+                // Esperamos 2 segundos
+                setTimeout(async () => {
+                    // Verificamos nuevamente si ahora tiene credenciales
+                    const updatedComercioAuth = await getComercioAuth(user.uid);
+                    Alert.alert("Credenciales actualizadas:", updatedComercioAuth);
+                    console.log("Credenciales actualizadas:", updatedComercioAuth);
+                }, 2000);
+            } else {
+                console.log("Su comercio ya esta autorizado para recibir pagos por MP");
+                Alert.alert("Su comercio ya esta autorizado para recibir pagos por MP");
+            }
+        } catch (error) {
+            console.log("ERROR al autorizar MP:", error);
+        }
+    }
 
     useFocusEffect(
         React.useCallback(() => {
@@ -50,16 +81,16 @@ const PerfilClomercio = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.header}>
-                    <TouchableOpacity
-                                onPress={() => navigation.goBack()}
-                                style={styles.backButton}
-                              >
-                                <Icon name="arrow-left" size={24} color="white" />
-                              </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Mi Perfil</Text>
-                </View>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={styles.backButton}
+                >
+                    <Icon name="arrow-left" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Mi Perfil</Text>
+            </View>
             <View style={styles.container}>
-                
+
                 <Image
                     source={imgPerfil ? { uri: imgPerfil } : require('../../assets/user-default.png')}
                     style={styles.profileImage}
@@ -88,6 +119,11 @@ const PerfilClomercio = () => {
                     <Text style={styles.sectionTitle}>Soporte</Text>
                 </View>
                 <ItemPerfil
+                    title="Configurar Mercado Pago"
+                    icon="credit-card"
+                    onPress={() => { autorizarMP() }}
+                />
+                <ItemPerfil
                     title="Terminos y condiciones"
                     icon="info"
                     onPress={() => setShowTermsModal(true)}
@@ -104,12 +140,14 @@ const PerfilClomercio = () => {
                 />
             </View>
             <ComercioTermsModal
-          visible={showTermsModal}
-          onClose={() => setShowTermsModal(false)}
-        />
+                visible={showTermsModal}
+                onClose={() => setShowTermsModal(false)}
+            />
         </SafeAreaView>
     );
 };
+
+
 
 const styles = StyleSheet.create({
     container: {
@@ -168,7 +206,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         marginRight: 16,
-      },
+    },
 });
 
 export default PerfilClomercio;
