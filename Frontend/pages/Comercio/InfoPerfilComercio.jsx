@@ -110,7 +110,7 @@ const InfoPerfilComercio = ({ route }) => {
                                 <FontAwesome name="close" size={20} color={'black'} />
                             </TouchableOpacity>
                         </View>
-                        <ListaResenas onCrearResena={() => console.log("Abrir modal para crear reseña")} uid_comercio={uid_comercio} />
+                        <ListaResenas uid_comercio={uid_comercio} />
                     </View>
                 </View>
             </Modal>

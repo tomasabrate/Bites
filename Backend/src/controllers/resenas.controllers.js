@@ -22,24 +22,15 @@ export const obtenerResenas = async (req, res) => {
 
 // Crear o actualizar una reseña
 export const crearResena = async (req, res) => {
-    const { uid_cliente, uid_comercio, puntuacion, comentario } = req.body;
-    const token = req.headers.authorization?.split(" ")[1];
+    console.log("Body recibido:", req.body);
 
-    if (!token) {
-        return res.status(401).json({ error: "No autorizado. Token no proporcionado" });
+    const { uid_cliente, uid_comercio, puntuacion, comentario } = req.body;
+
+    if (!uid_cliente || !uid_comercio || !puntuacion || !comentario) {
+        return res.status(400).json({ error: "Faltan datos obligatorios" });
     }
 
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-
-        if (decodedToken.uid !== uid_cliente) {
-            return res.status(403).json({ error: "El UID del token no coincide con el UID proporcionado" });
-        }
-
-        if (!uid_cliente || !uid_comercio || !puntuacion || !comentario) {
-            return res.status(400).json({ error: "Faltan datos obligatorios" });
-        }
-
         const query = `
             INSERT INTO Resenas (uid_cliente, uid_comercio, puntuacion, comentario)
             VALUES (?, ?, ?, ?)
@@ -50,10 +41,11 @@ export const crearResena = async (req, res) => {
 
         res.status(200).json({ message: "Reseña guardada correctamente" });
     } catch (error) {
-        console.error(error);
+        console.error("❌ Error al guardar reseña:", error);
         res.status(500).json({ error: "Error al guardar la reseña" });
     }
 };
+
 
 // Eliminar una reseña
 export const eliminarResena = async (req, res) => {

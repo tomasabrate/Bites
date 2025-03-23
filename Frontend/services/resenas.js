@@ -19,3 +19,27 @@ export const getResenas = async (uid_comercio, page = 1, limit = 10) => {
     throw error;
   }
 };
+
+
+export const postResena = async (data) => {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+    },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+    console.log("Reseña cargada con exito");
+    return await response.json();
+  } catch (error) {
+    console.error("Error al cargar reseña:", error);
+    throw error;
+  }
+};
