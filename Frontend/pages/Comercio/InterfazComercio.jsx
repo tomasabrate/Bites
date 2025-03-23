@@ -139,7 +139,7 @@ export default function InterfazComerciante() {
           <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
           <Text style={styles.tipo}>Cantidad: {item.cantidad}</Text>
         </View>
-        <Image source={item.imagenes || imagenDefault} style={styles.imagen} />
+        <Image source={item.imagenes || imagenDefault} style={styles.imagen} resizeMode="cover"/>
       </View>
       <View style={styles.botonesContainer}>
         <TouchableOpacity
@@ -366,7 +366,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 100,
     marginLeft: 8,
-    resizeMode: "cover",
   },
   modalContainer: {
     flex: 1,

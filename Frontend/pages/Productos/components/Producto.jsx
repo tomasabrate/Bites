@@ -19,7 +19,7 @@ export default function Producto(props) {
   const precioFinal = CalcularDescuento(props.precio, props.descuento);
   return (
     <Pressable onPress={props.onPress} style={styles.card}>
-      <Image source={imagen} style={styles.imagen} />
+      <Image source={imagen} style={styles.imagen} resizeMode="cover"/>
       <View style={styles.content}>
         <Text style={styles.nombre}>
           {props.nombre} - {props.nombre_comercio}
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
   imagen: {
     width: "100%",
     height: 150,
-    resizeMode: "cover",
   },
   content: {
     padding: 16,
