@@ -23,9 +23,7 @@ const InfoPerfilComercio = ({ route }) => {
 
     const obtenerComercio = async () => {
         try {
-            console.log(uid_comercio);
             const data = await getComercioById(uid_comercio);
-            console.log(data);
             setComercio(data);
         } catch (error) {
             setError("Error al obtener comercio. Inténtalo de nuevo más tarde.");

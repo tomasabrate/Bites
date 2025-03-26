@@ -184,5 +184,6 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:33.9.0')
     classpath("com.google.gms:google-services:4.3.10") 
+    implementation 'com.swmansion.reanimated:reanimated:2.14.4'
 
 }

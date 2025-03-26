@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { getResenas } from "../../services/resenas";
+import { getResenas, postResena, getResenasByCliente } from "../../services/resenas";
 import { FontAwesome } from "@expo/vector-icons";
 import { getNombreClienteByUid } from "../../services/clientes";
 import { useAuth } from '../../context/AuthContext';
-import { postResena } from "../../services/resenas";
 
 const ListaResenas = ({ uid_comercio }) => {
     const [resenas, setResenas] = useState([]);
@@ -15,19 +14,38 @@ const ListaResenas = ({ uid_comercio }) => {
     const [agregandoResena, setAgregandoResena] = useState(false);
     const [nuevaResena, setNuevaResena] = useState("");
     const [estrellas, setEstrellas] = useState(0);
+    const [resenaCliente, setResenaCliente] = useState(null);
 
     const { user } = useAuth();
+    const uid_cliente = user.uid;
 
     useEffect(() => {
         cargarResenas();
     }, []);
+
+    useEffect(() => {
+        cargarResenaCliente();
+    }, []);
+
+    const cargarResenaCliente = async () => {
+        console.log("1uid_comercio", uid_comercio);
+        console.log("2uid_cliente", uid_cliente);
+        try {
+            const resenaCliente = await getResenasByCliente(uid_comercio, uid_cliente);
+            console.log("Reseña del cliente:", resenaCliente);
+            setResenaCliente(resenaCliente);
+        } catch (error) {
+            console.error("Error al obtener reseña del cliente:", error);
+            setResenaCliente(null);
+        }
+    };
 
     const cargarResenas = async () => {
         if (loading || !hasMore) return;
         setLoading(true);
 
         try {
-            const nuevasResenas = await getResenas(uid_comercio, page);
+            const nuevasResenas = await getResenas(uid_comercio, uid_cliente, page);
 
             if (nuevasResenas.length === 0) {
                 setHasMore(false);
@@ -63,7 +81,7 @@ const ListaResenas = ({ uid_comercio }) => {
         setLoading(true);
 
         const data = {
-            uid_cliente: user.uid,
+            uid_cliente: uid_cliente,
             uid_comercio: uid_comercio,
             puntuacion: estrellas,
             comentario: nuevaResena,
@@ -71,25 +89,22 @@ const ListaResenas = ({ uid_comercio }) => {
         console.log("Datos antes de enviar:", data);
 
         try {
-
             await postResena(data);
-            console.log("✅ Reseña enviada con éxito");
+            console.log("Reseña enviada con éxito");
 
             const nuevaResenaObj = {
-                uid_cliente,
-                uid_comercio,
+                uid_cliente: uid_cliente,
+                uid_comercio: uid_comercio,
                 puntuacion: estrellas,
                 comentario: nuevaResena,
-                nombre: "Tú",
-                apellido: ""
             };
 
-            setResenas(prevResenas => [nuevaResenaObj, ...prevResenas]);
+            setResenaCliente(nuevaResenaObj);
             setNuevaResena("");
             setEstrellas(0);
             setAgregandoResena(false);
         } catch (error) {
-            console.error("❌ Error al enviar reseña:", error);
+            console.error("Error al enviar reseña:", error);
         }
 
         setLoading(false);
@@ -126,6 +141,23 @@ const ListaResenas = ({ uid_comercio }) => {
                 ListFooterComponent={loading ? <ActivityIndicator size="small" color="#FF6347" /> : null}
             />
 
+            {resenaCliente ? (
+                <View>
+                    <Text style={styles.tituloResena}>Tu reseña</Text>
+                    <View style={styles.resena}>
+                        <Text style={styles.usuario}>Tú</Text>
+                        <Text style={styles.comentario}>{resenaCliente.comentario}</Text>
+                        <Text style={styles.estrellas}>
+                            <FontAwesome name="star" size={16} color={'#c7b300'} /> {resenaCliente.puntuacion}
+                        </Text>
+                    </View>
+                </View>
+            ) : (
+                <Text style={styles.mensajeInvitacion}>
+                    Aún no has dejado una reseña. ¡Comparte tu experiencia!
+                </Text>
+            )}
+
             {agregandoResena && (
                 <View style={{ marginTop: 20, padding: 10, backgroundColor: "#fff2f0", borderRadius: 10 }}>
                     <TextInput
@@ -147,10 +179,14 @@ const ListaResenas = ({ uid_comercio }) => {
                 </View>
             )}
 
-            <TouchableOpacity style={{ marginTop: 20, backgroundColor: "#FF6347", padding: 10, borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center" }} onPress={onCrearResena}>
-                <Icon name="plus" size={20} color="white" />
-                <Text style={{ color: "white", marginLeft: 10 }}>Añadir una reseña</Text>
-            </TouchableOpacity>
+
+            {!agregandoResena && (
+                <TouchableOpacity style={{ marginTop: 20, backgroundColor: "#FF6347", padding: 10, borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center" }} onPress={onCrearResena}>
+                    <Icon name="plus" size={20} color="white" />
+                    <Text style={{ color: "white", marginLeft: 10 }}>{resenaCliente ? "Modificar reseña" : "Añadir una reseña"}</Text>
+                </TouchableOpacity>
+
+            )}
         </View>
     );
 };
@@ -205,7 +241,25 @@ const styles = StyleSheet.create({
         marginTop: 10,
         padding: 10,
         width: "100%",
-      },
+    },
+    mensajeInvitacion: {
+        textAlign: "center",
+        marginTop: 20,
+        fontSize: 16,
+        color: "#666",
+    },
+    resenaUsuario: {
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: "#fff2f0",
+        borderRadius: 10,
+    },
+    tituloResena: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 5,
+        color: "#FF6347",
+    },
 });
 
 export default ListaResenas;

@@ -3,14 +3,14 @@ import { pool } from "../database/connection.js";
 
 // Obtener reseñas por UID del comercio
 export const obtenerResenas = async (req, res) => {
-    const { uid_comercio } = req.params;
+    const { uid_comercio, uid_cliente } = req.params;
     const { page = 1, limit = 10 } = req.query; 
 
     const offset = (page - 1) * limit; 
 
     try {
-        const query = "SELECT * FROM Resenas WHERE uid_comercio = ? LIMIT ? OFFSET ?";
-        const [resenas] = await pool.query(query, [uid_comercio, Number(limit), Number(offset)]);
+        const query = "SELECT * FROM Resenas WHERE uid_comercio = ? AND uid_cliente != ? LIMIT ? OFFSET ?";
+        const [resenas] = await pool.query(query, [uid_comercio, uid_cliente, Number(limit), Number(offset)]);
 
         res.status(200).json(resenas);
     } catch (error) {
@@ -41,7 +41,7 @@ export const crearResena = async (req, res) => {
 
         res.status(200).json({ message: "Reseña guardada correctamente" });
     } catch (error) {
-        console.error("❌ Error al guardar reseña:", error);
+        console.error("Error al guardar reseña:", error);
         res.status(500).json({ error: "Error al guardar la reseña" });
     }
 };
@@ -59,5 +59,24 @@ export const eliminarResena = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error al eliminar la reseña" });
+    }
+};
+
+
+export const obtenerResenasByCliente = async (req, res) => {
+    const { uid_comercio, uid_cliente } = req.params;
+
+    try {
+        const query = "SELECT * FROM Resenas WHERE uid_comercio = ? AND uid_cliente = ?";
+        const [resena] = await pool.query(query, [uid_comercio, uid_cliente]);
+
+        if (resena.length > 0) {
+            res.status(200).json(resena[0]);
+          } else {
+            res.status(404).json({ message: "Resena no encontrada" });
+          }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener reseñas" });
     }
 };

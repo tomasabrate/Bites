@@ -4,7 +4,7 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import TabNavigator from './navigation/TabNavigator';
 import { StatusBar } from 'react-native';
-import 'react-native-reanimated';
+import "react-native-reanimated";
 
 
 import { Buffer } from 'buffer';
