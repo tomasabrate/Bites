@@ -15,21 +15,25 @@ const ListaResenas = ({ uid_comercio }) => {
     const [nuevaResena, setNuevaResena] = useState("");
     const [estrellas, setEstrellas] = useState(0);
     const [resenaCliente, setResenaCliente] = useState(null);
+    const [filtroEstrellas, setFiltroEstrellas] = useState(null);
+
+    console.log("filtro estrellas:", filtroEstrellas);
 
     const { user } = useAuth();
     const uid_cliente = user.uid;
 
     useEffect(() => {
-        cargarResenas();
-    }, []);
-
-    useEffect(() => {
         cargarResenaCliente();
     }, []);
 
+    useEffect(() => {
+        setPage(1);
+        setResenas([]);
+        setHasMore(true);
+        cargarResenas();
+    }, [filtroEstrellas]);
+
     const cargarResenaCliente = async () => {
-        console.log("1uid_comercio", uid_comercio);
-        console.log("2uid_cliente", uid_cliente);
         try {
             const resenaCliente = await getResenasByCliente(uid_comercio, uid_cliente);
             console.log("Reseña del cliente:", resenaCliente);
@@ -45,7 +49,7 @@ const ListaResenas = ({ uid_comercio }) => {
         setLoading(true);
 
         try {
-            const nuevasResenas = await getResenas(uid_comercio, uid_cliente, page);
+            const nuevasResenas = await getResenas(uid_comercio, uid_cliente, page, filtroEstrellas);
 
             if (nuevasResenas.length === 0) {
                 setHasMore(false);
@@ -125,68 +129,87 @@ const ListaResenas = ({ uid_comercio }) => {
     );
 
     return (
-        <View style={styles.container}>
-            {resenas.length === 0 && !loading && (
-                <Text style={{ textAlign: "center", marginVertical: 20, fontSize: 16, color: "#666" }}>
-                    No hay reseñas disponibles.
-                </Text>
-            )}
-
-            <FlatList
-                data={resenas}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                onEndReached={cargarResenas}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={loading ? <ActivityIndicator size="small" color="#FF6347" /> : null}
-            />
-
-            {resenaCliente ? (
-                <View>
-                    <Text style={styles.tituloResena}>Tu reseña</Text>
-                    <View style={styles.resena}>
-                        <Text style={styles.usuario}>Tú</Text>
-                        <Text style={styles.comentario}>{resenaCliente.comentario}</Text>
-                        <Text style={styles.estrellas}>
-                            <FontAwesome name="star" size={16} color={'#c7b300'} /> {resenaCliente.puntuacion}
-                        </Text>
-                    </View>
-                </View>
-            ) : (
-                <Text style={styles.mensajeInvitacion}>
-                    Aún no has dejado una reseña. ¡Comparte tu experiencia!
-                </Text>
-            )}
-
-            {agregandoResena && (
-                <View style={{ marginTop: 20, padding: 10, backgroundColor: "#fff2f0", borderRadius: 10 }}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Escribe tu reseña..."
-                        value={nuevaResena}
-                        onChangeText={setNuevaResena}
-                    />
-                    <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                        {[1, 2, 3, 4, 5].map((num) => (
-                            <TouchableOpacity key={num} onPress={() => setEstrellas(num)} style={{ marginHorizontal: 5 }}>
-                                <Icon name="star" size={24} color={num <= estrellas ? "#c7b300" : "#ccc"} />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                    <TouchableOpacity onPress={guardarResena} style={{ backgroundColor: "#FF6347", padding: 10, borderRadius: 5 }}>
-                        <Text style={{ color: "white", textAlign: "center" }}>Guardar Reseña</Text>
+        <View>
+            <View style={{ flexDirection: "row", justifyContent: "center", marginBottom: 10 }}>
+                {[1, 2, 3, 4, 5].map((num) => (
+                    <TouchableOpacity
+                        key={num}
+                        onPress={() => setFiltroEstrellas(num)}
+                        style={{
+                            padding: 8,
+                            margin: 5,
+                            backgroundColor: filtroEstrellas === num ? "#c7b300" : "#ccc",
+                            borderRadius: 5,
+                        }}
+                    >
+                        <Text style={{ color: "white" }}>{num} ★</Text>
                     </TouchableOpacity>
-                </View>
-            )}
+                ))}
+            </View>
+            <View style={styles.container}>
+                {resenas.length === 0 && !loading && (
+                    <Text style={{ textAlign: "center", marginVertical: 20, fontSize: 16, color: "#666" }}>
+                        No hay reseñas disponibles.
+                    </Text>
+                )}
 
 
-            {!agregandoResena && (
-                <TouchableOpacity style={{ marginTop: 20, backgroundColor: "#FF6347", padding: 10, borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center" }} onPress={onCrearResena}>
-                    <Icon name="plus" size={20} color="white" />
-                    <Text style={{ color: "white", marginLeft: 10 }}>{resenaCliente ? "Modificar reseña" : "Añadir una reseña"}</Text>
-                </TouchableOpacity>
+                <FlatList
+                    data={resenas}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    onEndReached={cargarResenas}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={loading ? <ActivityIndicator size="small" color="#FF6347" /> : null}
+                />
 
-            )}
+                {resenaCliente ? (
+                    <View>
+                        <Text style={styles.tituloResena}>Tu reseña</Text>
+                        <View style={styles.resena}>
+                            <Text style={styles.usuario}>Tú</Text>
+                            <Text style={styles.comentario}>{resenaCliente.comentario}</Text>
+                            <Text style={styles.estrellas}>
+                                <FontAwesome name="star" size={16} color={'#c7b300'} /> {resenaCliente.puntuacion}
+                            </Text>
+                        </View>
+                    </View>
+                ) : (
+                    <Text style={styles.mensajeInvitacion}>
+                        Aún no has dejado una reseña. ¡Comparte tu experiencia!
+                    </Text>
+                )}
+
+                {agregandoResena && (
+                    <View style={{ marginTop: 20, padding: 10, backgroundColor: "#fff2f0", borderRadius: 10 }}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Escribe tu reseña..."
+                            value={nuevaResena}
+                            onChangeText={setNuevaResena}
+                        />
+                        <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                            {[1, 2, 3, 4, 5].map((num) => (
+                                <TouchableOpacity key={num} onPress={() => setEstrellas(num)} style={{ marginHorizontal: 5 }}>
+                                    <Icon name="star" size={24} color={num <= estrellas ? "#c7b300" : "#ccc"} />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        <TouchableOpacity onPress={guardarResena} style={{ backgroundColor: "#FF6347", padding: 10, borderRadius: 5 }}>
+                            <Text style={{ color: "white", textAlign: "center" }}>Guardar Reseña</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+
+                {!agregandoResena && (
+                    <TouchableOpacity style={{ marginTop: 20, backgroundColor: "#FF6347", padding: 10, borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center" }} onPress={onCrearResena}>
+                        <Icon name="plus" size={20} color="white" />
+                        <Text style={{ color: "white", marginLeft: 10 }}>{resenaCliente ? "Modificar reseña" : "Añadir una reseña"}</Text>
+                    </TouchableOpacity>
+
+                )}
+            </View>
         </View>
     );
 };

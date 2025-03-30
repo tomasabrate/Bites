@@ -4,13 +4,24 @@ import { pool } from "../database/connection.js";
 // Obtener reseñas por UID del comercio
 export const obtenerResenas = async (req, res) => {
     const { uid_comercio, uid_cliente } = req.params;
-    const { page = 1, limit = 10 } = req.query; 
+    const { page = 1, limit = 10, puntuacion } = req.query; // Se agrega "puntuacion" como query param
 
-    const offset = (page - 1) * limit; 
+    const offset = (page - 1) * limit;
 
     try {
-        const query = "SELECT * FROM Resenas WHERE uid_comercio = ? AND uid_cliente != ? LIMIT ? OFFSET ?";
-        const [resenas] = await pool.query(query, [uid_comercio, uid_cliente, Number(limit), Number(offset)]);
+        let query = "SELECT * FROM Resenas WHERE uid_comercio = ? AND uid_cliente != ?";
+        let params = [uid_comercio, uid_cliente];
+
+        // Si se especifica una puntuación, agregamos la condición
+        if (puntuacion) {
+            query += " AND puntuacion = ?";
+            params.push(Number(puntuacion));
+        }
+
+        query += " LIMIT ? OFFSET ?";
+        params.push(Number(limit), Number(offset));
+
+        const [resenas] = await pool.query(query, params);
 
         res.status(200).json(resenas);
     } catch (error) {
@@ -18,6 +29,7 @@ export const obtenerResenas = async (req, res) => {
         res.status(500).json({ error: "Error al obtener reseñas" });
     }
 };
+
 
 
 // Crear o actualizar una reseña

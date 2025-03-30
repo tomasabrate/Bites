@@ -2,23 +2,29 @@ import { API_URL_BACK } from "./api_back";
 const API_URL = API_URL_BACK + '/resenas'; 
 
 //OBTENER PRODUCTOS
-export const getResenas = async (uid_comercio, uid_cliente, page = 1, limit = 10) => {
+export const getResenas = async (uid_comercio, uid_cliente, page, puntuacion = null) => {
   try {
-    const response = await fetch(`${API_URL}/${uid_comercio}/${uid_cliente}?page=${page}&limit=${limit}`);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Error ${response.status}: ${response.statusText}`
-      );
-    }
+      let url = `${API_URL}/${uid_comercio}/${uid_cliente}?page=${page}&limit=10`;
+      
+      // Si el usuario seleccionó un número de estrellas, lo agregamos a la URL
+      if (puntuacion) {
+          url += `&puntuacion=${puntuacion}`;
+      }
 
-    return await response.json();
+      const response = await fetch(url);
+
+      if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      return await response.json();
   } catch (error) {
-    console.error("Error al obtener reseñas:", error);
-    throw error;
+      console.error("Error al obtener reseñas:", error);
+      throw error;
   }
 };
+
 
 
 export const postResena = async (data) => {
