@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { getResenas, postResena, getResenasByCliente } from "../../services/resenas";
@@ -18,6 +18,7 @@ const ListaResenas = ({ uid_comercio }) => {
     const [filtroEstrellas, setFiltroEstrellas] = useState(null);
 
     console.log("filtro estrellas:", filtroEstrellas);
+    console.log("page:", page);
 
     const { user } = useAuth();
     const uid_cliente = user.uid;
@@ -32,11 +33,10 @@ const ListaResenas = ({ uid_comercio }) => {
         setHasMore(true);
         cargarResenas();
     }, [filtroEstrellas]);
-
+    
     const cargarResenaCliente = async () => {
         try {
             const resenaCliente = await getResenasByCliente(uid_comercio, uid_cliente);
-            console.log("Reseña del cliente:", resenaCliente);
             setResenaCliente(resenaCliente);
         } catch (error) {
             console.error("Error al obtener reseña del cliente:", error);
@@ -44,15 +44,15 @@ const ListaResenas = ({ uid_comercio }) => {
         }
     };
 
-    const cargarResenas = async () => {
-        if (loading || !hasMore) return;
+    const cargarResenas = useCallback(async () => {
+        if (loading || !hasMore) return; 
         setLoading(true);
-
+    
         try {
             const nuevasResenas = await getResenas(uid_comercio, uid_cliente, page, filtroEstrellas);
-
+    
             if (nuevasResenas.length === 0) {
-                setHasMore(false);
+                setHasMore(false); 
             } else {
                 const resenasConNombres = await Promise.all(
                     nuevasResenas.map(async (resena) => {
@@ -64,16 +64,18 @@ const ListaResenas = ({ uid_comercio }) => {
                         };
                     })
                 );
-
+    
                 setResenas(prevResenas => [...prevResenas, ...resenasConNombres]);
                 setPage(prevPage => prevPage + 1);
+                setHasMore(true); 
             }
         } catch (error) {
             console.error("Error al obtener reseñas:", error);
         }
-
+    
         setLoading(false);
-    };
+    }, [uid_comercio, uid_cliente, page, filtroEstrellas, loading, hasMore]);
+    
 
     const onCrearResena = () => {
         setAgregandoResena(true);
