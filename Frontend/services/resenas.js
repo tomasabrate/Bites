@@ -4,7 +4,7 @@ const API_URL = API_URL_BACK + '/resenas';
 //OBTENER PRODUCTOS
 export const getResenas = async (uid_comercio, uid_cliente, page, puntuacion = null) => {
   try {
-      let url = `${API_URL}/${uid_comercio}/${uid_cliente}?page=${page}&limit=10`;
+      let url = `${API_URL}/${uid_comercio}/${uid_cliente}?page=${Number(page)}&limit=10`;
       
       // Si el usuario seleccionó un número de estrellas, lo agregamos a la URL
       if (puntuacion) {

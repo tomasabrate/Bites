@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { getResenas, postResena, getResenasByCliente } from "../../services/resenas";
@@ -9,7 +9,6 @@ import { useAuth } from '../../context/AuthContext';
 const ListaResenas = ({ uid_comercio }) => {
     const [resenas, setResenas] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [agregandoResena, setAgregandoResena] = useState(false);
     const [nuevaResena, setNuevaResena] = useState("");
@@ -17,8 +16,10 @@ const ListaResenas = ({ uid_comercio }) => {
     const [resenaCliente, setResenaCliente] = useState(null);
     const [filtroEstrellas, setFiltroEstrellas] = useState(null);
 
+    const currentPage = useRef(1);
+
+
     console.log("filtro estrellas:", filtroEstrellas);
-    console.log("page:", page);
 
     const { user } = useAuth();
     const uid_cliente = user.uid;
@@ -28,12 +29,13 @@ const ListaResenas = ({ uid_comercio }) => {
     }, []);
 
     useEffect(() => {
-        setPage(1);
-        setResenas([]);
-        setHasMore(true);
-        cargarResenas();
+        setHasMore(true); // Restablece hasMore para permitir nuevas cargas
+        setLoading(false); // Asegura que no se quede cargando
+        cargarResenas(1, true); // Llama a cargarResenas con reset en true
     }, [filtroEstrellas]);
-    
+
+
+
     const cargarResenaCliente = async () => {
         try {
             const resenaCliente = await getResenasByCliente(uid_comercio, uid_cliente);
@@ -44,38 +46,52 @@ const ListaResenas = ({ uid_comercio }) => {
         }
     };
 
-    const cargarResenas = useCallback(async () => {
-        if (loading || !hasMore) return; 
+
+    const cargarResenas = useCallback(async (page = 1, reset = false) => {
+        if (loading || (!hasMore && !reset)) return;
         setLoading(true);
+    
+        console.log("Cargando página:", page);
     
         try {
             const nuevasResenas = await getResenas(uid_comercio, uid_cliente, page, filtroEstrellas);
     
-            if (nuevasResenas.length === 0) {
-                setHasMore(false); 
-            } else {
-                const resenasConNombres = await Promise.all(
-                    nuevasResenas.map(async (resena) => {
-                        const clienteData = await getNombreClienteByUid(resena.uid_cliente);
-                        return {
-                            ...resena,
-                            nombre: clienteData?.nombre || "Desconocido",
-                            apellido: clienteData?.apellido || "",
-                        };
-                    })
-                );
+            const resenasConNombres = await Promise.all(
+                nuevasResenas.map(async (resena) => {
+                    const clienteData = await getNombreClienteByUid(resena.uid_cliente);
+                    return {
+                        ...resena,
+                        nombre: clienteData?.nombre || "Desconocido",
+                        apellido: clienteData?.apellido || "",
+                    };
+                })
+            );
     
+            if (reset) {
+                setResenas(resenasConNombres);
+                currentPage.current = 2; // Se reinicia el contador de páginas
+                setHasMore(resenasConNombres.length > 0);
+            } else {
                 setResenas(prevResenas => [...prevResenas, ...resenasConNombres]);
-                setPage(prevPage => prevPage + 1);
-                setHasMore(true); 
+    
+                if (resenasConNombres.length > 0) {
+                    currentPage.current++; // Solo se incrementa si hay nuevas reseñas
+                } else {
+                    setHasMore(false);
+                }
             }
         } catch (error) {
             console.error("Error al obtener reseñas:", error);
         }
     
         setLoading(false);
-    }, [uid_comercio, uid_cliente, page, filtroEstrellas, loading, hasMore]);
+    }, [uid_comercio, uid_cliente, filtroEstrellas]);
     
+
+
+    const cambiarFiltroEstrellas = (num) => {
+        setFiltroEstrellas(num === filtroEstrellas ? null : num); // Si ya está seleccionado, lo deselecciona
+    };
 
     const onCrearResena = () => {
         setAgregandoResena(true);
@@ -136,7 +152,7 @@ const ListaResenas = ({ uid_comercio }) => {
                 {[1, 2, 3, 4, 5].map((num) => (
                     <TouchableOpacity
                         key={num}
-                        onPress={() => setFiltroEstrellas(num)}
+                        onPress={() => cambiarFiltroEstrellas(num)}
                         style={{
                             padding: 8,
                             margin: 5,
@@ -156,14 +172,21 @@ const ListaResenas = ({ uid_comercio }) => {
                 )}
 
 
-                <FlatList
-                    data={resenas}
-                    renderItem={renderItem}
-                    keyExtractor={(item, index) => index.toString()}
-                    onEndReached={cargarResenas}
-                    onEndReachedThreshold={0.5}
-                    ListFooterComponent={loading ? <ActivityIndicator size="small" color="#FF6347" /> : null}
-                />
+<FlatList
+    data={resenas}
+    renderItem={renderItem}
+    keyExtractor={(item, index) => index.toString()}
+    onEndReached={() => {
+        if (!loading && hasMore) {
+            cargarResenas(currentPage.current);
+        }
+    }}
+    onEndReachedThreshold={0.5}
+    ListFooterComponent={loading ? <ActivityIndicator size="small" color="#FF6347" /> : null}
+/>
+
+
+
 
                 {resenaCliente ? (
                     <View>
