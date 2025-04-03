@@ -33,7 +33,7 @@ export const createReserva = async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    const { uid_cliente, uid_comercio, estado, carrito } = req.body;
+    const { uid_cliente, estado, carrito } = req.body;
 
     //validamos que el carrito no esté vacío
     if (!carrito || carrito.length <= 0)
@@ -41,8 +41,8 @@ export const createReserva = async (req, res) => {
 
     //fecha de creacion es ahora, y la fecha fin es 30 minutos después
     const [result] = await connection.query(
-      'INSERT INTO Reservas (uid_cliente, uid_comercio, fecha_fin, estado, fecha_creacion) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), ?, NOW())',
-      [uid_cliente, uid_comercio, estado]
+      'INSERT INTO Reservas (uid_cliente, fecha_fin, estado, fecha_creacion) VALUES (?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), ?, NOW())',
+      [uid_cliente, estado]
     );
 
     const id_reserva = result.insertId;
@@ -57,7 +57,6 @@ export const createReserva = async (req, res) => {
     return res.status(201).json({
       id_reserva,
       uid_cliente,
-      uid_comercio,
       fecha_creacion,
       fecha_fin,
       estado
@@ -75,7 +74,7 @@ const createDetalleReserva = async (connection, id_reserva, producto) => {
   try {
     const { id_producto, cantidad, precio } = producto;
     await connection.query(
-      'INSERT INTO DetalleReservas (id_reserva, id_producto, cantidad, precio) VALUES (?, ?, ?, ?)',
+      'INSERT INTO DetalleReserva (id_reserva, id_producto, cantidad, precio) VALUES (?, ?, ?, ?)',
       [id_reserva, id_producto, cantidad, precio]
     );
   } catch (error) {

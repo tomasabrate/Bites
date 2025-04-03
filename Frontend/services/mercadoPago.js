@@ -1,12 +1,12 @@
 import { API_URL_BACK } from "./api_back";
 
-export const createPreference = async (id_reserva, carrito) =>{
+export const createPreference = async (id_reserva, carrito, succesUrl, failureUrl, pendingUrl) =>{
   try {
     const response = await fetch(`${API_URL_BACK}/mercadopago/create-preference`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-      }, body: JSON.stringify({id_reserva, carrito}),
+      }, body: JSON.stringify({id_reserva, carrito, succesUrl, failureUrl, pendingUrl}),
     });
 
     if (!response.ok) {

@@ -35,12 +35,12 @@ export const getPagoByPaymentId = async (req, res) => {
   }
 }
 
-export const createPago = async (estado, payment_id, external_reference, preference_id) => {
+export const createPago = async (estado, payment_id, external_reference,) => {
   const connection = await pool.getConnection();
   try {
     await connection.query(
-      'INSERT INTO Pagos (estado, payment_id, external_reference, preference_id, fecha_creacion) VALUES (?, ?, ?, ?, NOW())',
-      [estado, payment_id, external_reference, preference_id]
+      'INSERT INTO Pagos (estado, payment_id, external_reference,  fecha_creacion) VALUES (?, ?, ?, NOW())',
+      [estado, payment_id, external_reference]
     );
   } catch (error) {
     console.error("Error al crear el pago:", error);

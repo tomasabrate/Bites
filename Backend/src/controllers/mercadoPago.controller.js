@@ -30,7 +30,7 @@ export const webhookMP = async (req, res) => {
       await registrarVentaMP(payment.external_reference);
     } else if (payment.status === "pending") {
       console.log("Pago pendiente");
-      await createPago("pendiente", preference_id = data.id, id_reserva = payment.external_reference); //creamos el pago en nuestra base de datos
+      await createPago("pendiente", payment_id = data.id, id_reserva = payment.external_reference); //creamos el pago en nuestra base de datos
     } else {
       console.log("Pago rechazado");
       await createPago("rechazado", data.id, payment.external_reference); //creamos el pago en nuestra base de datos
@@ -46,7 +46,7 @@ export const webhookMP = async (req, res) => {
 //creamos una preferencia de pago
 export const createPreference = async (req, res) => {
   try {
-    const { carrito, id_reserva } = req.body;
+    const { carrito, id_reserva, succesUrl, failureUrl, pendingUrl } = req.body;
 
     //obtenemos todos los productos del carrito
     const items = carrito.map((item) => ({
@@ -64,11 +64,12 @@ export const createPreference = async (req, res) => {
           text,
         },
         external_reference: id_reserva,//referencia externa para identificar la venta en nuestra base de datos
-        //los back_urls se manejan con DeepLinks, averiguar eso.
-        //back_urls: {
-        //  success: `${process.env.FRONT_URL}/success`,
-        //  failure: `${process.env.FRONT_URL}/failure`,
-        //  pending: `${process.env.FRONT_URL}/pending`,
+        //los back_urls se manejan con DeepLinks, estos son creados en el front y pasados en el body de la request.
+        back_urls: {
+          success: succesUrl,
+          failure: failureUrl,
+          pending: pendingUrl
+        },
         notification_url: `${process.env.API_URL}/mercado-pago/webhook`,//para recibir notificaciones de pago tenemos que exponer nuestro server
         marketplace_fee: 5,
       },
@@ -127,6 +128,7 @@ export const connect = async (code) => {
 export const webhookCodeMP = async (req, res) => {
   try {
     //obtenemos el codigo de autorizacion y el state
+    //Creo que viene en el req.params, probar con ambos
     const { code, state } = req.body;
 
     // Extraer el uid_comercio del state
