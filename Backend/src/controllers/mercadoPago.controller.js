@@ -1,6 +1,6 @@
 import { Payment, MercadoPagoConfig, Preference, OAuth } from "mercadopago";
-import { updateEstadoReserva } from "./reservas.controller";
-import { registrarVentaMP } from "./ventas.controllers";
+import { updateEstadoReserva } from "./reservas.controller.js";
+import { registrarVentaMP } from "./ventas.controllers.js";
 
 const marketplace = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN_MARKETPLACE });
 

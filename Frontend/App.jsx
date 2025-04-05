@@ -10,7 +10,7 @@ global.Buffer = Buffer;
 
 
 export default function App() {
-  const navigationRef = useRef(null);
+  const navigationRef = React.useRef(null);
 
   // Usar el hook para manejo de deep links
   const { createDeepLink, prefix } = useDeepLinks(navigationRef);

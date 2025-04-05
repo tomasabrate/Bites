@@ -15,4 +15,4 @@ routerReservas.post('/reservas', createReserva);
 // routerReservas.put('/reservas/:id', updateEstadoReserva);
 routerReservas.delete('/reservas/:id', deleteReserva);
 
-module.exports = routerReservas;
+export default routerReservas;
