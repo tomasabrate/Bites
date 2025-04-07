@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, ScrollView } from "react-native";
 import {
   View,
   Text,
@@ -15,7 +15,6 @@ import Mapa from "./Mapa";
 import MisCompras from "./MisCompras";
 import Carrito from "./Cart";
 
-
 const InterfazCliente = () => {
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
@@ -26,7 +25,7 @@ const InterfazCliente = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <View style={styles.header}>
         <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
@@ -37,52 +36,54 @@ const InterfazCliente = () => {
 
       {menuVisible && <MenuDesplegable />}
 
-      {currentScreen === 'Inicio' ? (
-        <InicioCliente />
-      ) : currentScreen === 'Maps' ? (
-        <Mapa />
-      ) : currentScreen === 'MisCompras' ? (
-        <MisCompras />
-      ) : currentScreen === 'Carrito' ? (
-        <Carrito />
-      ) : null}
+      <View style={styles.content}>
+        {currentScreen === 'Inicio' ? (
+          <InicioCliente />
+        ) : currentScreen === 'Maps' ? (
+          <Mapa />
+        ) : currentScreen === 'MisCompras' ? (
+          <MisCompras />
+        ) : currentScreen === 'Carrito' ? (
+          <Carrito />
+        ) : null}
+      </View>
 
       <View style={styles.footer}>
-      <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => setCurrentScreen("Inicio")}
-            >
-              <Icon name="home" size={24} color="#FF6347" />
-              <Text style={styles.footerButtonText}>Inicio</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => setCurrentScreen("Maps")}
-            >
-              <Icon name="map-marker" size={24} color="#FF6347" />
-              <Text style={styles.footerButtonText}>Mapa</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => setCurrentScreen("MisCompras")}
-            >
-              <Icon name="list" size={24} color="#FF6347" />
-              <Text style={styles.footerButtonText}>Pedidos</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.footerButton}
-              onPress={() => setCurrentScreen("Carrito")}
-            >
-              <Icon name="shopping-cart" size={24} color="#FF6347" />
-              <Text style={styles.footerButtonText}>Carrito</Text>
-            </TouchableOpacity>
-          </View>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => setCurrentScreen("Inicio")}
+        >
+          <Icon name="home" size={24} color="#FF6347" />
+          <Text style={styles.footerButtonText}>Inicio</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => setCurrentScreen("Maps")}
+        >
+          <Icon name="map-marker" size={24} color="#FF6347" />
+          <Text style={styles.footerButtonText}>Mapa</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => setCurrentScreen("MisCompras")}
+        >
+          <Icon name="list" size={24} color="#FF6347" />
+          <Text style={styles.footerButtonText}>Pedidos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => setCurrentScreen("Carrito")}
+        >
+          <Icon name="shopping-cart" size={24} color="#FF6347" />
+          <Text style={styles.footerButtonText}>Carrito</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
@@ -105,6 +106,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#333333",
+  },
+  content: {
+    flex: 1, // El contenido principal ocupa el espacio restante
   },
   footer: {
     flexDirection: "row",

@@ -1,36 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
-    FlatList,
+    ScrollView,
     View
 } from "react-native";
 
 import Carrusel from "../../pages/Cliente/Carrusel";
 import Productos from "../Productos/Productos";
 
-
 const InicioCliente = () => {
-    const renderItem = ({ item }) => {
-        if (item.type === 'carrusel') {
-            return <Carrusel />;
-        } else if (item.type === 'productos') {
-            return <Productos />;
-        }
-        return null;
-    };
-
-    const data = [
-        { type: 'carrusel' },
-        { type: 'productos' }
-    ];
-    
     return (
-        <View style={{ flex: 1 }}>
-            <FlatList
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-            />
-        </View>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+            <Carrusel />
+            <Productos />
+        </ScrollView>
     );
 };
 

@@ -206,7 +206,6 @@ export default function Productos() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#FFF5F5",
     paddingTop: 20,
   },
