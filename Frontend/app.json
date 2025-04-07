@@ -30,12 +30,8 @@
         "projectId": "f9a32653-5fe7-4ae7-849e-f53c40fac9e5"
       }
     },
-    "scheme": "pjbites"
-  },
-  "plugins":[
-    "expo-file-system",
-    {
-      "photosPermission": "Necesitamos acceso para guardar reportes"
-    }
-  ]
+    "scheme": "pjbites",
+    "jsEngine": "hermes",
+    "newArchEnabled": true
+  }
 }
