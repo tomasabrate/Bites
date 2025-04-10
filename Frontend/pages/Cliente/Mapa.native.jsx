@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, ActivityIndicator, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from "react-native-maps";
 import { getComerciosForMaps } from '../../services/comercios';
 import LoadingScreen from '../../components/LoadingScreen';
+import { useNavigation } from '@react-navigation/native'; 
 
 const Mapa = () => {
+    const navigation = useNavigation(); 
+
     const [origin] = useState({
         latitude: -31.42857647241912,
         longitude: -64.18482463888431,
@@ -31,6 +34,10 @@ const Mapa = () => {
     useEffect(() => {
         obtenerComercios();
     }, []);
+
+    const handleMarkerPress = (comercio) => {
+        navigation.navigate("InfoPerfilComercio", { uid_comercio: comercio.uid_comercio });
+    };
 
     return (
         <View style={styles.container}>
@@ -59,12 +66,14 @@ const Mapa = () => {
                                     title={comercio.nombre_comercio}
                                     description={comercio.direccion}
                                     tracksViewChanges={false}
-                                />
+                                    onPress={() => handleMarkerPress(comercio)}
+                                >
+                                </Marker>
                             ))}
                     </MapView>
+                    {error && <Text style={styles.errorText}>{error}</Text>}
                 </>
             )}
-            {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
     );
 };
