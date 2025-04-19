@@ -1,14 +1,15 @@
 //Server
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
+// import bodyParser from "body-parser";
 const app = express();
-
-//Middleware para entender objetos Json
-app.use(express.json());
 
 //Middleware para aceptar peticiones desde fuera (Cross-Origin Resource Sharing = cors)
 app.use(cors());
+app.options('*', cors()); 
+
+//Middleware para entender objetos Json
+app.use(express.json());
 
 // Aumenta el límite de tamaño de payload para JSON
 // app.use(bodyParser.json({ limit: "100mb" }));

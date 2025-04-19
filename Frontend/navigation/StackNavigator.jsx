@@ -1,5 +1,5 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 
 import Inicio from "../pages/InicioApp/Inicio";
 import IntroScreen from "../pages/InicioApp/IntroScreen";
@@ -23,17 +23,17 @@ import Productos from "../pages/Productos/Productos";
 import DetalleProducto from "../pages/Productos/DetalleProducto";
 import CargarProducto from "../pages/Productos/CargarProducto";
 import ModificarProducto from "../pages/Productos/ModificarProducto";
-import MisVentas from "../pages/Comercio/Ventas/MisVentas"
+import MisVentas from "../pages/Comercio/Ventas/MisVentas";
 import DetalleVenta from "../pages/Comercio/Ventas/DetalleVenta";
 import DetalleUsuario from "../pages/Admin/DetalleUsuario";
-import MisCompras from "../pages/Cliente/MisCompras"
+import MisCompras from "../pages/Cliente/MisCompras";
 import DetalleCompra from "../pages/Cliente/DetalleCompra";
 import ModificarUsuario from "../pages/Admin/ModificarUsuario";
 import PerfilCliente from "../pages/Cliente/PerfilCliente";
 import PerfilComercio from "../pages/Comercio/PerfilComercio";
 import RegistroGoogle from "../pages/Registro/RegistroGoogle";
 import InfoPerfilComercio from "../pages/Comercio/InfoPerfilComercio";
-import ComprobandoPago from '../pages/Cliente/Pagos/ComprobandoPago';
+import ComprobandoPago from "../pages/Cliente/Pagos/ComprobandoPago";
 
 const Stack = createStackNavigator();
 

@@ -53,7 +53,7 @@ export const postComercio = async (req, res) => {
   try {
     const [rows] = await pool.query(
       "INSERT INTO Comercios (uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega, metodos_pago, imagenes, foto_perfil )" +
-      " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
       [
         uid_comercio,
         mail,
@@ -86,7 +86,7 @@ export const postComercio = async (req, res) => {
       costo_entrega,
       metodos_pago,
       imagenes,
-      foto_perfil
+      foto_perfil,
     });
     console.log("Perfil de comercio añadido con exito!", req.body);
   } catch (error) {
@@ -94,7 +94,6 @@ export const postComercio = async (req, res) => {
     return res.status(500).send("500 - Error en la base de datos");
   }
 };
-
 
 export const deleteComercio = async (req, res) => {
   const { uid_comercio } = req.params;
@@ -104,15 +103,20 @@ export const deleteComercio = async (req, res) => {
   }
 
   try {
-    const [result] = await pool.query("DELETE FROM Comercios WHERE uid_comercio = ?", [
-      uid_comercio,
-    ]);
+    const [result] = await pool.query(
+      "DELETE FROM Comercios WHERE uid_comercio = ?",
+      [uid_comercio]
+    );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Comercio no encontrado o ya eliminado" });
+      return res
+        .status(404)
+        .json({ message: "Comercio no encontrado o ya eliminado" });
     }
 
-    res.status(200).send(`Comercio con uid ${uid_comercio} eliminado exitosamente`);
+    res
+      .status(200)
+      .send(`Comercio con uid ${uid_comercio} eliminado exitosamente`);
   } catch (error) {
     console.log("ERROR en DELETE comercio.", error);
     return res.status(500).send("500 - Error en la base de datos.");
@@ -122,7 +126,10 @@ export const deleteComercio = async (req, res) => {
 export const deleteLogicoCormecio = async (req, res) => {
   const { uid_comercio } = req.params;
   try {
-    const [result] = await pool.query("UPDATE Comercios SET activo = 0 WHERE uid_comercio = ?", [uid_comercio]);
+    const [result] = await pool.query(
+      "UPDATE Comercios SET activo = 0 WHERE uid_comercio = ?",
+      [uid_comercio]
+    );
     console.log("El comercio se dio de baja correctamente.");
     res.status(200).json(result);
   } catch (error) {
@@ -134,8 +141,22 @@ export const deleteLogicoCormecio = async (req, res) => {
 export const putComercio = async (req, res) => {
   console.log("Datos recibidos:", req.body);
   const { uid_comercio } = req.params;
-  const { mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega, costo_entrega,
-    metodos_pago, imagenes, activo, foto_perfil } = req.body;
+  const {
+    mail,
+    nombre_comercio,
+    id_categoria,
+    descripcion,
+    direccion,
+    telefono,
+    horario_apertura,
+    horario_cierre,
+    zonas_entrega,
+    costo_entrega,
+    metodos_pago,
+    imagenes,
+    activo,
+    foto_perfil,
+  } = req.body;
 
   try {
     let query = `
@@ -144,8 +165,21 @@ export const putComercio = async (req, res) => {
       zonas_entrega = ?, costo_entrega = ?, metodos_pago = ?, imagenes = ?, activo = ?, foto_perfil = ?`;
 
     const values = [
-      uid_comercio, mail, nombre_comercio, id_categoria, descripcion, direccion, telefono, horario_apertura, horario_cierre, zonas_entrega,
-      costo_entrega, metodos_pago, imagenes, activo, foto_perfil
+      uid_comercio,
+      mail,
+      nombre_comercio,
+      id_categoria,
+      descripcion,
+      direccion,
+      telefono,
+      horario_apertura,
+      horario_cierre,
+      zonas_entrega,
+      costo_entrega,
+      metodos_pago,
+      imagenes,
+      activo,
+      foto_perfil,
     ];
 
     query += ` WHERE uid_comercio = ?`;
@@ -170,7 +204,9 @@ export const putComercio = async (req, res) => {
 
 export const getComerciosForMaps = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT uid_comercio, nombre_comercio, lat, lon, foto_perfil, direccion FROM Comercios WHERE lat is not null && lon is not null;");
+    const [result] = await pool.query(
+      "SELECT uid_comercio, nombre_comercio, lat, lon, foto_perfil, direccion FROM Comercios WHERE lat is not null && lon is not null;"
+    );
     console.log("Lista de Comercios:", result);
     res.status(200).json(result);
   } catch (error) {
@@ -182,21 +218,35 @@ export const getComerciosForMaps = async (req, res) => {
 //averiguamos si el comercio tiene credenciales de marketplace, es decir, si ya se autorizo a MP para hacer pagos en su nombre
 export const getComercioCredentialsMP = async (req, res) => {
   try {
-    const { uid_comercio } = req.body;
-    const [result] = await pool.query("SELECT credentialsMP FROM Comercios WHERE uid_comercio = ?", [uid_comercio]);
-    console.log("Marketplace del comercio:", result);
+    const { uid_comercio } = req.params;
+    console.log(uid_comercio)
+    const [result] = await pool.query(
+      "SELECT credentialsMP FROM Comercios WHERE uid_comercio = ?",
+      [uid_comercio]
+    );
+    console.log("Marketplace del comercio:", result[0]);
     res.status(200).json(result);
-
   } catch (error) {
     console.log("ERROR en GET marketplace de Comercios.", error);
     return res.status(500).send("500 - Error en la base de datos.");
   }
-}
+};
 
 //actualizamos las credenciales de MP del comercio
-export const updateComercioCredentialsMP = async (credentials, uid_comercio) => {
+export const updateComercioCredentialsMP = async (
+  credentials,
+  uid_comercio
+) => {
   try {
-    const [result] = await pool.query("UPDATE Comercios SET credentialsMP = ? WHERE uid_comercio = ?", [credentials.access_token, uid_comercio]);
+    console.log(
+      "INICIO ACTUALIZACION DE CREDENCIALES",
+      credentials.access_token,
+      uid_comercio
+    );
+    const [result] = await pool.query(
+      "UPDATE Comercios SET credentialsMP = ? WHERE uid_comercio = ?",
+      [credentials.access_token, uid_comercio]
+    );
     if (result.affectedRows === 0) {
       console.log("Comercio no encontrado");
       return "Comercio no encontrado";
@@ -206,4 +256,4 @@ export const updateComercioCredentialsMP = async (credentials, uid_comercio) => 
   } catch (error) {
     console.log("Error al actualizar credenciales del comercio", error);
   }
-}
+};

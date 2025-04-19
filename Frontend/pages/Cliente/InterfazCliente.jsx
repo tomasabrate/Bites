@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    paddingBottom: 60,
   },
   header: {
     flexDirection: "row",
@@ -113,6 +114,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#EEEEEE",
     backgroundColor: "#FFFFFF",
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
   },
   footerButton: {
     alignItems: "center",

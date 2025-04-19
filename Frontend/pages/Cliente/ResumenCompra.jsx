@@ -16,15 +16,15 @@ import { postVenta } from "../../services/ventas";
 import { useAuth } from "../../context/AuthContext";
 import { generarCodigoDeRetiro } from "../../utils/generarCodigoDeRetiro";
 import { openBrowserAsync } from "expo-web-browser";
-import { get } from "@react-native-firebase/database";
-import { getAuthURL } from "../../services/mercadoPago";
+// import { get } from "@react-native-firebase/database";
+import { getAuthURL, createPreference } from "../../services/mercadoPago";
 import { getComercioAuth } from "../../services/comercios";
 import { createReserva } from "../../services/reservas";
 import { useDeepLinks } from "../../hooks/useDeepLinks";
 
 export default function ResumenCompra({ navigation }) {
   const { carrito, vaciarCarrito } = useCart();
-  const { createDeepLink } = useDeepLinks()
+  const { createDeepLink } = useDeepLinks();
   const { user } = useAuth();
   const uid_cliente = user.uid;
 
@@ -42,7 +42,7 @@ export default function ResumenCompra({ navigation }) {
       (acc, producto) =>
         acc +
         CalcularDescuento(producto.precio, producto.descuento) *
-        producto.cantidad,
+          producto.cantidad,
       0
     );
     const descuento = subtotal - subTotalConDescuento;
@@ -81,10 +81,10 @@ export default function ResumenCompra({ navigation }) {
   //   }
   // };
 
-
   const HandleCompra = async () => {
     try {
       if (metodoPago === "mercado-pago") {
+        const uid_comercio = carrito[0].uid_comercio;
         const comercioAuth = getComercioAuth(uid_comercio);
         //Si es null, el comercio no autorizo para cobrar con Mercado Pago
         if (comercioAuth === null) {
@@ -93,33 +93,66 @@ export default function ResumenCompra({ navigation }) {
           return;
         }
         //creamos la reserva de los productos en estado PENDIENTE
-        const reserva = await createReserva(uid_cliente, carrito, "PENDIENTE");
+        const reserva = await createReserva(
+          uid_cliente,
+          uid_comercio,
+          carrito,
+          "PENDIENTE"
+        );
         console.log("Reserva creada: ", reserva);
 
         // Crear URLs de retorno usando expo-linking (más robusto)
-        const successUrl = createDeepLink('payment/success');
-        const failureUrl = createDeepLink('payment/failure');
-        const pendingUrl = createDeepLink('payment/pending');
+        const successUrl = createDeepLink("payment/success");
+        const failureUrl = createDeepLink("payment/failure");
+        const pendingUrl = createDeepLink("payment/pending");
 
         //creamos la preferencia de pago pasando el id_reserva como external_reference
-        const preference = await createPreference(reserva.id_reserva, carrito, successUrl, failureUrl, pendingUrl);
+        const preference = await createPreference(
+          reserva.id_reserva,
+          carrito,
+          successUrl,
+          failureUrl,
+          pendingUrl
+        );
         console.log("Preference creada: ", preference);
 
         //abrimos el navegador con la url de la preferencia de pago
-        result = await openBrowserAsync(preference.init_point);
+        result = await openBrowserAsync(preference.preference.init_point);
         console.log("Browser result: ", result);
 
         //navegamos a la pantalla de comprobando pago pasando el id del pago
         //creo que esta navegacion se hace con las "back_urls:" de la preferencia de pago
         // navigation.navigate("ComprobandoPago", { payment_id: preference.payment_id });
       } else {
-        //creamos la venta con el método de pago seleccionado
-
+        const codigo_retiro = generarCodigoDeRetiro();
+        try {
+          await postVenta({
+            carrito,
+            total,
+            metodoPago,
+            metodoEnvio,
+            uid_cliente,
+            codigo_retiro,
+          });
+          console.log("Compra confirmada: ", {
+            carrito,
+            total,
+            metodoPago,
+            metodoEnvio,
+            uid_cliente,
+            codigo_retiro,
+          });
+          vaciarCarrito();
+          navigation.navigate("MisCompras");
+        } catch (err) {
+          console.error(err);
+          alert("Error: " + err);
+        }
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const RadioButton = ({ value, label, selected, onSelect }) => (
     <TouchableOpacity

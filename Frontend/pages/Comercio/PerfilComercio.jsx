@@ -29,10 +29,10 @@ const PerfilClomercio = () => {
             const comercioAuth = await getComercioAuth(user.uid);
             console.log(comercioAuth);
             // Si es igual a null, el comercio no autorizó pagos por MP
-            if (comercioAuth === null) {
+            if (comercioAuth.length === 0 || comercioAuth === null) {
                 console.log("No se encuentra comercio");
                 // Obtenemos la URL de autorización
-                const authURL = await getAuthURL();
+                const authURL = await getAuthURL(user.uid);
                 // Redirigimos al comercio a la URL de autorización
                 await openBrowserAsync(authURL);
 

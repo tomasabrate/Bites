@@ -176,7 +176,7 @@ export const postVenta = async (req, res) => {
 
 //Crear una venta mediante una reserva
 //Se registra desde el webhook de MercadoPago
-export const registrarVentaMP = async (id_reserva) => {
+export const registrarVentaMP = async (id_reserva, total) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
@@ -189,18 +189,17 @@ export const registrarVentaMP = async (id_reserva) => {
 
     const { uid_cliente, uid_comercio } = reserva[0];
 
-    const [detalles] = await connection.query('SELECT * FROM DetalleReservas WHERE id_reserva = ?', [id_reserva]);
+    const [detalles] = await connection.query('SELECT * FROM DetalleReserva WHERE id_reserva = ?', [id_reserva]);
     if (detalles.length === 0) {
       throw new Error(`No se encontraron detalles para la reserva con ID ${id_reserva}.`);
     }
 
-    // Calcular el total de la venta
-    const total = detalles.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+    
     //generamos el codigo de retiro
     const codigo_retiro = generarCodigoDeRetiro();
     // Crear la venta
     const [ventaResult] = await connection.query(
-      'INSERT INTO Ventas (uid_comercio, uid_cliente, total, metodo_pago, fecha_venta, estado, codigo_retiro) VALUES (?, ?, ?, ?, NOW(), "FINALIZADA")',
+      'INSERT INTO Ventas (uid_comercio, uid_cliente, total, metodo_pago, fecha_venta, estado, codigo_retiro) VALUES (?, ?, ?, ?, NOW(), "EN CURSO", ?)',
       [uid_comercio, uid_cliente, total, "MercadoPago", codigo_retiro]
     );
     const id_venta = ventaResult.insertId;
@@ -243,7 +242,7 @@ export const registrarVentaMP = async (id_reserva) => {
     }
 
     // Actualizar el id_venta en el pago
-    await updatePagoVenta(id_venta, reserva[0].payment_id);
+    // await updatePagoVenta(id_venta, reserva[0].payment_id);
 
     // Confirmar transacción
     await connection.commit();

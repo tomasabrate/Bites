@@ -1,12 +1,12 @@
 import { API_URL_BACK } from "./api_back";
 
-export const createReserva = async (uid_cliente, carrito, estado) => {
+export const createReserva = async (uid_cliente, uid_comercio, carrito, estado) => {
   try {
     const response = await fetch(`${API_URL_BACK}/reservas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-      }, body: JSON.stringify({uid_cliente, carrito, estado}),
+      }, body: JSON.stringify({uid_cliente, uid_comercio, carrito, estado}),
     });
 
     if (!response.ok) {

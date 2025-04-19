@@ -1,6 +1,7 @@
 //Dependencias
 import { PORT } from "./config.js";
 import app from "./app.js";
+import cors from "cors";
 import routerProductos from "./routes/products.routes.js";
 import routerClientes from "./routes/clientes.routes.js";
 import routerComercios from "./routes/comercio.routes.js";
@@ -12,6 +13,7 @@ import routerResenas from "./routes/resenas.routes.js";
 import routerMP from "./routes/mercadoPago.routes.js";
 import routerReservas from "./routes/reservas.routes.js";
 import routerPagos from "./routes/pagos.routes.js";
+import reportesRoutes from "./routes/reporte.routes.js";
 // import cron from "node-cron.js";
 // import { deleteExpiredOrEmptyProducts } from "./controllers/products.controllers.js";
 //Eliminar productos vencidos o agotados
@@ -25,10 +27,20 @@ import routerPagos from "./routes/pagos.routes.js";
 //   }
 // });
 
-import reportesRoutes from './routes/reporte.routes.js';
+app.use(cors());
+app.options("*", cors());
+
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  console.log('Query:', req.query);
+  console.log('Body:', req.body);
+  next();
+});
+
 //Home
-app.get('/', (req, res) => {
-  res.send('Home Page');
+app.get("/", (req, res) => {
+  res.send("Home Page");
 });
 
 //Productos
@@ -53,7 +65,7 @@ app.use(routerCompras);
 app.use(routerCategoriasComercio);
 
 //Reportes
-app.use('/reportes', reportesRoutes);
+app.use("/reportes", reportesRoutes);
 
 //Reseñas
 app.use(routerResenas);
@@ -67,10 +79,9 @@ app.use(routerReservas);
 //Pagos
 app.use(routerPagos);
 
-
 //Middleware - Ruta no encontrada
 app.use((req, res, next) => {
-  res.status(404).send('404 - Ruta no existente.');
+  res.status(404).send("404 - Ruta no existente.");
 });
 
 app.listen(PORT, () => {

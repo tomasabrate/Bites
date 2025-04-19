@@ -127,7 +127,8 @@ export const getComerciosForMaps = async () => {
 //Si no tiene credenciales, devuelve null
 export const getComercioAuth = async (uid_comercio) => {
   try {
-    const result = await fetch(`${API_URL}/comercio/auth-mercado-pago/:${uid_comercio}`);
+    console.log(uid_comercio)
+    const result = await fetch(`${API_URL}/auth-mercado-pago/${uid_comercio}`);
     if (!result.ok) {
       const errorData = await result.json().catch(() => ({}));
       throw new Error(
