@@ -3,6 +3,7 @@ import { pool } from '../database/connection.js';
 //Importar cloudinary
 import cloudinary from 'cloudinary';
 
+//Estas claves deberian estar en el archivo config.js
 // Configurar Cloudinary
 cloudinary.config({
   cloud_name: 'dturrtxzx',

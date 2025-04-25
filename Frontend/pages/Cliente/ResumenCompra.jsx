@@ -15,15 +15,23 @@ import CalcularDescuento from "../Productos/utilities/calcularDescuento.utilitie
 import { postVenta } from "../../services/ventas";
 import { useAuth } from "../../context/AuthContext";
 import { generarCodigoDeRetiro } from "../../utils/generarCodigoDeRetiro";
+import { openBrowserAsync } from "expo-web-browser";
+// import { get } from "@react-native-firebase/database";
+import { getAuthURL, createPreference } from "../../services/mercadoPago";
+import { getComercioAuth } from "../../services/comercios";
+import { createReserva } from "../../services/reservas";
+import { useDeepLinks } from "../../hooks/useDeepLinks";
 
 export default function ResumenCompra({ navigation }) {
   const { carrito, vaciarCarrito } = useCart();
+  const { createDeepLink } = useDeepLinks();
   const { user } = useAuth();
   const uid_cliente = user.uid;
 
   const [metodoPago, setMetodoPago] = useState("efectivo");
   const [metodoEnvio, setMetodoEnvio] = useState("pickup");
 
+  //calculamos los datos del resumen de la compra y guardamos el calculo mediante useMemo
   const { subtotal, descuento, total, cantidadProductos } = useMemo(() => {
     const costoEnvio = metodoEnvio === "delivery" ? 200 : 0;
     const subtotal = carrito.reduce(
@@ -46,30 +54,103 @@ export default function ResumenCompra({ navigation }) {
     return { subtotal, total, cantidadProductos, descuento };
   }, [carrito, metodoEnvio]);
 
+  // const HandleCompra = async () => {
+  //   const codigo_retiro = generarCodigoDeRetiro();
+  //   try {
+  //     await postVenta({
+  //       carrito,
+  //       total,
+  //       metodoPago,
+  //       metodoEnvio,
+  //       uid_cliente,
+  //       codigo_retiro,
+  //     });
+  //     console.log("Compra confirmada: ", {
+  //       carrito,
+  //       total,
+  //       metodoPago,
+  //       metodoEnvio,
+  //       uid_cliente,
+  //       codigo_retiro,
+  //     });
+  //     vaciarCarrito();
+  //     navigation.navigate("MisCompras");
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Error: " + err);
+  //   }
+  // };
+
   const HandleCompra = async () => {
-    const codigo_retiro = generarCodigoDeRetiro();
     try {
-      await postVenta({
-        carrito,
-        total,
-        metodoPago,
-        metodoEnvio,
-        uid_cliente,
-        codigo_retiro,
-      });
-      console.log("Compra confirmada: ", {
-        carrito,
-        total,
-        metodoPago,
-        metodoEnvio,
-        uid_cliente,
-        codigo_retiro,
-      });
-      vaciarCarrito();
-      navigation.navigate("MisCompras");
+      if (metodoPago === "mercado-pago") {
+        const uid_comercio = carrito[0].uid_comercio;
+        const comercioAuth = getComercioAuth(uid_comercio);
+        //Si es null, el comercio no autorizo para cobrar con Mercado Pago
+        if (comercioAuth === null) {
+          console.log("Comercio no autorizado para cobrar con Mercado Pago");
+          metodoPago = "efectivo";
+          return;
+        }
+        //creamos la reserva de los productos en estado PENDIENTE
+        const reserva = await createReserva(
+          uid_cliente,
+          uid_comercio,
+          carrito,
+          "PENDIENTE"
+        );
+        console.log("Reserva creada: ", reserva);
+
+        // Crear URLs de retorno usando expo-linking (más robusto)
+        const successUrl = createDeepLink("payment/success");
+        const failureUrl = createDeepLink("payment/failure");
+        const pendingUrl = createDeepLink("payment/pending");
+
+        //creamos la preferencia de pago pasando el id_reserva como external_reference
+        const preference = await createPreference(
+          reserva.id_reserva,
+          carrito,
+          successUrl,
+          failureUrl,
+          pendingUrl
+        );
+        console.log("Preference creada: ", preference);
+
+        //abrimos el navegador con la url de la preferencia de pago
+        result = await openBrowserAsync(preference.preference.init_point);
+        console.log("Browser result: ", result);
+
+        //navegamos a la pantalla de comprobando pago pasando el id del pago
+        //creo que esta navegacion se hace con las "back_urls:" de la preferencia de pago
+        // navigation.navigate("ComprobandoPago", { payment_id: preference.payment_id });
+      } else {
+        const codigo_retiro = generarCodigoDeRetiro();
+        try {
+          await postVenta({
+            carrito,
+            total,
+            metodoPago,
+            metodoEnvio,
+            uid_cliente,
+            codigo_retiro,
+          });
+          console.log("Compra confirmada: ", {
+            carrito,
+            total,
+            metodoPago,
+            metodoEnvio,
+            uid_cliente,
+            codigo_retiro,
+          });
+          vaciarCarrito();
+          navigation.navigate("MisCompras");
+        } catch (err) {
+          console.error(err);
+          alert("Error: " + err);
+        }
+      }
     } catch (err) {
-      console.error(err);
-      alert("Error: " + err);
+      console.log(err);
     }
   };
 
