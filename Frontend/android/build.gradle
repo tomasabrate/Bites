@@ -1,3 +1,9 @@
+project.ext.reactNativeVersion = [
+    major: 0,
+    minor: 76,
+    patch: 9
+]
+
 buildscript {
     ext {
         buildToolsVersion = findProperty('android.buildToolsVersion') ?: '35.0.0'
@@ -13,7 +19,7 @@ buildscript {
         maven { url 'https://www.jitpack.io' }
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:8.0.2') // 🔧 FALTABA LA VERSIÓN
+        classpath('com.android.tools.build:gradle:8.0.2') 
         classpath('com.facebook.react:react-native-gradle-plugin')
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
         classpath("com.google.gms:google-services:4.3.10")
