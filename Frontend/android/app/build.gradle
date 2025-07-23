@@ -1,9 +1,6 @@
-plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'com.facebook.react'
-    id 'com.google.gms.google-services'
-}
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -176,8 +173,4 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    implementation platform('com.google.firebase:firebase-bom:33.9.0')
-    implementation 'com.swmansion.reanimated:reanimated:2.14.4'
-
 }

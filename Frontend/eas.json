@@ -1,28 +1,25 @@
 {
+  "cli": {
+    "version": ">= 3.16.0"
+  },
   "build": {
-    "development": {
+    "preview": {
+      "developmentClient": true,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
-      "ios": {
-        "simulator": true
-      }
-    },
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "simulator": true
+      "env": {
+        "EXPO_MODULES_AUTO_LINKING": "1",
+        "EXPO_NO_BUNDLER": "1"
       }
     },
     "production": {
-      "android": {
-        "buildType": "app-bundle"
-      },
-      "ios": {
-        "simulator": false
+      "developmentClient": false,
+      "distribution": "store",
+      "env": {
+        "EXPO_MODULES_AUTO_LINKING": "1",
+        "EXPO_NO_BUNDLER": "1"
       }
     }
   }
