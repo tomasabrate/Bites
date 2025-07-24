@@ -6,7 +6,11 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "platforms": ["android", "ios", "web"],
+    "platforms": [
+      "android",
+      "ios",
+      "web"
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -32,6 +36,9 @@
     },
     "scheme": "pjbites",
     "jsEngine": "hermes",
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
