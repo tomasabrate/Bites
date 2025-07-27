@@ -26,6 +26,9 @@ import { postProducto } from '../../services/productos';
 import { useAuth } from '../../context/AuthContext';
 import { CargaDeImagenes } from '../../utils/cargaDeImagenes';
 
+import { API_URL_BACK } from '../../services/api_back'; 
+const API_URL = API_URL_BACK + '/productos'; 
+
 //Imagenes
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
 
@@ -112,7 +115,7 @@ export default function CargarProducto({ route }) {
       console.log(JSON.stringify(formDataFinal));
       console.log('Datos de las imagenes: ', formDataFinal.imagenes);
 
-      const response = await fetch('http://localhost:3000/productos', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formDataFinal),

@@ -13,6 +13,9 @@ import useLogout from "../../utils/logout";
 const firestore = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 
+import { API_URL_BACK } from '../../services/api_back'; 
+const API_URL = API_URL_BACK + '/productos'; 
+
 const navItems = [
   { name: 'Dashboard', icon: 'bar-chart' },
   { name: 'Productos', icon: 'dropbox' },
@@ -43,7 +46,7 @@ const handleLogout = useLogout()
   const fetchProductsSQL = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:3000/productos');
+      const response = await axios.get(API_URL);
       setProductos(response.data);
     } catch (error) {
       console.error("Error al obtener productos:", error);

@@ -1,6 +1,8 @@
 import { API_URL_BACK } from "./api_back";
 const API_URL = API_URL_BACK + '/productos'; 
 
+console.log("Usando API_URL:", API_URL);
+
 //OBTENER PRODUCTOS
 export const getProductos = async () => {
   try {

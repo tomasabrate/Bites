@@ -17,6 +17,9 @@
     "production": {
       "developmentClient": false,
       "distribution": "store",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EXPO_MODULES_AUTO_LINKING": "1",
         "EXPO_NO_BUNDLER": "1"

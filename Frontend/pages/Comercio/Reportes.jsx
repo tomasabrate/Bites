@@ -26,6 +26,9 @@ import { getAuth } from 'firebase/auth';
 import ExportarExcelButton from '../../components/ExportarExcelButton';
 import ViewShot from 'react-native-view-shot';
 
+import { API_URL_BACK } from '../../services/api_back'; 
+const API_URL = API_URL_BACK + '/reportes'; 
+
 const { width: screenWidth } = Dimensions.get('window');
 const chartHeight = 350;
 const pieChartHeight = 280;
@@ -59,12 +62,12 @@ const Reportes = ({ navigation }) => {
         const token = await user.getIdToken();
 
         const response = await axios.get(
-          `http://localhost:3000/reportes/ventas/${user.uid}`,
+          `${API_URL}/ventas/${user.uid}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         const historicoResponse = await axios.get(
-          `http://localhost:3000/reportes/ventas/historico/${user.uid}`,
+          `${API_URL}/ventas/historico/${user.uid}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
