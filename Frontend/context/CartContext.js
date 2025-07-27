@@ -39,10 +39,18 @@ export const CartProvider = ({ children }) => {
     setCarrito([]);
   }, []);
 
-  //ARREGLAR - Quitar no funciona
   const quitarDelCarrito = useCallback((id_producto) => {
-    const index = carrito.findIndex(id_producto);
-    setCarrito(carrito.toSpliced(index, 1));
+    setCarrito((prevCarrito) => {
+      return prevCarrito.map((item) => {
+        if (item.id_producto === id_producto) {
+          const nuevaCantidad = item.cantidad - 1;
+          return nuevaCantidad > 0
+            ? { ...item, cantidad: nuevaCantidad }
+            : null; // lo marcamos para eliminar si llega a 0
+        }
+        return item;
+      }).filter(Boolean); // eliminamos los `null` (productos con cantidad 0)
+    });
   }, []);
 
 

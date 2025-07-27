@@ -38,7 +38,7 @@ const Cart = () => {
 
   const total = useMemo(() => {
     return carrito.reduce(
-      (acc, producto) => acc + producto.precio * producto.cantidad,
+      (acc, producto) => acc + producto.precio * (1 - producto.descuento / 100) * producto.cantidad,
       0
     );
   }, [productosAgrupados]);
@@ -47,7 +47,9 @@ const Cart = () => {
     <View style={styles.item}>
       <View style={styles.itemInfo}>
         <Text style={styles.productoNombre}>{item.nombre}</Text>
-        <Text style={styles.productoPrecio}>${item.precio}</Text>
+        <Text style={styles.productoPrecio}>
+          ${(item.precio * (1 - item.descuento / 100)).toFixed(2)}
+        </Text>
       </View>
       <View style={styles.itemActions}>
         <Pressable
@@ -95,12 +97,6 @@ const Cart = () => {
             <Text style={styles.totalAmount}>${total.toFixed(2)}</Text>
           </View>
           <View style={styles.buttonContainer}>
-            <BotonGenerico
-              title="Volver a Comprar"
-              onPress={() => navigation.goBack()}
-              colorInicial="#ff6347"
-              colorPressed="#e5573e"
-            />
             <BotonGenerico
               title="Vaciar carrito"
               onPress={vaciarCarrito}
