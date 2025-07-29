@@ -143,7 +143,7 @@ export default function ResumenCompra({ navigation }) {
             codigo_retiro,
           });
           vaciarCarrito();
-          navigation.navigate("MisCompras");
+          navigation.navigate('InterfazCliente', { initialScreen: 'MisCompras' });
         } catch (err) {
           console.error(err);
           alert("Error: " + err);
@@ -214,18 +214,6 @@ export default function ResumenCompra({ navigation }) {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Método de Pago</Text>
             <RadioButton
-              value="credit-card"
-              label="Tarjeta de Crédito"
-              selected={metodoPago === "credit-card"}
-              onSelect={setMetodoPago}
-            />
-            <RadioButton
-              value="debit-card"
-              label="Tarjeta de Débito"
-              selected={metodoPago === "debit-card"}
-              onSelect={setMetodoPago}
-            />
-            <RadioButton
               value="mercado-pago"
               label="Mercado Pago"
               selected={metodoPago === "mercado-pago"}
@@ -261,7 +249,7 @@ export default function ResumenCompra({ navigation }) {
             )}
           </View>
 
-          <View style={styles.card}>
+           {/*<View style={styles.card}>
             <Text style={styles.cardTitle}>Dirección de Envío</Text>
             <TouchableOpacity style={styles.select}>
               <Text>
@@ -271,7 +259,7 @@ export default function ResumenCompra({ navigation }) {
               </Text>
               <Icon name="chevron-down" size={24} color="#888" />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
 
         <View style={styles.buttonContainer}>
@@ -304,6 +292,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     flexDirection: "row",
     alignItems: "center",
+     paddingTop: 10,
   },
   backButton: {
     marginRight: 16,

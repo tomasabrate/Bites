@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, ScrollView } from "react-native";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  StatusBar,
+  StatusBar
 } from "react-native";
 import MenuDesplegable from "../../pages/Cliente/MenuDesplegable";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import InicioCliente from "./InicioCliente";
 import Mapa from "./Mapa";
 import MisCompras from "./MisCompras";
@@ -17,8 +17,16 @@ import Carrito from "./Cart";
 
 const InterfazCliente = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
   const [menuVisible, setMenuVisible] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('Inicio');
+
+  useEffect(() => {
+    if (route.params?.initialScreen) {
+      setCurrentScreen(route.params.initialScreen);
+    }
+  }, [route.params?.initialScreen]);
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
