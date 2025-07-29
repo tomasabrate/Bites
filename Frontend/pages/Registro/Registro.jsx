@@ -43,6 +43,7 @@ const Registro = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+        <BotonVolverSimple styles={{ paddingTop: 15, alignSelf: 'flex-start' }} />
         <Text style={styles.title}>Inicio de Sesion</Text>
 
         <Text style={styles.label}>Correo Electrónico</Text>
@@ -84,7 +85,7 @@ const Registro = ({ navigation }) => {
           <Text style={styles.submitButtonText}>Registrarse</Text>
         </TouchableOpacity>
       </View>
-      <BotonVolverSimple styles={{ paddingTop: 15 }} />
+      
     </ScrollView>
   );
 };
