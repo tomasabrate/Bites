@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // O la familia de íconos que prefieras
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from "@react-navigation/native";
 import useLogout from "../../utils/logout";
@@ -8,29 +8,49 @@ import useLogout from "../../utils/logout";
 const MenuDeslizanteC = ({ setPaginaActual }) => {
   const handleLogout = useLogout();
   const navigation = useNavigation();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+
   return (
     <View style={styles.menu}>
       <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('PerfilComercio')}>
         <Icon name="user" size={20} color="#000" />
         <Text style={styles.menuText}>Mi Perfil</Text>
       </TouchableOpacity>
+
+      {/* NUEVO: Información del comercio */}
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => navigation.navigate('InfoPerfilComercio', { uid_comercio: user.uid })}
+      >
+        <Icon name="info-circle" size={20} color="#000" />
+        <Text style={styles.menuText}>Información del comercio</Text>
+      </TouchableOpacity>
+
+      {/* NUEVO: Editar información del perfil */}
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => navigation.navigate('EditarPerfilComercio', { uid_comercio: user.uid })}
+      >
+        <Icon name="edit" size={20} color="#000" />
+        <Text style={styles.menuText}>Editar perfil</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Dashboard")}>
         <Icon name="bar-chart" size={20} color="#000" />
-        <Text style={styles.menuText}>Estadisticas</Text>
+        <Text style={styles.menuText}>Estadísticas</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Reportes")}>
         <Icon name="line-chart" size={20} color="#000" />
         <Text style={styles.menuText}>Reportes</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("MisVentas")}>
         <Icon name="bookmark" size={20} color="#000" />
         <Text style={styles.menuText}>Mis Ventas</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.menuItem}
-        onPress={handleLogout}
-      >
+
+      <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
         <Icon name="sign-out" size={20} color="#000" />
         <Text style={styles.menuText}>Cerrar Sesión</Text>
       </TouchableOpacity>
@@ -55,12 +75,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   menuItem: {
-    flexDirection: 'row', // Para alinear el ícono y el texto en fila
-    alignItems: 'center', // Centrar ícono y texto verticalmente
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 10,
   },
   menuText: {
-    marginLeft: 10, // Espacio entre el ícono y el texto
+    marginLeft: 10,
     fontSize: 16,
   },
 });

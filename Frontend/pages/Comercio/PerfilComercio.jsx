@@ -13,7 +13,7 @@ import { openBrowserAsync } from 'expo-web-browser';
 import { getAuthURL } from '../../services/mercadoPago';
 
 const PerfilClomercio = () => {
-    const handleLogout = useLogout()
+    const handleLogout = useLogout();
     const navigation = useNavigation();
     const { user, logout } = useAuth();
 
@@ -22,23 +22,16 @@ const PerfilClomercio = () => {
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
 
-    //funcion que autoriza a un comercio a recibir pagos por MP
     const autorizarMP = async () => {
         try {
-            // Obtenemos la credencial del comercio
             const comercioAuth = await getComercioAuth(user.uid);
             console.log(comercioAuth);
-            // Si es igual a null, el comercio no autorizó pagos por MP
             if (comercioAuth.length === 0 || comercioAuth === null) {
                 console.log("No se encuentra comercio");
-                // Obtenemos la URL de autorización
                 const authURL = await getAuthURL(user.uid);
-                // Redirigimos al comercio a la URL de autorización
                 await openBrowserAsync(authURL);
 
-                // Esperamos 2 segundos
                 setTimeout(async () => {
-                    // Verificamos nuevamente si ahora tiene credenciales
                     const updatedComercioAuth = await getComercioAuth(user.uid);
                     Alert.alert("Credenciales actualizadas:", updatedComercioAuth);
                     console.log("Credenciales actualizadas:", updatedComercioAuth);
@@ -62,13 +55,10 @@ const PerfilClomercio = () => {
                 }
 
                 try {
-                    let data;
-                    data = await getComercioById(user.uid);
-
+                    let data = await getComercioById(user.uid);
                     setNombreComercio(data.nombre_comercio);
                     setImgPerfil(data.foto_perfil);
                     setEmail(data.mail);
-
                 } catch (error) {
                     console.log("No se pudo cargar al usuario:", error);
                 }
@@ -104,7 +94,7 @@ const PerfilClomercio = () => {
                 <ItemPerfil
                     title="Información del comercio"
                     icon="shopping-bag"
-                    onPress={() => navigation.navigate(null)}
+                    onPress={() => navigation.navigate('InfoPerfilComercio', { uid_comercio: user.uid })}
                 />
                 <ItemPerfil
                     title="Editar información del perfil"
@@ -146,8 +136,6 @@ const PerfilClomercio = () => {
         </SafeAreaView>
     );
 };
-
-
 
 const styles = StyleSheet.create({
     container: {

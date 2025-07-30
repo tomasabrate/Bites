@@ -21,6 +21,15 @@ const InfoPerfilComercio = ({ route }) => {
     const [error, setError] = useState(false);
     const [productos, setProductos] = useState(false);
 
+    const [coordenadas, setCoordenadas] = useState(null);
+
+    const generarCoordenadasSimuladas = () => {
+        return {
+            lat: -34.60 + Math.random() * 0.98,
+            lng: -58.38 + Math.random() * 0.95
+        };
+    };
+
     const obtenerComercio = async () => {
         try {
             const data = await getComercioById(uid_comercio);
@@ -46,34 +55,34 @@ const InfoPerfilComercio = ({ route }) => {
     useEffect(() => {
         obtenerComercio();
         obtenerProductos();
+        setCoordenadas(generarCoordenadasSimuladas());
     }, []);
 
-
-    if (loading) {
-        return <LoadingScreen />;
-    }
-
-    if (error) {
-        return (<Text>{error}</Text>);
-    }
+    if (loading) return <LoadingScreen />;
+    if (error) return (<Text>{error}</Text>);
 
     const openCloseModal = () => {
-        if (modalResenaVisible) {
-            setModalResenaVisible(false);
-        } else {
-            setModalResenaVisible(true);
-        };
-    }
+        setModalResenaVisible(!modalResenaVisible);
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <HeaderInfoPerfil comercio={comercio} onPressRating={openCloseModal} />
+
+            {/* 🧭 Coordenadas visibles debajo del Header */}
+            {coordenadas && (
+                <Text style={styles.coordenadasText}>
+                    Coordenadas: {coordenadas.lat.toFixed(4)}, {coordenadas.lng.toFixed(4)}
+                </Text>
+            )}
+
             {loadingProductos ? (
                 <LoadingScreen />
             ) : error ? (
                 <Text style={styles.errorText}>{error}</Text>
             ) : (
                 <FlatList
+                    contentContainerStyle={{ paddingBottom: 20 }}
                     style={styles.flatList}
                     data={productos}
                     keyExtractor={(item) => item.id_producto.toString()}
@@ -95,6 +104,7 @@ const InfoPerfilComercio = ({ route }) => {
                     showsVerticalScrollIndicator={false}
                 />
             )}
+
             <Modal
                 style={styles.modalContainer}
                 transparent={true}
@@ -112,22 +122,16 @@ const InfoPerfilComercio = ({ route }) => {
                     </View>
                 </View>
             </Modal>
-
-
         </SafeAreaView>
     );
 };
-
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: "#f5f5f5",
         padding: 20,
-    },
-    container1: {
-        flexDirection: "row",
-        alignItems: "center",
+        paddingTop: 140, // 👈 espacio suficiente debajo del header
     },
     modalContainer: {
         flex: 1,
@@ -145,13 +149,17 @@ const styles = StyleSheet.create({
     },
     flatList: {
         width: "100%",
-        marginTop: 100
     },
     cerrarModal: {
         alignSelf: "flex-end",
         padding: 10,
+    },
+    coordenadasText: {
+        fontSize: 14,
+        fontWeight: "bold",
+        marginBottom: 10,
+        color: "#555",
     }
 });
-
 
 export default InfoPerfilComercio;
