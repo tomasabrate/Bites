@@ -1,16 +1,13 @@
 {
   "expo": {
-    "name": "pj-bites",
+    "name": "Bites",
     "slug": "pj-bites",
+    "owner": "tomas_abrate",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "platforms": [
-      "android",
-      "ios",
-      "web"
-    ],
+    "platforms": ["android", "ios", "web"],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -37,8 +34,6 @@
     "scheme": "pjbites",
     "jsEngine": "hermes",
     "newArchEnabled": true,
-    "plugins": [
-      "expo-font"
-    ]
+    "plugins": ["expo-font"]
   }
 }

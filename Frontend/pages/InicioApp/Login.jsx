@@ -13,7 +13,7 @@ import {
 import { validate as validateEmail } from 'email-validator';
 import CustomModal from "../../components/CustomModal";
 import * as WebBrowser from 'expo-web-browser'
-import * as Google from 'expo-auth-session/providers/google'
+import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Svg, { Path } from 'react-native-svg';
 import Divider from 'react-native-divider';
@@ -43,11 +43,14 @@ import {
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 const firestore = getFirestore(firebaseApp);
 
+import { makeRedirectUri } from 'expo-auth-session';
+
 let auth;
 if (Platform.OS !== 'web') {
   auth = initializeAuth(firebaseApp, {
     persistence: getReactNativePersistence(ReactNativeAsyncStorage),
   });
+  console.log("Persistencia en androdid o iOS activada", auth);
 } else {
   auth = getAuth(firebaseApp);
   setPersistence(auth, browserLocalPersistence)
@@ -74,13 +77,33 @@ const Login = ({ navigation }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
   // widht min: 820
 
+  const redirectUri = makeRedirectUri({
+    scheme: "pjbites",
+    useProxy: Constants.appOwnership === 'expo' || Platform.OS === 'web',
+  });
+
+  // useProxy: true   -- para usar Expo Go
+  // scheme: "pjbites" -- para usar en la apk / app nativa
+
+  // androidClientId: "450223259168-7737lk4hnlb8olutbnok7qprfs1osm9i.apps.googleusercontent.com",
+  // webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
+  // expoClientId: "450223259168-kf5cts2q84r85tqfiqu3nuda1p778sma.apps.googleusercontent.com",
+
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: "450223259168-rfhmemkmk1k8sppunio88bl2l2rqqqv6.apps.googleusercontent.com",
+    androidClientId: "450223259168-7737lk4hnlb8olutbnok7qprfs1osm9i.apps.googleusercontent.com",
     webClientId: "450223259168-tsl71mm95565km09onfvn7fe0r01o48n.apps.googleusercontent.com",
     expoClientId: "450223259168-kf5cts2q84r85tqfiqu3nuda1p778sma.apps.googleusercontent.com",
     scopes: ["profile", "email"],
-    responseType: "id_token"
-  })
+    responseType: "id_token",
+    redirectUri,
+  });
+
+  useEffect(() => {
+    console.log("=== DEBUG REDIRECT URI ===");
+    console.log("Platform:", Platform.OS);
+    console.log("Execution environment:", Constants.executionEnvironment);
+    console.log("Redirect URI:", redirectUri);
+  }, []);
 
 
   useEffect(() => {
