@@ -20,6 +20,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { getProductoById, putProducto } from "../../services/productos";
 import { CargaDeImagenes } from "../../utils/cargaDeImagenes";
 
+
+
 const categorias = [
   { value: "Comida Rápida", key: 1 },
   { value: "Saludable", key: 2 },
@@ -43,6 +45,8 @@ export default function ModificarProducto() {
   const [cargando, setCargando] = useState(true);
   const [producto, setProducto] = useState(null);
   const [cambioImg, setCambioImg] = useState(false);
+
+  const [guardando, setGuardando] = useState(false);
 
   const {
     handleSubmit,
@@ -88,7 +92,12 @@ export default function ModificarProducto() {
   }, [obtenerProducto]);
 
   const onSubmit = async (data) => {
-    const imagenesFinales = await CargaDeImagenes(data);
+    let imagenesFinales = await CargaDeImagenes(data);
+
+    // Si no se eligieron nuevas imágenes, conservar las actuales
+    if (!imagenesFinales || imagenesFinales.length === 0) {
+      imagenesFinales = producto.imagenes?.split(";") || [];
+    }
 
     const formData = {
       ...data,
@@ -101,7 +110,9 @@ export default function ModificarProducto() {
     };
 
     try {
+      setGuardando(true);
       await putProducto(productoId, formData);
+      setGuardando(false);
       Alert.alert(
         "Producto modificado",
         "El producto se ha modificado exitosamente."
@@ -111,7 +122,18 @@ export default function ModificarProducto() {
     } catch (error) {
       Alert.alert("Error", "No se pudo conectar con el servidor.");
     }
+
+
+    
   };
+
+  if (guardando) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Guardando cambios...</Text>
+      </View>
+    );
+  }
 
   if (cargando || !producto) {
     return (
@@ -221,6 +243,8 @@ export default function ModificarProducto() {
               name="imagenes"
               title="Seleccionar imágenes"
               errors={errors}
+              imagenesIniciales={producto.imagenes?.split(";") || []}
+              setValue={setValue}
             />
           </View>
 

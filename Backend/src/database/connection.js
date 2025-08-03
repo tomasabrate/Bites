@@ -5,7 +5,7 @@ import {
   DB_USER,
   DB_PORT,
 } from '../config.js';
-import mysql from 'mysql2/promise'; //IMPORTANTE agregar el "/promise" que es lo que nos permite usar promesas async await
+import mysql from 'mysql2/promise';
 
 const pool = mysql.createPool(process.env.MYSQL_URL);
 
