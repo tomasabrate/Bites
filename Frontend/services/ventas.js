@@ -1,5 +1,5 @@
 import { API_URL_BACK } from "./api_back";
-const API_URL = API_URL_BACK + '/ventas'; 
+const API_URL = API_URL_BACK + '/ventas';
 
 //OBTENER ventas
 export const getVentas = async () => {
@@ -125,3 +125,29 @@ export const deleteVenta = async (ventaId) => {
   }
 };
 
+export const actualizarEstadoVenta = async (id_venta, estado) => {
+  try {
+    const response = await fetch(`${API_URL_BACK}/ventas/${id_venta}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ estado }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+        `Error ${response.status}: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    console.log("Estado actualizado con éxito:", data);
+    return data;
+  } catch (error) {
+    console.error("ERROR al actualizar estado de venta:", error);
+    throw error;
+  }
+};

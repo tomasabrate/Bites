@@ -10,12 +10,15 @@ import {
   RefreshControl,
   Alert,
   Image,
+  Modal
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
 import { getComprasByCliente } from "../../services/compras";
 import { useAuth } from "../../context/AuthContext";
+import { actualizarEstadoVenta } from "../../services/ventas";
+
 
 const MisCompras = () => {
   const [compras, setCompras] = useState([]);
@@ -24,6 +27,11 @@ const MisCompras = () => {
   const [filtroActual, setFiltroActual] = useState("todos");
   const navigation = useNavigation();
   const { user } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
+  const [cargandoCancelacion, setCargandoCancelacion] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState(null);
+  const [modalTipo, setModalTipo] = useState("info"); 
 
   const fetchCompras = useCallback(async () => {
     if (!user?.uid) {
@@ -32,7 +40,7 @@ const MisCompras = () => {
       setRefreshing(false);
       return;
     }
-  
+
     try {
       const comprasData = await getComprasByCliente(user.uid);
       const comprasOrdenadas = comprasData.sort(
@@ -46,12 +54,12 @@ const MisCompras = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [user?.uid]); 
+  }, [user?.uid]);
 
   useFocusEffect(
     useCallback(() => {
       fetchCompras();
-    }, [fetchCompras]) 
+    }, [fetchCompras])
   );
 
   const getComprasFiltradas = () => {
@@ -67,59 +75,114 @@ const MisCompras = () => {
     }
   };
 
-  const renderCompraItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.compraItem}
-      onPress={() => navigation.navigate("DetalleCompra", { compra: item })}
-    >
-      <View style={styles.compraContent}>
-        <Image
-          source={{
-            uri: item.comercio_imagen || "/placeholder.svg?height=60&width=60",
-          }}
-          style={styles.comercioImagen}
-        />
-        <View style={styles.compraInfo}>
-          <View style={styles.compraHeader}>
-            <Text
-              style={[
-                styles.estadoCompra,
-                {
-                  color:
-                    item.estado === "CANCELADO"
-                      ? "#dc2626"
-                      : item.estado === "EN CURSO"
-                      ? "#FFA500"
-                      : "#4CAF50",
-                },
-              ]}
-            >
-              {item.estado} • {new Date(item.fecha_venta).toLocaleDateString()}{" "}
-              •{" "}
-              {new Date(item.fecha_venta).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}{" "}
+  const abrirModalCancelacion = (venta) => {
+    setVentaSeleccionada(venta);
+    setModalVisible(true);
+  };
+
+  const confirmarCancelacion = async () => {
+    if (!ventaSeleccionada) return;
+
+    setCargandoCancelacion(true);
+
+    try {
+      await actualizarEstadoVenta(ventaSeleccionada.id_venta, "CANCELADO");
+      setModalMensaje("La compra fue cancelada con éxito.");
+      setModalTipo("exito");
+      fetchCompras();
+    } catch (error) {
+      setModalMensaje("No se pudo cancelar la compra. Intenta nuevamente.");
+      setModalTipo("error");
+    } finally {
+      setCargandoCancelacion(false);
+      setModalVisible(false);
+      setVentaSeleccionada(null);
+    }
+  };
+
+
+  const renderCompraItem = ({ item }) => {
+
+    {
+      item.estado === "EN CURSO" && (
+        <TouchableOpacity
+          style={[styles.accionButton, { marginLeft: "auto" }]}
+          onPress={() => abrirModalCancelacion(item)}
+        >
+          <Icon name="x-circle" size={16} color="#dc2626" />
+          <Text style={[styles.accionText, { color: "#dc2626" }]}>Cancelar</Text>
+        </TouchableOpacity>
+      )
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.compraItem}
+        onPress={() => navigation.navigate("DetalleCompra", { compra: item })}
+      >
+        <View style={styles.compraContent}>
+          <Image
+            source={{
+              uri: item.comercio_imagen || "/placeholder.svg?height=60&width=60",
+            }}
+            style={styles.comercioImagen}
+          />
+          <View style={styles.compraInfo}>
+            <View style={styles.compraHeader}>
+              <Text
+                style={[
+                  styles.estadoCompra,
+                  {
+                    color:
+                      item.estado === "CANCELADO"
+                        ? "#dc2626"
+                        : item.estado === "EN CURSO"
+                          ? "#FFA500"
+                          : "#4CAF50",
+                  },
+                ]}
+              >
+                {item.estado} • {new Date(item.fecha_venta).toLocaleDateString()}{" "}
+                •{" "}
+                {new Date(item.fecha_venta).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}{" "}
+              </Text>
+            </View>
+            <Text style={styles.comercioNombre}>{item.nombre_comercio}</Text>
+            <Text style={styles.compraDetalles}>
+              ${item.total} • {item.cantidad_productos} productos
             </Text>
-          </View>
-          <Text style={styles.comercioNombre}>{item.nombre_comercio}</Text>
-          <Text style={styles.compraDetalles}>
-            ${item.total} • {item.cantidad_productos} productos
-          </Text>
-          <View style={styles.compraAcciones}>
-            <TouchableOpacity style={styles.accionButton}>
-              <Icon name="star" size={16} color="#888" />
-              <Text style={styles.accionText}>Opinar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.accionButton}>
-              <Icon name="refresh-ccw" size={16} color="#888" />
-              <Text style={styles.accionText}>Repetir</Text>
-            </TouchableOpacity>
+
+            <View style={styles.compraAcciones}>
+              <TouchableOpacity style={styles.accionButton}>
+                <Icon name="star" size={16} color="#888" />
+                <Text style={styles.accionText}>Opinar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.accionButton}>
+                <Icon name="refresh-ccw" size={16} color="#888" />
+                <Text style={styles.accionText}>Repetir</Text>
+              </TouchableOpacity>
+
+              {item.estado === "EN CURSO" && (
+                <TouchableOpacity
+                  style={[styles.accionButton, { marginLeft: "auto" }]}
+                  onPress={() => abrirModalCancelacion(item)}
+                >
+                  <Icon name="x-circle" size={16} color="#dc2626" />
+                  <Text style={[styles.accionText, { color: "#dc2626" }]}>
+                    Cancelar
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
+
 
   if (loading) {
     return (
@@ -131,73 +194,136 @@ const MisCompras = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-        <View style={styles.filtros}>
-          <TouchableOpacity style={styles.filtroButton}>
-            <Icon name="sliders" size={20} color="#333" />
-            <Text style={styles.filtroButtonText}>Filtros</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.filtroTab,
-              filtroActual === "entregados" && styles.filtroTabActivo,
-            ]}
-            onPress={() =>
-              setFiltroActual(
-                filtroActual === "entregados" ? "todos" : "entregados"
-              )
-            }
-          >
-            <Text style={styles.filtroTabText}>Entregados</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.filtroTab,
-              filtroActual === "cancelados" && styles.filtroTabActivo,
-            ]}
-            onPress={() =>
-              setFiltroActual(
-                filtroActual === "cancelados" ? "todos" : "cancelados"
-              )
-            }
-          >
-            <Text style={styles.filtroTabText}>Cancelados</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.filtroTab,
-              filtroActual === "en curso" && styles.filtroTabActivo,
-            ]}
-            onPress={() =>
-              setFiltroActual(
-                filtroActual === "en curso" ? "todos" : "en curso"
-              )
-            }
-          >
-            <Text style={styles.filtroTabText}>En Curso</Text>
-          </TouchableOpacity>
-        </View>
 
-        {getComprasFiltradas().length === 0 ? (
-          <View style={styles.emptyState}>
-            <Icon name="shopping-bag" size={50} color="#888" />
-            <Text style={styles.emptyStateText}>
-              No hay compras para mostrar
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitulo}>Cancelar compra</Text>
+            <Text style={styles.modalMensaje}>
+              ¿Estás seguro de que querés cancelar esta compra?
             </Text>
+            <Text style={styles.modalMensaje}>
+              Si fue pagada con Mercado Pago, el reembolso se procesará según las políticas de Mercado Pago.
+            </Text>
+            <View style={styles.modalBotones}>
+              <TouchableOpacity
+                style={[styles.modalBoton, { backgroundColor: "#ccc" }]}
+                onPress={() => setModalVisible(false)}
+                disabled={cargandoCancelacion}
+              >
+                <Text style={styles.modalBotonTexto}>No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBoton, { backgroundColor: "#dc2626" }]}
+                onPress={confirmarCancelacion}
+                disabled={cargandoCancelacion}
+              >
+                <Text style={[styles.modalBotonTexto, { color: "#fff" }]}>
+                  {cargandoCancelacion ? "Cancelando..." : "Sí, cancelar"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        ) : (
-          <FlatList
-            data={getComprasFiltradas()}
-            renderItem={renderCompraItem}
-            keyExtractor={(item) => item.id_venta.toString()}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={fetchCompras}
-              />
-            }
-            contentContainerStyle={styles.listContainer}
-          />
-        )}
+        </View>
+      </Modal>
+
+      <View style={styles.filtros}>
+        <TouchableOpacity style={styles.filtroButton}>
+          <Icon name="sliders" size={20} color="#333" />
+          <Text style={styles.filtroButtonText}>Filtros</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.filtroTab,
+            filtroActual === "entregados" && styles.filtroTabActivo,
+          ]}
+          onPress={() =>
+            setFiltroActual(
+              filtroActual === "entregados" ? "todos" : "entregados"
+            )
+          }
+        >
+          <Text style={styles.filtroTabText}>Entregados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.filtroTab,
+            filtroActual === "cancelados" && styles.filtroTabActivo,
+          ]}
+          onPress={() =>
+            setFiltroActual(
+              filtroActual === "cancelados" ? "todos" : "cancelados"
+            )
+          }
+        >
+          <Text style={styles.filtroTabText}>Cancelados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.filtroTab,
+            filtroActual === "en curso" && styles.filtroTabActivo,
+          ]}
+          onPress={() =>
+            setFiltroActual(
+              filtroActual === "en curso" ? "todos" : "en curso"
+            )
+          }
+        >
+          <Text style={styles.filtroTabText}>En Curso</Text>
+        </TouchableOpacity>
+      </View>
+
+      {getComprasFiltradas().length === 0 ? (
+        <View style={styles.emptyState}>
+          <Icon name="shopping-bag" size={50} color="#888" />
+          <Text style={styles.emptyStateText}>
+            No hay compras para mostrar
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={getComprasFiltradas()}
+          renderItem={renderCompraItem}
+          keyExtractor={(item) => item.id_venta.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={fetchCompras}
+            />
+          }
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalMensaje !== null}
+        onRequestClose={() => setModalMensaje(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={[styles.modalTitulo, {
+              color: modalTipo === "error" ? "#dc2626" : "#4CAF50"
+            }]}>
+              {modalTipo === "error" ? "Error" : "Éxito"}
+            </Text>
+            <Text style={styles.modalMensaje}>{modalMensaje}</Text>
+            <TouchableOpacity
+              style={[styles.modalBoton, { backgroundColor: "#ff6347", width: "100%" }]}
+              onPress={() => setModalMensaje(null)}
+            >
+              <Text style={[styles.modalBotonTexto, { color: "#fff" }]}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -315,6 +441,47 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#888",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    alignItems: "center",
+    elevation: 5,
+  },
+  modalTitulo: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalMensaje: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalBotones: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalBoton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  modalBotonTexto: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
 });
 
 export default MisCompras;
