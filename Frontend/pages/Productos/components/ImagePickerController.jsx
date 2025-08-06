@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Controller } from 'react-hook-form';
+import React, { useState, useEffect  } from "react";
+import { Controller } from "react-hook-form";
 import {
   FlatList,
   StyleSheet,
@@ -8,17 +8,25 @@ import {
   Image,
   useWindowDimensions,
   TouchableOpacity,
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import BotonGenerico from '../../../components/BotonGenerico';
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import BotonGenerico from "../../../components/BotonGenerico";
 
 export default function ImagePickerController({
   name,
   control,
   title,
   errors,
+  imagenesIniciales = [],
+  setValue,
 }) {
   const [images, setImages] = useState([]);
+  useEffect(() => {
+    if (imagenesIniciales.length > 0) {
+      setImages(imagenesIniciales);
+      setValue(name, imagenesIniciales); // sincronizás con el formulario
+    }
+  }, [imagenesIniciales]);
   const { width } = useWindowDimensions();
 
   const pickImages = async (onChange) => {
@@ -37,15 +45,15 @@ export default function ImagePickerController({
         onChange(selectedImages);
       }
     } catch (error) {
-      console.error('Error al seleccionar imágenes:', error.message);
+      console.error("Error al seleccionar imágenes:", error.message);
     }
   };
 
   const removeImage = (uri) => {
     const updatedImages = images.filter((image) => image !== uri);
     setImages(updatedImages);
-    //onChange(updatedImages); // Asegúrate de que onChange se pasa aquí
-    control.setValue(name, updatedImages); // Usar control para actualizar el formulario
+    setValue(name, updatedImages);
+
   };
 
   return (
@@ -91,35 +99,35 @@ export default function ImagePickerController({
 
 const styles = StyleSheet.create({
   inputError: {
-    justifyContent: 'space-between',
-    color: 'red',
+    justifyContent: "space-between",
+    color: "red",
     marginBottom: 20,
     marginTop: 10,
     padding: 10,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   imageContainer: {
-    position: 'relative',
-    width: '100%', // Asegura que el contenedor ocupe todo el ancho disponible
+    position: "relative",
+    width: "100%", // Asegura que el contenedor ocupe todo el ancho disponible
     height: 250, // Mantén una altura fija para el contenedor de imágenes
   },
   image: {
-    width: '100%', // Asegura que la imagen ocupe todo el ancho del contenedor
-    height: '100%', // Asegura que la imagen ocupe toda la altura del contenedor
+    width: "100%", // Asegura que la imagen ocupe todo el ancho del contenedor
+    height: "100%", // Asegura que la imagen ocupe toda la altura del contenedor
     borderRadius: 10, // Bordes redondeados (opcional)
   },
   removeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderRadius: 15,
     padding: 5,
   },
   removeImageText: {
-    color: 'red',
+    color: "red",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
