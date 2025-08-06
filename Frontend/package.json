@@ -71,7 +71,6 @@
     "xlsx": "^0.18.5",
     "xlsx-populate": "^1.21.0",
     "yup": "^1.4.0",
-    "expo-modules-core": "~2.2.3",
     "expo-application": "~6.0.2",
     "expo-font": "~13.0.4"
   },
