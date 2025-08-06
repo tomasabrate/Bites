@@ -184,3 +184,50 @@ export const updateEstadoReserva = async (id_reserva, estado) => {
     connection.release();
   }
 };
+
+// Cancelar una reserva (cambia el estado a 'cancelado' solo si está en estado 'pendiente')
+export const cancelarReserva = async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    const { id_reserva } = req.params;
+
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      "SELECT estado FROM Reservas WHERE id_reserva = ?",
+      [id_reserva]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Reserva not found" });
+    }
+
+    const estadoActual = rows[0].estado;
+
+    if (estadoActual !== "pendiente") {
+      return res.status(400).json({
+        message: `No se puede cancelar una reserva en estado '${estadoActual}'`,
+      });
+    }
+
+    await connection.query(
+      "UPDATE Reservas SET estado = 'cancelada', fecha_actualizacion = NOW() WHERE id_reserva = ?",
+      [id_reserva]
+    );
+
+    await connection.commit();
+
+    return res.status(200).json({
+      message: "Reserva cancelada correctamente",
+      id_reserva,
+      nuevo_estado: "cancelada",
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.log(`ERROR al cancelar reserva: ${req.params.id_reserva}`, error);
+    return res.status(500).json({ message: error.message });
+  } finally {
+    connection.release();
+  }
+};
+
