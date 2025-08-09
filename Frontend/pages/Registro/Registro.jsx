@@ -11,7 +11,7 @@ import {
 import firebaseApp from "../../firebase_config";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-import BotonVolverSimple from "../../components/BotonVolverSimple";
+import BotonVolver from "../../components/BotonVolver";
 
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
@@ -43,8 +43,8 @@ const Registro = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <BotonVolverSimple styles={{ paddingTop: 15, alignSelf: 'flex-start' }} />
-        <Text style={styles.title}>Inicio de Sesion</Text>
+        <BotonVolver styles={{ paddingTop: 15, alignSelf: 'flex-start' }} />
+        <Text style={styles.title}>Registro</Text>
 
         <Text style={styles.label}>Correo Electrónico</Text>
         <TextInput

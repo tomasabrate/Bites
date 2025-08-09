@@ -63,7 +63,7 @@ export const getDetallesByIdVenta = async (req, res) => {
     const { id_venta } = req.params;
     const [detalles] = await pool.query(
       `SELECT dv.id_detalleVenta, dv.cantidad, dv.precio_unitario, dv.subtotal,
-              p.nombre as nombre_producto
+              p.nombre as nombre_producto, p.imagenes as imagen_producto
        FROM DetallesVenta dv
        JOIN Productos p ON dv.id_producto = p.id_producto
        WHERE dv.id_venta = ?`,

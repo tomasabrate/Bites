@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getComprasByCliente } from "../../services/compras";
 import { useAuth } from "../../context/AuthContext";
 import { actualizarEstadoVenta } from "../../services/ventas";
+import { getComercioById } from "../../services/comercios";
 
 
 const MisCompras = () => {
@@ -31,7 +32,7 @@ const MisCompras = () => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
   const [cargandoCancelacion, setCargandoCancelacion] = useState(false);
   const [modalMensaje, setModalMensaje] = useState(null);
-  const [modalTipo, setModalTipo] = useState("info"); 
+  const [modalTipo, setModalTipo] = useState("info");
 
   const fetchCompras = useCallback(async () => {
     if (!user?.uid) {
@@ -43,7 +44,28 @@ const MisCompras = () => {
 
     try {
       const comprasData = await getComprasByCliente(user.uid);
-      const comprasOrdenadas = comprasData.sort(
+
+      const comprasConImagenes = await Promise.all(
+        comprasData.map(async (compra) => {
+          try {
+            const comercio = await getComercioById(compra.uid_comercio);
+            return {
+              ...compra,
+              comercio_imagen: comercio?.foto_perfil || null,
+              nombre_comercio: comercio?.nombre_comercio || "Comercio desconocido",
+            };
+          } catch (error) {
+            console.error("Error cargando comercio:", error);
+            return {
+              ...compra,
+              comercio_imagen: null,
+              nombre_comercio: "Comercio desconocido",
+            };
+          }
+        })
+      );
+
+      const comprasOrdenadas = comprasConImagenes.sort(
         (a, b) => new Date(b.fecha_venta) - new Date(a.fecha_venta)
       );
       setCompras(comprasOrdenadas);
@@ -55,6 +77,7 @@ const MisCompras = () => {
       setRefreshing(false);
     }
   }, [user?.uid]);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -127,6 +150,7 @@ const MisCompras = () => {
             }}
             style={styles.comercioImagen}
           />
+
           <View style={styles.compraInfo}>
             <View style={styles.compraHeader}>
               <Text
