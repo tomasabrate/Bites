@@ -27,20 +27,6 @@ const MenuDeslizanteC = ({ setPaginaActual }) => {
         <Text style={styles.menuText}>Información del comercio</Text>
       </TouchableOpacity>
 
-      {/* NUEVO: Editar información del perfil */}
-      <TouchableOpacity
-        style={styles.menuItem}
-        onPress={() => navigation.navigate('EditarPerfilComercio', { uid_comercio: user.uid })}
-      >
-        <Icon name="edit" size={20} color="#000" />
-        <Text style={styles.menuText}>Editar perfil</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Dashboard")}>
-        <Icon name="bar-chart" size={20} color="#000" />
-        <Text style={styles.menuText}>Estadísticas</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.menuItem} onPress={() => setPaginaActual("Reportes")}>
         <Icon name="line-chart" size={20} color="#000" />
         <Text style={styles.menuText}>Reportes</Text>

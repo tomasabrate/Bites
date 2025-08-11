@@ -105,6 +105,16 @@ const PerfilClomercio = () => {
                 <View style={styles.sectionView}>
                     <Text style={styles.sectionTitle}>Actividad</Text>
                 </View>
+                <ItemPerfil
+                    title="Reportes"
+                    icon="pie-chart"
+                    onPress={() => navigation.navigate('Reportes')}
+                />
+                <ItemPerfil
+                    title="Ventas"
+                    icon="bookmark"
+                    onPress={() => navigation.navigate('MisVentas')}
+                />
                 <View style={styles.sectionView}>
                     <Text style={styles.sectionTitle}>Soporte</Text>
                 </View>

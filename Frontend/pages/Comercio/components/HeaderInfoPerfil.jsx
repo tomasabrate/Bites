@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import BotonVolverSimple from '../../../components/BotonVolverSimple';
+import BotonVolver from '../../../components/BotonVolver';
 //import { getColors } from 'react-native-image-colors';
 import EstrellaRating from './EstrellaRating';
 
@@ -34,7 +34,7 @@ const HeaderInfoPerfil = ({ comercio, onPressRating }) => {
         <View style={styles.header}>
             <View style={styles.leftContainer}>
                 <View style={{ position: 'absolute', top: 0, left: 0 }}>
-                    <BotonVolverSimple />
+                    <BotonVolver />
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.title}>{comercio?.nombre_comercio || 'Nombre no disponible'}</Text>

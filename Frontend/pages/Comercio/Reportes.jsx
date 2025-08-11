@@ -25,9 +25,10 @@ import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import ExportarExcelButton from '../../components/ExportarExcelButton';
 import ViewShot from 'react-native-view-shot';
+import BotonVolver from '../../components/BotonVolver';
 
-import { API_URL_BACK } from '../../services/api_back'; 
-const API_URL = API_URL_BACK + '/reportes'; 
+import { API_URL_BACK } from '../../services/api_back';
+const API_URL = API_URL_BACK + '/reportes';
 
 const { width: screenWidth } = Dimensions.get('window');
 const chartHeight = 350;
@@ -381,13 +382,9 @@ const Reportes = ({ navigation }) => {
       contentContainerStyle={[styles.container, { minHeight: windowHeight }]}
       showsVerticalScrollIndicator={false}
     >
-      <TouchableOpacity
-        style={[styles.backButton, { width: windowWidth > 600 ? 140 : 120 }]}
-        onPress={() => navigation.goBack()}
-      >
-        <Icon name="arrow-back" size={24} color="#fff" />
-        <Text style={styles.backButtonText}>Volver</Text>
-      </TouchableOpacity>
+      <View style={{ position: 'absolute', top: 10, left: 10 }}>
+        <BotonVolver />
+      </View>
 
       <Text style={[styles.titulo, { fontSize: windowWidth > 600 ? 28 : 24 }]}>
         Reportes de Ventas

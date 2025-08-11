@@ -9,7 +9,6 @@ import InterfazCliente from "../pages/Cliente/InterfazCliente";
 import MisPedidos from "../pages/Cliente/Mispedidos";
 import Mapa from "../pages/Cliente/Mapa";
 import Cart from "../pages/Cliente/Cart";
-import Dashboard from "../pages/Comercio/Dashboard";
 import Reportes from "../pages/Comercio/Reportes";
 import FloatingButton from "../pages/Comercio/FloatingButton";
 import StatCard from "../pages/Comercio/StatCard";
@@ -62,7 +61,6 @@ export default function StackNavigator() {
       <Stack.Screen name="DetalleProducto" component={DetalleProducto} />
       <Stack.Screen name="CargarProducto" component={CargarProducto} />
       <Stack.Screen name="Carrito" component={Cart} />
-      <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="Reportes" component={Reportes} />
       <Stack.Screen name="MisVentas" component={MisVentas} />
       <Stack.Screen name="DetalleVenta" component={DetalleVenta} />
