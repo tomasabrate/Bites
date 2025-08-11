@@ -4,10 +4,10 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
-  } from "react-native";
+} from "react-native";
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import useLogout from "../../utils/logout";
+import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 
 import firebaseApp from "../../firebase_config";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
@@ -18,9 +18,8 @@ const RegistroGoogle = () => {
     const route = useRoute();
     const { userInfo } = route.params;
 
-    const handleLogout = useLogout();
-
     const [rol, setRol] = useState(false);
+    const [modalCSVisible, setModalCSVisible] = useState(false);
 
     const handleCreateAccount = async (userInfo) => {
         try {
@@ -66,10 +65,16 @@ const RegistroGoogle = () => {
                 >
                     <Text style={styles.submitButtonText}>Continuar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.cancelButton]} onPress={handleLogout}>
+                <TouchableOpacity style={[styles.cancelButton]} onPress={() => setModalCSVisible(true)}>
                     <Text style={styles.submitButtonText}>Cancelar y cerrar sesión</Text>
                 </TouchableOpacity>
             </View>
+
+            <ModalCerrarSesion
+                visible={modalCSVisible}
+                onClose={() => setModalCSVisible(false)}
+            />
+
         </ScrollView>
     );
 };
@@ -153,7 +158,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: "center",
         marginTop: 20,
-      },
+    },
 });
 
 export default RegistroGoogle;

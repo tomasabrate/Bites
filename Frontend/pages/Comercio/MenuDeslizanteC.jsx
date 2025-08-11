@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from "@react-navigation/native";
-import useLogout from "../../utils/logout";
+import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 
 const MenuDeslizanteC = ({ setPaginaActual }) => {
-  const handleLogout = useLogout();
   const navigation = useNavigation();
   const { user } = useAuth();
+
+  const [modalCSVisible, setModalCSVisible] = useState(false);
 
   return (
     <View style={styles.menu}>
@@ -50,10 +51,16 @@ const MenuDeslizanteC = ({ setPaginaActual }) => {
         <Text style={styles.menuText}>Mis Ventas</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => setModalCSVisible(true)}>
         <Icon name="sign-out" size={20} color="#000" />
         <Text style={styles.menuText}>Cerrar Sesión</Text>
       </TouchableOpacity>
+
+      <ModalCerrarSesion
+        visible={modalCSVisible}
+        onClose={() => setModalCSVisible(false)}
+      />
+
     </View>
   );
 };

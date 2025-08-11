@@ -8,12 +8,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import ComercioTermsModal from '../TerminosyCond/TermComercio';
-import useLogout from "../../utils/logout";
+import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 import { openBrowserAsync } from 'expo-web-browser';
 import { getAuthURL } from '../../services/mercadoPago';
 
 const PerfilClomercio = () => {
-    const handleLogout = useLogout();
     const navigation = useNavigation();
     const { user, logout } = useAuth();
 
@@ -21,6 +20,7 @@ const PerfilClomercio = () => {
     const [imgPerfil, setImgPerfil] = useState([]);
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
+    const [modalCSVisible, setModalCSVisible] = useState(false);
 
     const autorizarMP = async () => {
         try {
@@ -126,12 +126,17 @@ const PerfilClomercio = () => {
                     icon="log-out"
                     color={"red"}
                     direccion={false}
-                    onPress={handleLogout}
+                    onPress={() => setModalCSVisible(true)}
                 />
             </View>
             <ComercioTermsModal
                 visible={showTermsModal}
                 onClose={() => setShowTermsModal(false)}
+            />
+
+            <ModalCerrarSesion
+                visible={modalCSVisible}
+                onClose={() => setModalCSVisible(false)}
             />
         </SafeAreaView>
     );

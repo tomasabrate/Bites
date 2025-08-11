@@ -8,10 +8,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import ClientTermsModal from '../TerminosyCond/TermCliente';
-import useLogout from "../../utils/logout";
+import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 
 const PerfilCliente = () => {
-    const handleLogout = useLogout();
     const navigation = useNavigation();
     const { user, logout } = useAuth();
 
@@ -20,6 +19,7 @@ const PerfilCliente = () => {
     const [imgPerfil, setImgPerfil] = useState("");
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
+    const [modalCSVisible, setModalCSVisible] = useState(false);
 
 
     useFocusEffect(
@@ -83,9 +83,6 @@ const PerfilCliente = () => {
                 />
 
                 <View style={styles.sectionView}>
-                    <Text style={styles.sectionTitle}>Actividad</Text>
-                </View>
-                <View style={styles.sectionView}>
                     <Text style={styles.sectionTitle}>Soporte</Text>
                 </View>
                 <ItemPerfil
@@ -101,12 +98,17 @@ const PerfilCliente = () => {
                     icon="log-out"
                     color={"red"}
                     direccion={false}
-                    onPress={handleLogout}
+                    onPress={() => setModalCSVisible(true)}
                 />
             </View>
             <ClientTermsModal
                 visible={showTermsModal}
                 onClose={() => setShowTermsModal(false)}
+            />
+
+            <ModalCerrarSesion
+                visible={modalCSVisible}
+                onClose={() => setModalCSVisible(false)}
             />
         </SafeAreaView>
     );

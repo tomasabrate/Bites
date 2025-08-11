@@ -13,6 +13,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio } from "../../services/categoriasComercio";
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
 import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
+import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 
 import firebaseApp from '../../firebase_config';
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
@@ -31,6 +32,7 @@ const RegistroComercio = () => {
   const [categoriasComercio, setCategoriasComercio] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [imageUri, setImageUri] = useState(null);
+  const [modalCSVisible, setModalCSVisible] = useState(false);
 
 
   const { user, logout } = useAuth();
@@ -275,15 +277,7 @@ const RegistroComercio = () => {
 
           <TouchableOpacity
             style={styles.cerrarSesionButtom}
-            onPress={async () => {
-              try {
-                await logout();
-                navigation.navigate("Login");
-                console.log("Sesión cerrada");
-              } catch (error) {
-                console.error("No se pudo cerrar sesión:", error);
-              }
-            }}
+            onPress={() => setModalCSVisible(true)}
           >
             <Text style={styles.cerrarSesionButtonText}>
               Cerrar Sesión, completar perfil más tarde
@@ -310,6 +304,11 @@ const RegistroComercio = () => {
           </View>
         </View>
       </Modal>
+
+      <ModalCerrarSesion
+        visible={modalCSVisible}
+        onClose={() => setModalCSVisible(false)}
+      />
     </SafeAreaView>
   );
 };

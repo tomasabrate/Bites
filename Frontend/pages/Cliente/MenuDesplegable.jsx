@@ -1,31 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // O la familia de íconos que prefieras
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from "@react-navigation/native";
-import useLogout from "../../utils/logout";
+import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 
 const MenuDesplegable = () => {
-  const handleLogout = useLogout();
   const navigation = useNavigation();
   const { user, logout } = useAuth();
+
+  const [modalCSVisible, setModalCSVisible] = useState(false);
+
   return (
     <View style={styles.menu}>
       <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('PerfilCliente')}>
         <Icon name="user" size={20} color="#000" />
         <Text style={styles.menuText}>Mi Perfil</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem}>
-        <Icon name="cog" size={20} color="#000" />
-        <Text style={styles.menuText}>Configuraciones</Text>
-      </TouchableOpacity>
       <TouchableOpacity
         style={styles.menuItem}
-        onPress={handleLogout}
+        onPress={() => setModalCSVisible(true)}
       >
         <Icon name="sign-out" size={20} color="#000" />
         <Text style={styles.menuText}>Cerrar Sesión</Text>
       </TouchableOpacity>
+
+      <ModalCerrarSesion
+        visible={modalCSVisible}
+        onClose={() => setModalCSVisible(false)}
+      />
+
     </View>
   );
 };
