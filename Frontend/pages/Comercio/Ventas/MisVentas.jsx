@@ -9,8 +9,9 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  SafeAreaView
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
 import { getVentasByComercio } from "../../../services/ventas";

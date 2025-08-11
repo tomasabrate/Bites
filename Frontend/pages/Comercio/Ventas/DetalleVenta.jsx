@@ -11,8 +11,9 @@ import {
   Modal,
   TextInput,
   Alert,
+  SafeAreaView
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getDetallesByIdVenta } from "../../../services/detallesVenta";

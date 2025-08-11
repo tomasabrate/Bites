@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, SafeAreaView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getClienteById } from "../../services/clientes";
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 import BotonVolverSimple from "../../components/BotonVolverSimple";
 import LoadingScreen from "../../components/LoadingScreen";
 

@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getComercioAuth, getComercioById } from "../../services/comercios";
 import { useAuth } from "../../context/AuthContext";
 import ItemPerfil from '../../components/ItemPerfil';
 import { useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import ComercioTermsModal from '../TerminosyCond/TermComercio';
 import ModalCerrarSesion from '../../components/ModalCerrarSesion';
 import { openBrowserAsync } from 'expo-web-browser';
 import { getAuthURL } from '../../services/mercadoPago';
+import BotonVolverSimple from '../../components/BotonVolverSimple';
 
 const PerfilClomercio = () => {
     const navigation = useNavigation();
     const { user, logout } = useAuth();
 
     const [nombreComercio, setNombreComercio] = useState([]);
-    const [imgPerfil, setImgPerfil] = useState([]);
+    const [imgPerfil, setImgPerfil] = useState(null);
     const [email, setEmail] = useState([]);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [modalCSVisible, setModalCSVisible] = useState(false);
@@ -71,18 +72,18 @@ const PerfilClomercio = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.header}>
-                <TouchableOpacity
-                    onPress={() => navigation.goBack()}
-                    style={styles.backButton}
-                >
-                    <Icon name="arrow-left" size={24} color="white" />
-                </TouchableOpacity>
+                <BotonVolverSimple color={"white"} />
                 <Text style={styles.headerTitle}>Mi Perfil</Text>
+                <View style={{ width: 24 }} />
             </View>
             <View style={styles.container}>
 
                 <Image
-                    source={imgPerfil ? { uri: imgPerfil } : require('../../assets/user-default.png')}
+                    source={
+                        imgPerfil && typeof imgPerfil === "string"
+                            ? { uri: imgPerfil }
+                            : require('../../assets/user-default.png')
+                    }
                     style={styles.profileImage}
                 />
                 <Text style={styles.name}>{nombreComercio}</Text>
@@ -196,12 +197,13 @@ const styles = StyleSheet.create({
         padding: 16,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
+        //justifyContent: "space-between",
     },
     headerTitle: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: "bold",
         color: "white",
+        paddingLeft: 10,
     },
     safeArea: {
         flex: 1,

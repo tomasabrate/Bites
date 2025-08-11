@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
+  SafeAreaView
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import { useCart } from "../../context/CartContext";
 import CalcularDescuento from "../Productos/utilities/calcularDescuento.utilities";

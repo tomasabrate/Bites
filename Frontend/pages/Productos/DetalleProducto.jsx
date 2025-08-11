@@ -24,18 +24,6 @@ export default function DetalleProducto({ navigation, route }) {
   const handleAgregarAlCarrito = () => {
     agregarAlCarrito(producto);
     console.log(carrito);
-    console.log("Agregado");
-    Alert.alert(
-      "Producto añadido",
-      `${producto.nombre} ha sido añadido al carrito.`,
-      [
-        {
-          text: "Ir al Carrito",
-          onPress: () => navigation.navigate("Carrito"),
-        },
-        { text: "Cancelar", style: "cancel" },
-      ]
-    );
   };
 
   const tipoProducto = (tipo) => {

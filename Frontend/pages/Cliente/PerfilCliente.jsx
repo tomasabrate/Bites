@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getClienteById } from "../../services/clientes";
 import { useAuth } from "../../context/AuthContext";
 import ItemPerfil from '../../components/ItemPerfil';
 import { useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import ClientTermsModal from '../TerminosyCond/TermCliente';
 import ModalCerrarSesion from '../../components/ModalCerrarSesion';
+import BotonVolverSimple from '../../components/BotonVolverSimple';
 
 const PerfilCliente = () => {
     const navigation = useNavigation();
@@ -52,13 +53,9 @@ const PerfilCliente = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.header}>
-                <TouchableOpacity
-                    onPress={() => navigation.goBack()}
-                    style={styles.backButton}
-                >
-                    <Icon name="arrow-left" size={24} color="white" />
-                </TouchableOpacity>
+                <BotonVolverSimple color={"white"} />
                 <Text style={styles.headerTitle}>Mi Perfil</Text>
+                <View style={{ width: 24 }} />
             </View>
             <View style={styles.container}>
 
@@ -159,12 +156,13 @@ const styles = StyleSheet.create({
         padding: 16,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
+        //justifyContent: "space-between",
     },
     headerTitle: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: "bold",
         color: "white",
+        paddingLeft: 10,
     },
     safeArea: {
         flex: 1,
