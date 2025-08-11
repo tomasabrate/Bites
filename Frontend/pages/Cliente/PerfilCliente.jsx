@@ -75,6 +75,7 @@ const PerfilCliente = () => {
                 <ItemPerfil
                     title="Información personal"
                     icon="user"
+                    onPress={() => navigation.navigate('InfoPersonalCliente', { uid: user.uid })}
                 />
                 <ItemPerfil
                     title="Editar información del perfil"

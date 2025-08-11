@@ -15,6 +15,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { getCategoriasComercio, getCategoriaComercioById } from "../../services/categoriasComercio";
 import SelectorImagenPerfil from "../../components/SelectorImagenPerfil";
 import { CargaDeImagenPerfil } from "../../utils/cargaDeImagenPerfil";
+import BotonVolverSimple from "../../components/BotonVolverSimple";
 
 const categories = ['Postres', 'Comida Saludable', 'Bebidas', 'Viandas', 'Comida Rápida'];
 
@@ -209,6 +210,12 @@ const RegistroCliente = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+
+      <View style={styles.header}>
+        <BotonVolverSimple color={"white"} />
+        <Text style={styles.headerTitle}>Modificar usuario</Text>
+        <View style={{ width: 24 }} />
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           {/* Cliente */}
@@ -320,7 +327,7 @@ const RegistroCliente = () => {
             <>
               <View style={styles.section}>
 
-              <SelectorImagenPerfil initialImage={imgPerfil} onImageSelected={setImageUri} />
+                <SelectorImagenPerfil initialImage={imgPerfil} onImageSelected={setImageUri} />
 
                 <Text style={styles.label}>Nombre del Comercio</Text>
                 <FormInputController
@@ -505,6 +512,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  header: {
+    backgroundColor: "#ff6347",
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    //justifyContent: "space-between",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    paddingLeft: 10,
   },
   container: {
     padding: 20,

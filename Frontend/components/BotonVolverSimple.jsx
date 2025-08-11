@@ -1,5 +1,5 @@
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from '@react-navigation/native';
 import React from "react";
 import { Feather } from '@expo/vector-icons';
@@ -9,7 +9,7 @@ export default function BotonVolver({color}) {
 
     return (
         <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Feather name='chevron-left' size={40} color={color ? color : 'black'} />
+            <Icon name="arrow-left" size={24} color={color ? color : 'white'} />
         </TouchableOpacity>
     );
 }

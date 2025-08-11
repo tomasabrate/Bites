@@ -34,6 +34,7 @@ import PerfilComercio from "../pages/Comercio/PerfilComercio";
 import RegistroGoogle from "../pages/Registro/RegistroGoogle";
 import InfoPerfilComercio from "../pages/Comercio/InfoPerfilComercio";
 import ComprobandoPago from "../pages/Cliente/Pagos/ComprobandoPago";
+import InfoPersonalCliente from '../pages/Cliente/InfoPersonalCliente';
 
 const Stack = createStackNavigator();
 
@@ -82,6 +83,7 @@ export default function StackNavigator() {
       <Stack.Screen name="RegistroGoogle" component={RegistroGoogle} />
       <Stack.Screen name="InfoPerfilComercio" component={InfoPerfilComercio} />
       <Stack.Screen name="ComprobandoPago" component={ComprobandoPago} />
+      <Stack.Screen name="InfoPersonalCliente" component={InfoPersonalCliente} />
     </Stack.Navigator>
   );
 }
