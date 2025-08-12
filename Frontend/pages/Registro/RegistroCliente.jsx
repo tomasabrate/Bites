@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Pressable
 } from 'react-native';
 import ClientTermsModal from '../TerminosyCond/TermCliente';
 import { useAuth } from '../../context/AuthContext';
@@ -49,7 +50,7 @@ const RegistroCliente = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
-  const [textModal, setTextModal] = useState('Continuar');
+  const [textModal, setTextModal] = useState("Continuar");
   const [imageUri, setImageUri] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -88,9 +89,9 @@ const RegistroCliente = () => {
     let imagenFinal = null;
 
     if (imageUri) {
-        imagenFinal = await CargaDeImagenPerfil(imageUri);  
-    } else if (imagenGoogle) {  
-        imagenFinal = imagenGoogle;  
+      imagenFinal = await CargaDeImagenPerfil(imageUri);
+    } else if (imagenGoogle) {
+      imagenFinal = imagenGoogle;
     }
 
     const formData = {
@@ -125,7 +126,7 @@ const RegistroCliente = () => {
       setModalVisible(false);
       navigation.navigate('InterfazCliente');
     } else {
-      setTextModal('Intentar nuevamente');
+      setTextModal("Intentar nuevamente");
       setModalVisible(false);
     }
   };
@@ -319,7 +320,14 @@ const RegistroCliente = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTexto}>{modalMessage}</Text>
-            <BotonGenerico title={textModal} onPress={cerrarModal} />
+            <Pressable style={({ pressed }) => [
+              styles.button,
+              { backgroundColor: pressed ? "#ff8566": "#ff5226" },
+            ]}
+              onPress={cerrarModal} >
+              <Text style={styles.buttonText}>{textModal}</Text>
+            </Pressable>
+            {console.log("Modal message:", textModal)}
           </View>
         </View>
       </Modal>
@@ -486,6 +494,18 @@ const styles = StyleSheet.create({
   section: {
     padding: 5,
     marginTop: 2,
+  },
+  button: {
+    borderRadius: 5,
+    padding: 12,
+    marginHorizontal: 5,
+    margin: 10,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
 

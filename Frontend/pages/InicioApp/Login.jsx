@@ -8,7 +8,8 @@ import {
   TextInput,
   Dimensions,
   Modal,
-  Platform
+  Platform,
+  Pressable
 } from "react-native";
 import { validate as validateEmail } from 'email-validator';
 import CustomModal from "../../components/CustomModal";
@@ -439,8 +440,11 @@ const Login = ({ navigation }) => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTexto}>{textModal}</Text>
               <View style={styles.modalBotones}>
-                <BotonGenerico
-                  title="Salir"
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.button1,
+                    { backgroundColor: pressed ? "#ff8566": "#ff5226" },
+                  ]}
                   onPress={async () => {
                     try {
                       cerrarModal();
@@ -449,7 +453,9 @@ const Login = ({ navigation }) => {
                       console.error('No se pudo cerrar sesión:', error);
                     }
                   }}
-                />
+                >
+                  <Text style={styles.buttonText}>Salir</Text>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -579,6 +585,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 15,
     fontSize: 16,
+  },
+  button1: {
+    borderRadius: 5,
+    padding: 12,
+    marginHorizontal: 5,
+    margin: 10,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
 
