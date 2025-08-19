@@ -496,8 +496,8 @@ const RegistroCliente = () => {
               style={styles.submitButton}
               title="Guardar cambios"
               onPress={handleSubmit(rol === "Cliente" ? onSubmitCliente : onSubmitComercio)}
-              colorInicial="#f44336"
-              colorPressed="#d32f2f"
+              colorInicial="#ff6347"
+              colorPressed="#ff8566"
             />
           </View>
         </View>
