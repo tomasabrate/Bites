@@ -4,14 +4,55 @@
 
 | Ficha Técnica | Detalle |
 | :--- | :--- |
-| **Candidato / Rol** | Ingeniero de Backend & Persistencia |
-| **Enfoque evaluado** | Modelado de datos, arquitectura backend e integración de servicios |
 | **Stack de Persistencia** | MySQL, `mysql2/promise`, SQL parametrizado y pool de conexiones. No se observan ORM, migraciones versionadas ni cache |
 | **Stack de Backend** | Node.js, Express, JavaScript ESM, dotenv, Mercado Pago, Cloudinary y XLSX |
 | **Stack de Consumo (Front)** | React Native/Expo, ejecución web, Fetch API, Axios y Firebase Auth |
 | **Repositorio / Código** | [github.com/tomasabrate/Bites](https://github.com/tomasabrate/Bites) |
 
 ---
+
+## Funcionalidades principales
+
+- Publicación y consulta de catálogos con precios, descuentos, vencimientos, stock e imágenes.
+- Creación y cancelación de reservas con control de disponibilidad.
+- Gestión de ventas, detalles de venta, estados operativos y códigos de retiro.
+- Integración de pagos con Mercado Pago mediante preferencias y webhooks.
+- Gestión de imágenes mediante Cloudinary.
+- Reportes mensuales e históricos por comercio, incluidos productos más vendidos.
+- Exportación de reportes en formato XLSX.
+- Autenticación de usuarios mediante Firebase Auth.
+
+## Ejecución local
+
+El backend y el frontend se ejecutan como proyectos independientes. Antes de iniciar el backend, configura las variables de entorno requeridas, incluida `MYSQL_URL`, según [`Backend/src/config.js`](C:/Users/Tomas%20Abrate/Documents/Repositorios/Bites/Backend/src/config.js).
+
+### Backend
+
+```bash
+cd Backend
+npm install
+npm start
+```
+
+Para desarrollo con recarga automática:
+
+```bash
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd Frontend
+npm install
+npm start
+```
+
+Para ejecutar la versión web:
+
+```bash
+npm run web
+```
 
 ## 1. Contexto Operativo y Flujo de Información
 
@@ -127,11 +168,11 @@ Los servicios del cliente, como [`Frontend/services/productos.js`](C:/Users/Toma
 
 El frontend consulta productos, reservas, ventas y reportes para representar el estado operativo y los indicadores comerciales. [`Frontend/pages/Comercio/Reportes.jsx`](C:/Users/Tomas%20Abrate/Documents/Repositorios/Bites/Frontend/pages/Comercio/Reportes.jsx) consume los agregados de seis meses e histórico por comercio. La generación de archivos puede realizarse en backend o desde el cliente mediante [`Frontend/components/ExportarExcelButton.jsx`](C:/Users/Tomas%20Abrate/Documents/Repositorios/Bites/Frontend/components/ExportarExcelButton.jsx).
 
-## 5. Mis Contribuciones Directas de Ingeniería
+## 5. Alcance técnico de la participación
 
-### Módulos bajo mi autoría
+### Módulos y responsabilidades técnicas
 
-Como integrante del equipo principal, mi participación incluyó commits directos, pair programming, diseño de arquitectura y refactorización colaborativa en:
+La participación en el equipo principal incluyó commits directos, pair programming, diseño de arquitectura y refactorización colaborativa en:
 
 - diseño y evolución del modelo de clientes, comercios, categorías, productos, ventas, detalles, reservas, pagos y reseñas;
 - implementación del acceso MySQL y controladores de productos, ventas, reservas, reportes y pagos;
@@ -141,15 +182,23 @@ Como integrante del equipo principal, mi participación incluyó commits directo
 - consultas agregadas de ventas mensuales, productos más vendidos e histórico;
 - bajas lógicas y actualización de estados operativos.
 
-La atribución contempla módulos commiteados por otros integrantes cuando fueron desarrollados mediante pair programming o refactorización colaborativa.
+El alcance contempla módulos commiteados por otros integrantes cuando fueron desarrollados mediante pair programming o refactorización colaborativa.
 
 ### Decisiones técnicas y trade-offs
 
-- **MySQL frente a una base documental:** prioriza integridad referencial, transacciones y agregaciones; requiere versionar formalmente el esquema.
+- **MySQL frente a una base documental:** prioriza integridad referencial, transacciones y agregaciones.
 - **Precio unitario en `DetallesVenta`:** introduce redundancia controlada para conservar el precio histórico aunque cambie el producto.
-- **Transacciones:** garantizan consistencia entre cabecera, detalle y stock; deben complementarse con bloqueo de filas e idempotencia bajo concurrencia.
-- **Baja lógica:** preserva referencias históricas, pero debe aplicarse de forma consistente frente a eliminaciones físicas.
-- **Reportes calculados bajo demanda:** simplifican la arquitectura y mantienen datos frescos; requieren índices, paginación o materialización si crece el volumen.
-- **Imágenes externas:** reducen el tamaño de MySQL, aunque el almacenamiento como texto delimitado podría evolucionar a una tabla normalizada de imágenes.
+- **Transacciones:** garantizan consistencia entre cabecera, detalle y stock.
+- **Baja lógica:** preserva referencias históricas.
+- **Reportes calculados bajo demanda:** simplifican la arquitectura y mantienen los datos frescos.
+- **Imágenes externas:** reducen el tamaño de MySQL.
 
 El resultado es un backend funcional con persistencia transaccional, integración de pagos, control de inventario y una capa de reportes orientada a la toma de decisiones operativas.
+
+### Limitaciones y evolución prevista
+
+- El esquema no cuenta con migraciones versionadas; su incorporación facilitaría la evolución controlada de la base de datos.
+- El control de stock no utiliza `SELECT ... FOR UPDATE`, actualización condicional ni una estrategia de idempotencia para webhooks.
+- La baja lógica y las eliminaciones físicas coexisten y requieren una aplicación más consistente.
+- Los reportes y listados podrían requerir índices, paginación o materialización si crece el volumen.
+- El almacenamiento de imágenes como texto delimitado podría evolucionar a una tabla normalizada de imágenes.
