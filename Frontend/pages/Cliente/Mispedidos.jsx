@@ -115,6 +115,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#ffeae6', // Fondo salmón claro
+    maxWidth: 800,
+    alignSelf: 'center',
+    width: '100%',
   },
   titulo: {
     fontSize: 28,

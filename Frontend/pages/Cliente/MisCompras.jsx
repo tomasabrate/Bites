@@ -355,6 +355,9 @@ const MisCompras = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
   },
   filtros: {
     flexDirection: "row",

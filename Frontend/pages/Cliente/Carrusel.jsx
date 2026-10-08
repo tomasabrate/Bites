@@ -38,7 +38,9 @@ const Carrusel = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%', // Ocupa todo el ancho
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
     height: 200, // Altura del carrusel
     overflow: 'hidden', // Oculta el desbordamiento
   },

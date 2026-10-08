@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, ScrollView } from "react-native";
+import { SafeAreaView, ScrollView, useWindowDimensions } from "react-native";
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import Carrito from "./Cart";
 const InterfazCliente = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('Inicio');
@@ -33,13 +35,35 @@ const InterfazCliente = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { paddingBottom: isDesktop ? 0 : 60 }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <View style={styles.header}>
         <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
           <Icon name="bars" size={24} color="#FF6347" />
         </TouchableOpacity>
-        <Text style={styles.title}></Text>
+        
+        {isDesktop && (
+          <View style={styles.desktopNav}>
+            <TouchableOpacity style={styles.desktopNavButton} onPress={() => setCurrentScreen("Inicio")}>
+              <Icon name="home" size={20} color="#FF6347" />
+              <Text style={[styles.desktopNavText, currentScreen === 'Inicio' && styles.activeNavText]}>Inicio</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.desktopNavButton} onPress={() => setCurrentScreen("Maps")}>
+              <Icon name="map-marker" size={20} color="#FF6347" />
+              <Text style={[styles.desktopNavText, currentScreen === 'Maps' && styles.activeNavText]}>Mapa</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.desktopNavButton} onPress={() => setCurrentScreen("MisCompras")}>
+              <Icon name="list" size={20} color="#FF6347" />
+              <Text style={[styles.desktopNavText, currentScreen === 'MisCompras' && styles.activeNavText]}>Pedidos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.desktopNavButton} onPress={() => setCurrentScreen("Carrito")}>
+              <Icon name="shopping-cart" size={20} color="#FF6347" />
+              <Text style={[styles.desktopNavText, currentScreen === 'Carrito' && styles.activeNavText]}>Carrito</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View style={{ width: 40 }} /> 
       </View>
 
       {menuVisible && <MenuDesplegable />}
@@ -56,36 +80,38 @@ const InterfazCliente = () => {
         ) : null}
       </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => setCurrentScreen("Inicio")}
-        >
-          <Icon name="home" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Inicio</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => setCurrentScreen("Maps")}
-        >
-          <Icon name="map-marker" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Mapa</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => setCurrentScreen("MisCompras")}
-        >
-          <Icon name="list" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Pedidos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => setCurrentScreen("Carrito")}
-        >
-          <Icon name="shopping-cart" size={24} color="#FF6347" />
-          <Text style={styles.footerButtonText}>Carrito</Text>
-        </TouchableOpacity>
-      </View>
+      {!isDesktop && (
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => setCurrentScreen("Inicio")}
+          >
+            <Icon name="home" size={24} color={currentScreen === 'Inicio' ? "#E53E3E" : "#FF6347"} />
+            <Text style={[styles.footerButtonText, currentScreen === 'Inicio' && styles.activeFooterText]}>Inicio</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => setCurrentScreen("Maps")}
+          >
+            <Icon name="map-marker" size={24} color={currentScreen === 'Maps' ? "#E53E3E" : "#FF6347"} />
+            <Text style={[styles.footerButtonText, currentScreen === 'Maps' && styles.activeFooterText]}>Mapa</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => setCurrentScreen("MisCompras")}
+          >
+            <Icon name="list" size={24} color={currentScreen === 'MisCompras' ? "#E53E3E" : "#FF6347"} />
+            <Text style={[styles.footerButtonText, currentScreen === 'MisCompras' && styles.activeFooterText]}>Pedidos</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => setCurrentScreen("Carrito")}
+          >
+            <Icon name="shopping-cart" size={24} color={currentScreen === 'Carrito' ? "#E53E3E" : "#FF6347"} />
+            <Text style={[styles.footerButtonText, currentScreen === 'Carrito' && styles.activeFooterText]}>Carrito</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -94,7 +120,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    paddingBottom: 60,
   },
   header: {
     flexDirection: "row",
@@ -104,9 +129,34 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
+    backgroundColor: "#FFFFFF",
   },
   menuButton: {
     padding: 8,
+  },
+  desktopNav: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  desktopNavButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  desktopNavText: {
+    marginLeft: 6,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#666666",
+  },
+  activeNavText: {
+    color: "#E53E3E",
+    fontWeight: "bold",
   },
   cartButton: {
     padding: 8,
@@ -117,7 +167,7 @@ const styles = StyleSheet.create({
     color: "#333333",
   },
   content: {
-    flex: 1, // El contenido principal ocupa el espacio restante
+    flex: 1,
   },
   footer: {
     flexDirection: "row",
@@ -139,6 +189,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 12,
     color: "#666666",
+  },
+  activeFooterText: {
+    color: "#E53E3E",
+    fontWeight: "bold",
   },
 });
 

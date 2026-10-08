@@ -36,12 +36,11 @@ export default function Producto(props) {
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     backgroundColor: "#FFF",
     borderRadius: 12,
-    width: width * 0.9, // Cambia a un 90% del ancho de la pantalla para que no ocupe todo el espacio
     marginVertical: 8,
-    marginHorizontal: 16,
-    alignSelf: "center", // Centra el producto en la pantalla
+    marginHorizontal: 8,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 0.1,

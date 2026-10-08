@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import Producto from "./components/Producto";
 import { useNavigation } from "@react-navigation/native";
@@ -44,6 +45,8 @@ const categorias = [
 
 export default function Productos() {
   const navigation = useNavigation();
+  const { width } = useWindowDimensions();
+  const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : width >= 480 ? 2 : 1;
   const [productos, setProductos] = useState([]);
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -116,43 +119,55 @@ export default function Productos() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Locales y productos"
-          placeholderTextColor="#999"
-          value={busqueda}
-          onChangeText={setBusqueda}
-        />
-      </View>
-
-      <View>
-        <View style={styles.priceFilterContainer}>
+      <View style={styles.filtersWrapper}>
+        <View style={styles.searchContainer}>
+          <Icon name="search" size={20} color="#888" style={styles.searchIcon} />
           <TextInput
-            style={styles.priceInput}
-            placeholder="Precio mínimo"
-            placeholderTextColor="#A0AEC0"
-            keyboardType="numeric"
-            value={precioMin}
-            onChangeText={setPrecioMin}
-          />
-          <TextInput
-            style={styles.priceInput}
-            placeholder="Precio máximo"
-            placeholderTextColor="#A0AEC0"
-            keyboardType="numeric"
-            value={precioMax}
-            onChangeText={setPrecioMax}
+            style={styles.searchInput}
+            placeholder="Buscar locales o productos..."
+            placeholderTextColor="#888"
+            value={busqueda}
+            onChangeText={setBusqueda}
           />
         </View>
 
+        <View style={styles.priceFilterContainer}>
+          <View style={styles.priceInputWrapper}>
+            <Text style={styles.priceCurrency}>$</Text>
+            <TextInput
+              style={styles.priceInputInner}
+              placeholder="Min"
+              placeholderTextColor="#A0AEC0"
+              keyboardType="numeric"
+              value={precioMin}
+              onChangeText={setPrecioMin}
+            />
+          </View>
+          <Text style={styles.priceSeparator}>—</Text>
+          <View style={styles.priceInputWrapper}>
+            <Text style={styles.priceCurrency}>$</Text>
+            <TextInput
+              style={styles.priceInputInner}
+              placeholder="Max"
+              placeholderTextColor="#A0AEC0"
+              keyboardType="numeric"
+              value={precioMax}
+              onChangeText={setPrecioMax}
+            />
+          </View>
+        </View>
+      </View>
+
+      <View>
         <FlatList
           data={categorias}
           keyExtractor={(item) => item.key.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriaContainer}
+          contentContainerStyle={[
+            styles.categoriaContainer,
+            width >= 768 && { flexGrow: 1, justifyContent: "center" }
+          ]}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -181,6 +196,8 @@ export default function Productos() {
         <FlatList
           style={styles.flatList}
           data={productosFiltrados}
+          key={numColumns}
+          numColumns={numColumns}
           keyExtractor={(item) => item.id_producto.toString()}
           renderItem={({ item }) => (
             <Producto
@@ -206,17 +223,28 @@ export default function Productos() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "#FFF5F5",
     paddingTop: 20,
+  },
+  filtersWrapper: {
+    maxWidth: 800,
+    width: "100%",
+    alignSelf: "center",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 16,
     marginVertical: 12,
-    paddingHorizontal: 12,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   searchIcon: {
     marginRight: 8,
@@ -230,19 +258,42 @@ const styles = StyleSheet.create({
   priceFilterContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 16,
   },
-  priceInput: {
+  priceInputWrapper: {
     flex: 1,
-    marginHorizontal: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
     borderWidth: 1,
-    borderColor: "#E53E3E",
-    borderRadius: 8,
-    padding: 12,
+    borderColor: "#E2E8F0",
+  },
+  priceCurrency: {
+    fontSize: 16,
+    color: "#A0AEC0",
+    marginRight: 4,
+    fontWeight: "bold",
+  },
+  priceInputInner: {
+    flex: 1,
+    paddingVertical: 10,
     fontSize: 16,
     color: "#4A5568",
-    backgroundColor: "#FFF",
+  },
+  priceSeparator: {
+    marginHorizontal: 12,
+    fontSize: 18,
+    color: "#A0AEC0",
+    fontWeight: "bold",
   },
   categoriaContainer: {
     paddingHorizontal: 16,
@@ -252,11 +303,12 @@ const styles = StyleSheet.create({
   categoriaButton: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderRadius: 12,
     backgroundColor: "#FED7D7",
-    marginRight: 12,
-    width: 80,
+    marginRight: 10,
+    minWidth: 80,
     height: 100,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

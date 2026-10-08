@@ -1,16 +1,5 @@
 import { pool } from "../database/connection.js";
 
-//Importar cloudinary
-import cloudinary from "cloudinary";
-
-//Estas claves deberian estar en el archivo config.js
-// Configurar Cloudinary
-cloudinary.config({
-  cloud_name: "dturrtxzx",
-  api_key: "337961572316383",
-  api_secret: "kp7PKcTyqJIDYY5pCYbPhi9p_Vk",
-});
-
 export const getProductos = async (req, res) => {
   try {
     // const [result] = await pool.query("SELECT * FROM Productos p JOIN where p.cantidad > 0");//para que solo se devuelvan productos con cantidad > 0
@@ -82,7 +71,7 @@ export const postProducto = async (req, res) => {
     tipo,
     cantidad,
     activo,
-    imagenes, // URLs de cloudinary
+    imagenes, // Base64 strings or URLs now
   } = req.body;
 
   console.log("Datos del producto:", req.body);
@@ -103,22 +92,9 @@ export const postProducto = async (req, res) => {
     // Si no es ni un array ni una cadena, usa null
     imagenesFinales = null;
   }
-  console.log("Imagenes recibidas:", imagenes);
-  console.log("Imagenes final procesadas:", imagenesFinales);
+  console.log("Imagenes final procesadas (listas para DB):", imagenesFinales ? "Presente" : "Nulo");
 
   try {
-    // Subir imágenes a Cloudinary
-    let imagenesUrls = [];
-    if (imagenes && Array.isArray(imagenes)) {
-      const uploadPromises = imagenes.map(async (imagen) => {
-        const result = await cloudinary.v2.uploader.upload(imagen, {
-          folder: "BitesImages",
-        });
-        return result.secure_url; // Guardar la URL segura
-      });
-      imagenesUrls = await Promise.all(uploadPromises);
-    }
-
     const [rows] = await pool.query(
       "INSERT INTO Productos (uid_comercio, id_categoria, nombre, descripcion, precio, descuento, fecha_produccion, fecha_vencimiento, tipo, cantidad, activo, imagenes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [

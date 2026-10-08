@@ -17,6 +17,8 @@ import imagenDefault from "./utilities/imagenDefault.utilities";
 import CalcularDescuento from "./utilities/calcularDescuento.utilities";
 import BotonGenerico from "../../components/BotonGenerico";
 
+import BotonVolver from "../../components/BotonVolver";
+
 export default function DetalleProducto({ navigation, route }) {
   const producto = route.params.producto;
   const { agregarAlCarrito, carrito } = useCart();
@@ -38,6 +40,9 @@ export default function DetalleProducto({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.floatingBackButton}>
+        <BotonVolver />
+      </View>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
 
@@ -107,12 +112,6 @@ export default function DetalleProducto({ navigation, route }) {
 
       <View style={styles.buttonContainer}>
         <BotonGenerico
-          title="Volver"
-          onPress={() => navigation.goBack()}
-          colorInicial="#f44336"
-          colorPressed="#d32f2f"
-        />
-        <BotonGenerico
           title="Añadir al Carrito"
           onPress={handleAgregarAlCarrito}
           colorInicial="#4CAF50"
@@ -128,6 +127,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F0F8FF",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    maxWidth: 800,
+    width: "100%",
+    alignSelf: "center",
   },
   container: {
     flex: 1,
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: 200,
+    height: 350,
     borderRadius: 12,
     overflow: "hidden",
     marginBottom: 16,
@@ -239,5 +241,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 16,
+  },
+  floatingBackButton: {
+    position: 'absolute',
+    top: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 16,
+    left: 16,
+    zIndex: 10,
   },
 });

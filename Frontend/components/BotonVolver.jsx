@@ -12,7 +12,7 @@ export default function BotonVolver() {
                 style={styles.backButton}
                 onPress={() => navigation.goBack()}
             >
-                <Icon name="arrow-left" size={24} color="white" />
+                <Icon name="arrow-left" size={20} color="#333333" />
             </TouchableOpacity>
         </View>
     );
@@ -28,8 +28,15 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        backgroundColor: "#ffffff",
         justifyContent: "center",
         alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: "#f0f0f0"
     },
 });

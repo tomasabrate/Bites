@@ -286,6 +286,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+    maxWidth: 800,
+    width: "100%",
+    alignSelf: "center",
   },
   header: {
     backgroundColor: "#ff6347",

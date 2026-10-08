@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, useWindowDimensions } from 'react-native';
 import { getComercioById } from '../../services/comercios';
 import LoadingScreen from '../../components/LoadingScreen';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +12,8 @@ import { FontAwesome } from "@expo/vector-icons";
 
 const InfoPerfilComercio = ({ route }) => {
     const navigation = useNavigation();
+    const { width } = useWindowDimensions();
+    const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : width >= 480 ? 2 : 1;
     const uid_comercio = route.params.uid_comercio;
 
     const [comercio, setComercio] = useState(null);
@@ -71,9 +73,11 @@ const InfoPerfilComercio = ({ route }) => {
 
             {/* 🧭 Coordenadas visibles debajo del Header */}
             {coordenadas && (
-                <Text style={styles.coordenadasText}>
-                    Coordenadas: {coordenadas.lat.toFixed(4)}, {coordenadas.lng.toFixed(4)}
-                </Text>
+                <View style={{ maxWidth: 1200, width: '100%', alignSelf: 'center' }}>
+                  <Text style={styles.coordenadasText}>
+                      Coordenadas: {coordenadas.lat.toFixed(4)}, {coordenadas.lng.toFixed(4)}
+                  </Text>
+                </View>
             )}
 
             {loadingProductos ? (
@@ -81,41 +85,45 @@ const InfoPerfilComercio = ({ route }) => {
             ) : error ? (
                 <Text style={styles.errorText}>{error}</Text>
             ) : (
-                <FlatList
-                    contentContainerStyle={{ paddingBottom: 20 }}
-                    style={styles.flatList}
-                    data={productos}
-                    keyExtractor={(item) => item.id_producto.toString()}
-                    renderItem={({ item }) => (
-                        <Producto
-                            imagenes={item.imagenes}
-                            id_producto={item.id_producto}
-                            nombre={item.nombre}
-                            precio={item.precio}
-                            descuento={item.descuento}
-                            nombre_comercio={item.nombre_comercio}
-                            foto_perfil={item.foto_perfil}
-                            uid_comercio={item.uid_comercio}
-                            onPress={() =>
-                                navigation.navigate("DetalleProducto", { producto: item })
-                            }
-                        />
-                    )}
-                    showsVerticalScrollIndicator={false}
-                />
+                <View style={{ flex: 1, maxWidth: 1200, width: '100%', alignSelf: 'center' }}>
+                  <FlatList
+                      contentContainerStyle={{ paddingBottom: 20 }}
+                      style={styles.flatList}
+                      data={productos}
+                      key={numColumns}
+                      numColumns={numColumns}
+                      keyExtractor={(item) => item.id_producto.toString()}
+                      renderItem={({ item }) => (
+                          <Producto
+                              imagenes={item.imagenes}
+                              id_producto={item.id_producto}
+                              nombre={item.nombre}
+                              precio={item.precio}
+                              descuento={item.descuento}
+                              nombre_comercio={item.nombre_comercio}
+                              foto_perfil={item.foto_perfil}
+                              uid_comercio={item.uid_comercio}
+                              onPress={() =>
+                                  navigation.navigate("DetalleProducto", { producto: item })
+                              }
+                          />
+                      )}
+                      showsVerticalScrollIndicator={false}
+                  />
+                </View>
             )}
 
             <Modal
                 style={styles.modalContainer}
                 transparent={true}
-                animationType="slide"
+                animationType="fade"
                 visible={modalResenaVisible}
                 onRequestClose={openCloseModal}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <View style={styles.cerrarModal}>
                             <TouchableOpacity onPress={openCloseModal}>
-                                <FontAwesome name="close" size={20} color={'black'} />
+                                <FontAwesome name="close" size={24} color={'#555'} />
                             </TouchableOpacity>
                         </View>
                         <ListaResenas uid_comercio={uid_comercio} />
@@ -141,10 +149,11 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '90%',
+        maxWidth: 600,
         maxHeight: '80%',
         backgroundColor: 'white',
         padding: 20,
-        borderRadius: 10,
+        borderRadius: 12,
         elevation: 10,
     },
     flatList: {
